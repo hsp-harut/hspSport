@@ -1,0 +1,115 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:sec="http://www.springframework.org/security"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="subheader">
+        Role Management
+    </ui:define>
+
+	<ui:define name="content">
+
+		<div class="Container100 ui-fluid">
+			<div class="ContainerIndent">
+				<div class="Card ShadowEffect">
+					<h:form id="roleListForm">
+					<p:messages showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+					<h2 class="BigTopic">Roles 
+						<sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_ROLE">
+							<p:commandButton update=":roleUpdateForm" 
+                        		value="Create Role"
+                        		style="width:auto" icon="fa fa-plus Fs16 White" action="#{roleAdminController.newRole}"/>
+                        </sec:ifAnyGranted>
+                    </h2>
+					<p:dataTable var="role" value="#{roleAdminController.roles}" sortMode="single"
+						reflow="true" lazy="true" paginator="true" rows="10" style="" rowKey="#{role.id}" paginatorAlwaysVisible="false"
+						paginatorPosition="bottom" selectionMode="single" selection="#{roleAdminController.selectedRole}"
+						paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+						rowsPerPageTemplate="10,25,50" id="roles">
+						<f:facet name="header">
+                            Roles
+                        </f:facet>
+                        <p:ajax event="rowSelect" listener="#{roleAdminController.onRowSelect}" update=":roleUpdateForm:roleContainer" />
+        				<p:ajax event="rowUnselect" listener="#{roleAdminController.onRowUnselect}" update=":roleUpdateForm:roleContainer" />
+						<p:column headerText="Name" sortBy="#{role.name}" sortable="true">
+							<h:outputText value="#{role.name}" />
+						</p:column>
+						
+						<p:column headerText="Country">
+							<h:outputText value="#{role.country.name}" />
+						</p:column>
+
+						<p:column headerText="No of Assigned Users">
+							<h:outputText value="#{role.users.size()}" />
+						</p:column>
+						
+						<p:column headerText="Number of Assigned Permissions">
+							<h:outputText value="#{role.permissions.size()}" />
+						</p:column>
+						
+						<p:column headerText="Actions" style="text-align: center">
+							<sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_ROLE">
+                    		<p:commandButton icon="fa fa-trash Fs16 White" rendered="#{role.users.size() == 0}"
+                        		title="Delete this role"
+                        		style="width:auto"
+                        		styleClass="RedButton"
+                        		actionListener="#{roleAdminController.removeRole(role)}"/>
+                        	</sec:ifAnyGranted>
+                		</p:column>
+					</p:dataTable>
+					</h:form>
+				</div>
+			</div>
+		</div>
+		
+	    <div class="Container100 ui-fluid" id="rootRoleInputContainer">
+            <div class="ContainerIndent">
+                <div class="Card ShadowEffect">
+                	<h:form id="roleUpdateForm">
+                	<p:messages showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+                    <h2 class="BigTopic">Role Details</h2>
+                    <p:panelGrid id="roleContainer" columns="3" columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
+                        <p:outputLabel for="name" value="Role Name"/>
+                        <p:inputText id="name" value="#{roleAdminController.selectedRole.name}" required="true" requiredMessage="Role Name should be filled." validator="#{roleAdminController.validateName}" maxlength="150"/>
+                        <p:message for="name" />
+                        
+                        <p:outputLabel for="countries" value="Country"/>
+                        <p:selectOneMenu id="countries" value="#{roleAdminController.selectedRole.country}" filter="true" filterMatchMode="startsWith" 
+                        	required="true" requiredMessage="Country should be selected" converter="omnifaces.SelectItemsConverter">
+                        	<f:selectItem itemLabel="Select One" itemValue="" />
+                            <f:selectItems value="#{roleAdminController.countries}" var="country" itemLabel="#{country.name}" itemValue="#{country}"/>
+                        </p:selectOneMenu>
+                        <p:message for="countries" />
+                        
+                        <p:outputLabel for="permissionList" value="Permissions"/>
+                        <p:pickList id="permissionList" value="#{roleAdminController.permissions}" var="permission" itemLabel="#{permission.name}" itemValue="#{permission}"
+                                 showSourceFilter="true" showTargetFilter="true" responsive="true" style="max-width:900px;" filterMatchMode="contains" converter="permissionConverter">
+                        	<f:facet name="sourceCaption">All Permissions</f:facet>
+                        	<f:facet name="targetCaption">Role Permissions</f:facet>
+                    	</p:pickList>
+                    	<p:message for="permissionList" />
+                    	
+                    	<p:outputLabel for="userList" value="Users"/>
+                        <p:pickList id="userList" value="#{roleAdminController.users}" var="user" itemLabel="#{user.fullName} #{'('.concat(user.roles.size()).concat(')')}" itemValue="#{user}"
+                                showSourceFilter="true" showTargetFilter="true" responsive="true" style="max-width:900px;" filterMatchMode="contains" converter="userConverter">
+                        	<f:facet name="sourceCaption">All Users</f:facet>
+                        	<f:facet name="targetCaption">Assigned Users</f:facet>
+                    	</p:pickList>
+                    	<p:message for="userList" />
+                    	
+                    	<sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_ROLE">
+                        <p:commandButton update="roleContainer :roleListForm" styleClass="#{roleAdminController.selectedRole.id != null ? 'GreenButton' : ''}" 
+                        	value="#{roleAdminController.selectedRole.id != null ? 'Update Role' : 'Create Role'}"
+                        	style="width:auto" icon="#{roleAdminController.selectedRole.id != null ? 'fa fa-pencil' : 'fa fa-plus'} Fs16 White" action="#{roleAdminController.save}"/>
+                        </sec:ifAnyGranted>
+                    </p:panelGrid>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+
+	</ui:define>
+
+</ui:composition>

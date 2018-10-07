@@ -1,0 +1,74 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:sec="http://www.springframework.org/security"
+	template="/WEB-INF/template.xhtml">
+
+<ui:define name="subheader">
+	<h:outputLink value="../exam/examsEnabled" styleClass="BoldGray">
+		<h:outputText value=" #{bundle['exams']}"/>
+	</h:outputLink>
+</ui:define>
+
+<ui:define name="content">
+
+<f:loadBundle id="bundle" var="bundle" basename="#{examController.currentBundle}"/>
+
+<div class="Container100 ui-fluid">
+	<div class="ContainerIndent">
+		<div class="Card ShadowEffect">
+		
+			<p:messages id="infoErrorMessages" showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+			
+			<h2 class="BigTopic">					
+				<h:outputText value="#{bundle['exams']}"/>
+			</h2>
+			
+			<p:dataTable id="examList" value="#{examController.exams}" var="exam"
+				reflow="true" lazy="true" paginator="true" rows="10" rowKey="#{exam.id}" 
+				paginatorPosition="bottom" selectionMode="single" paginatorAlwaysVisible="false"
+				paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+				rowsPerPageTemplate="10,25,50"
+				emptyMessage="#{bundle['noExamFound']}">
+				
+				<p:column headerText="#{bundle['name']}">
+					<h:outputText value="#{exam.name}" />
+				</p:column>
+
+				<p:column headerText="#{bundle['description']}">
+					<h:outputText value="#{exam.description}" />
+				</p:column>
+				
+				<p:column headerText="#{bundle['questions']}">
+					<h:outputText value="#{exam.questionsCount}" />
+				</p:column>
+				
+				<p:column headerText="#{bundle['points']}">
+					<h:outputText value="#{exam.points}" />
+				</p:column>
+				
+				<p:column headerText="#{bundle['durationMinutes']}">
+					<h:outputText value="#{exam.minutes}" />
+				</p:column>
+				
+				<p:column headerText="#{bundle['actions']}" style="text-align: center;">
+              		<p:commandButton action="#{examController.onPassExam(exam)}"
+              						 process="@this"
+              						 update="infoErrorMessages"
+		                   			 icon="fa fa-play"
+		                       		 title="#{bundle['passExamTitle']}"			                       		 
+		                       		 styleClass="GreenButton"/>		        			        	
+       			</p:column>
+			</p:dataTable>
+			
+		</div>
+	</div>
+</div>
+
+			   
+
+</ui:define>
+
+</ui:composition>

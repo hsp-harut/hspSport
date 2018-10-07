@@ -1,0 +1,31 @@
+dependencies:
+  pre:
+    - sudo debconf-set-selections <<< "postfix postfix/mailname string chronograph.am"
+    - sudo debconf-set-selections <<< "postfix postfix/main_mailer_type string 'Internet Site'"
+    - sudo apt-get install -y postfix
+    - sudo add-apt-repository -y 'deb http://repo.mysql.com/apt/ubuntu/ precise mysql-5.7'
+    - sudo apt-get update; sudo DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-server-5.7
+    - sudo mysql_upgrade --force
+    - sudo echo 'ALTER TABLE mysql.event MODIFY modified timestamp DEFAULT CURRENT_TIMESTAMP;' | mysql -u ubuntu
+    - sudo echo 'ALTER TABLE mysql.proc MODIFY modified timestamp DEFAULT CURRENT_TIMESTAMP;' | mysql -u ubuntu
+    - sudo mysqlcheck --all-databases --check-upgrade --auto-repair
+    - sudo mysqlcheck --all-databases --repair
+    - sudo mysqlcheck --all-databases --check
+    - sudo service mysql restart
+machine:
+  environment: 
+    myhost: circleci
+  services: 
+    - mysql
+  java:
+    version: oraclejdk8
+test:
+  override:
+    - mvn test -Dmyhost=circleci
+  post:
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
+    - find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+    - sudo pip install codecov && codecov --token=9871a212-b3b3-43f1-97eb-46cd4c19c43a
+notify:
+  webhooks:
+    - url: https://webhooks.gitter.im/e/ad789096519ab368c46c

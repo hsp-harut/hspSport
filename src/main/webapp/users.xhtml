@@ -1,0 +1,152 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:sec="http://www.springframework.org/security"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="subheader">
+        Օգտվողներ
+    </ui:define>
+
+	<ui:define name="content">
+	
+	<f:loadBundle id="bundle" var="bundle" basename="#{userController.currentBundle}"/>
+
+		<div class="Container100 ui-fluid">
+			<div class="ContainerIndent">
+				<div class="Card ShadowEffect">
+					<h:form id="userListForm">
+					
+					<p:messages showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+					
+					<h2 class="BigTopic"> 
+						<h:outputText value="Օգտվողներ"/>
+                    </h2>
+                    
+                    <p:toolbar>
+					
+		            	<f:facet name="right">
+		            		<p:commandButton update=":userUpdateForm" 
+                        		value="Նոր օգտվող"
+                        		style="width:auto" icon="fa fa-plus Fs16 White" action="#{userController.newUser}"/>
+		            	</f:facet>
+		            </p:toolbar>
+            
+					<p:dataTable var="user" value="#{userController.users}" sortMode="single"
+						reflow="true" lazy="true" paginator="true" rows="10" style="" rowKey="#{user.id}" paginatorAlwaysVisible="false"
+						paginatorPosition="bottom" selectionMode="single" selection="#{userController.selectedUser}"
+						paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+						rowsPerPageTemplate="10,25,50" id="users">
+						
+                        <p:ajax event="rowSelect" listener="#{userController.onRowSelect}" update=":userUpdateForm" />
+        				<p:ajax event="rowUnselect" listener="#{userController.onRowUnselect}" update=":userUpdateForm" />
+						<p:column headerText="Անուն" sortBy="#{user.firstName}" sortable="true">
+							<h:outputText value="#{user.firstName}" />
+						</p:column>
+						
+						<p:column headerText="Ազգանուն" sortBy="#{user.lastName}" sortable="true">
+							<h:outputText value="#{user.lastName}" />
+						</p:column>
+						
+						<p:column headerText="Էլ․ հասցե" sortBy="#{user.email}" sortable="true" style="text-align: center">
+							<h:outputText value="#{user.email}" />
+						</p:column>
+						
+						<p:column headerText="Դերերի քանակ">
+							<h:outputText value="#{user.roles.size()}" />
+						</p:column>
+						
+						<p:column headerText="#{bundle['contractActions']}" style="text-align: center">
+							<sec:ifAnyGranted roles="ROLE_ADMIN">
+                    		<p:commandButton icon="fa fa-close Fs16 White" 
+                    			rendered="#{!user.disabled}"
+                        		title="Disable this user"
+                        		style="width:auto"
+                        		update="userListForm :userUpdateForm"
+                        		styleClass="RedButton"
+                        		actionListener="#{userController.disableUser(user)}"/>
+                        	<p:commandButton icon="fa fa-check Fs16 White" 
+                        		rendered="#{user.disabled}"
+                        		title="Enable this user"
+                        		style="width:auto"
+                        		update="userListForm :userUpdateForm"
+                        		actionListener="#{userController.enableUser(user)}"/>
+                        	<p:commandButton icon="fa fa-envelope-o Fs16 White"
+                        		rendered="#{user.password == null}"
+                        		title="Resend the activation email"
+                        		style="width:auto"
+                        		update="userListForm"
+                        		actionListener="#{userController.sendActivationUser(user)}"/>
+                        	</sec:ifAnyGranted>
+                		</p:column>
+					</p:dataTable>
+					</h:form>
+				</div>
+			</div>
+		</div>
+		
+	    <div class="Container100 ui-fluid" id="rootUserInputContainer">
+            <div class="ContainerIndent">
+                <div class="Card ShadowEffect">
+                	<h:form id="userUpdateForm">
+                	<p:messages showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+                    <h2 class="BigTopic">Օտվողի տվյալներ 
+	                    <p:commandButton update=":userUpdateForm" immediate="true" rendered="#{userController.selectedUser.id != null and !userController.selectedUser.disabled}"
+	                        		value="#{userController.editPass ? 'Թաքցնել գաղտնաբառը' : 'Փոխել գաղտնաբառը'}"
+	                        		style="width:auto" icon="fa #{userController.editPass ? 'fa-lock' : 'fa-unlock-alt'} Fs16 White" action="#{userController.editMode}"/>
+               		</h2>
+                        		
+					<div class="EmptyBox20"></div>
+					                        		
+                    <p:panelGrid id="userContainer" columns="3" columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
+                        <p:outputLabel for="email" value="Էլ․ հասցե"/>
+                        <p:inputText id="email" value="#{userController.selectedUser.email}" required="true" validatorMessage="Invalid email format" requiredMessage="Email should be filled." validator="#{userController.validateEmail}" maxlength="150">
+                        	<f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+						</p:inputText>
+                        <p:message for="email" />
+                        
+                        <p:outputLabel for="firstName" value="Անուն"/>
+                        <p:inputText id="firstName" value="#{userController.selectedUser.firstName}" required="true" requiredMessage="Firstname should be filled." maxlength="100"/>
+                        <p:message for="firstName" />
+                        
+                        <p:outputLabel for="lastName" value="Ազգանուն"/>
+                        <p:inputText id="lastName" value="#{userController.selectedUser.lastName}" required="true" requiredMessage="Lastname should be filled." maxlength="100"/>
+                        <p:message for="lastName" />
+                        						
+                        <p:outputLabel for="pass1" value="Գաղտնաբառ" rendered="#{userController.selectedUser.id != null and userController.editPass}"/>
+                        <p:password id="pass1" placeholder="Password"  rendered="#{userController.selectedUser.id != null and userController.editPass}"
+        	            		value="#{userController.selectedUser.password}" match="pass2"
+        	            		styleClass="Wid80 TexAlCenter Fs18"  feedback="true"
+        	            		requiredMessage="Password should be filled"
+        	            		validatorMessage="Passwords doesnt match"/>
+        	            <p:message for="pass1" rendered="#{userController.selectedUser.id != null and userController.editPass}"/>
+                        
+                        <p:outputLabel for="pass2" value="Կրկնել գաղտնաբառ" rendered="#{userController.selectedUser.id != null and userController.editPass}"/>
+                        <p:password id="pass2" placeholder="Re-enter Password" value="#{userController.selectedUser.password}"
+                	    		 styleClass="Wid80 TexAlCenter Fs18" rendered="#{userController.selectedUser.id != null and userController.editPass}"
+                	    		 requiredMessage="Re-Password should be filled"/>
+                	    <p:message for="pass2" rendered="#{userController.selectedUser.id != null and userController.editPass}"/>
+                        
+                        <p:outputLabel for="roleList" value="Դերեր"/>
+                        <p:pickList id="roleList" value="#{userController.roles}" var="role" itemLabel="#{role.name}" itemValue="#{role}"
+                                 showSourceFilter="true" showTargetFilter="true" responsive="true" style="max-width:900px;" filterMatchMode="contains" converter="roleConverter">
+                        	<f:facet name="sourceCaption">Ամբողջը</f:facet>
+                        	<f:facet name="targetCaption">Օգտվողինը</f:facet>
+                    	</p:pickList>
+                    	<p:message for="roleList" />
+                    	
+                    	<sec:ifAnyGranted roles="ROLE_ADMIN">
+                        <p:commandButton update="userContainer :userListForm :userUpdateForm" styleClass="#{userController.selectedUser.id != null ? 'GreenButton' : ''}" 
+                        	value="#{userController.selectedUser.id != null ? 'Թարմացնել' : 'Ավելացնել'}"
+                        	style="width:auto" icon="#{userController.selectedUser.id != null ? 'fa fa-pencil' : 'fa fa-plus'} Fs16 White" action="#{userController.save}"/>
+                        </sec:ifAnyGranted>
+                    </p:panelGrid>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+
+	</ui:define>
+
+</ui:composition>

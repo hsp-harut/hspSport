@@ -1,0 +1,738 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:of="http://omnifaces.org/functions"
+                xmlns:sec="http://www.springframework.org/security"
+                template="/WEB-INF/template.xhtml">
+                
+ <ui:define name="head">
+        <script type="text/javascript">
+            // Blue : #3E98D3  |  Red : #EF3F61  |  Green : #2BB673  |  Orange : #F15732
+            function stockPie() {
+                this.cfg.shadow = true;
+                this.cfg.title = '';
+                this.cfg.seriesColors = ['#3E98D3', '#EF3F61', '#2BB673', '#F15732'];
+                this.cfg.grid = {
+                    background: '#ffffff',
+                    borderColor: '#ffffff',
+                    gridLineColor: '#F5F5F5',
+                    shadow: false
+                };
+                this.cfg.axesDefaults = {
+                    rendererOptions: {
+                        textColor: '#666F77',
+                    }
+                };
+                this.cfg.seriesDefaults = {
+                    renderer: $.jqplot.PieRenderer,
+                    shadow: false,
+                    lineWidth: 1,
+                    markerOptions: {
+                        shadow: false,
+                        size: 7,
+                        style: 'circle'
+                    }
+                }
+            }
+
+        </script>
+        <style type="text/css">
+            .jqplot-target, .jqplot-axis {
+                color: #546E7A;
+            }
+        </style>
+    </ui:define>
+
+<ui:define name="subheader">
+	<a class="BoldGray" href="#{request.contextPath}/dashboard"> Dashboard</a>
+</ui:define>
+    
+<ui:define name="content">
+    
+<f:loadBundle id="bundle" var="bundle" basename="#{dashBoardController.currentBundle}"/>
+
+<h:form id="pollForm" rendered="#{sec:ifAnyGranted('ROLE_ADMIN,READ_PROCESS,EDIT_PROCESS')}">
+<p:poll interval="3600" 
+	listener="#{dashBoardController.ajaxReload}" autoStart="true" update=":processForm:processStepsTable"/>
+    
+</h:form>
+<!-- Left Column -->
+<h:panelGroup layout="block" styleClass="#{sec:ifAnyGranted('ROLE_ADMIN,READ_STOCK,EDIT_STOCK,VIEW_TASKS_OTHERS') ? 'Container70' : 'Container100'} Responsive100" id="dashboardMainLeftArea">
+	
+	<h:form id="processForm">
+	
+	<sec:ifAnyGranted roles="ROLE_ADMIN,READ_PROCESS,EDIT_PROCESS"> 	     
+	<h:panelGroup id="stepPanel" layout="block" class="Container100 ui-fluid" rendered="#{dashBoardController.selectedDashboardElements.contains('showNewTasks')}">
+				  
+        <h:panelGroup layout="block" class="ContainerIndent">
+      		<div class="Card ShadowEffect HeiAutoOnMobile">      			      			
+      		
+          		<h2 class="CardTopic TexAlCenter">
+             		<h:outputText value="#{bundle['newTasks']}"/>
+          		</h2>
+	            <div class="SeparatorFull"></div>
+               	<div class="EmptyBox20"></div>
+               	
+               	<sec:ifAnyGranted roles="ROLE_ADMIN,VIEW_TASKS_OTHERS">
+               	<p:panelGrid columns="2" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
+					
+					<p:outputLabel for="assignee" value="#{bundle['assignee']}"/>
+
+             		<p:selectOneMenu id="assignee" value="#{dashBoardController.stepAssignedUserId}">             			
+                        <f:selectItems value="#{dashBoardController.users}"/>
+                        
+                        <p:ajax event="change" listener="#{dashBoardController.onSearchTasksByUser}" update="processStepList" process="assignee"/>
+                    </p:selectOneMenu>
+                    	               		               	
+      			</p:panelGrid>
+      			</sec:ifAnyGranted>
+      			
+      			<h:panelGroup id="processStepList" layout="block" style="padding-left: 10px; padding-right: 10px;">
+      			
+      				<p:dataTable value="#{dashBoardController.processSteps}" var="processStep" styleClass="myTable"
+						paginator="true" rows="5" rowKey="#{processStep.id}"				
+						paginatorPosition="bottom" paginatorAlwaysVisible="false"
+						paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+						rowsPerPageTemplate="5,10,25" id="processStepsTable"
+						emptyMessage="#{bundle['noProcessFound']}"
+						rowStyleClass="#{processStep.overdued ? 'overduedStepTableRow' : null}">
+						
+						<p:column style="width:16px">
+            				<p:rowToggler />
+        				</p:column>
+						
+						<p:column headerText="#{bundle['task']}">
+							<h:outputText value="#{processStep.name.concat(' (').concat(processStep.processName).concat(')')}" style="#{processStep.overdued ? 'color: white;' : ''}"/>
+						</p:column>
+						
+						<p:column headerText="Due Date" style="text-align:center; white-space: nowrap;">
+							<h:outputText rendered="#{processStep.estimatedTill != null}" value="#{processStep.estimatedTill}" converter="chronoDateTimeConverter" style="#{processStep.overdued ? 'color: white;' : ''}"/>
+							<h:outputText rendered="#{processStep.estimatedTill == null}" value="No Estimation" style="#{processStep.overdued ? 'color: white;' : ''}"/>
+						</p:column>
+						
+						<p:column headerText="Overdue Days" style="text-align:center; white-space: nowrap;">
+							<h:outputText value="#{(processStep.estimatedTill == null or of:daysBetween(processStep.estimatedTill, now) le 0) ? 'none' : of:daysBetween(processStep.estimatedTill, now) }" style="#{processStep.overdued ? 'color: white;' : ''}"/>
+						</p:column>
+						
+						<p:column headerText="#{bundle['actions']}" style="text-align: center;">
+							<p:commandButton action="#{dashBoardController.onMarkProcess(processStep.id,'done')}"
+		                 					 process="@this"
+				                   			 icon="fa fa-check Fs16 White"
+				                   			 styleClass="GreenButton"
+				                       		 title="Mark Done"
+				                       		 rendered="#{processStep.userAssignedId == sessionScope['SPRING_SECURITY_CONTEXT'].authentication.principal.id or sec:ifAllGranted('ROLE_ADMIN')}">
+				                       		 <p:ajax event="dialogReturn" listener="#{dashBoardController.onReloadProcessSteps}" update="processForm" />
+				            </p:commandButton>
+				            <p:commandButton action="#{dashBoardController.onMarkProcess(processStep.id,'failed')}"
+		                 					 process="@this"
+				                   			 icon="fa fa-times Fs16 White"
+				                   			 styleClass="RedButton"
+				                       		 title="Mark Failed"
+				                       		 onclick="if (!confirm('#{bundle['terminateProcessStepConfirm']}')) return false;" 	
+				                       		 rendered="#{(processStep.userAssignedId == sessionScope['SPRING_SECURITY_CONTEXT'].authentication.principal.id and processStep.assigneCanTerminate) or sec:ifAllGranted('ROLE_ADMIN')}">
+				                       		 <p:ajax event="dialogReturn" listener="#{dashBoardController.onReloadProcessSteps}" update="processForm" />
+				            </p:commandButton>
+		              		<p:commandButton action="#{dashBoardController.onSeeProgress(processStep.processId, processStep.id)}"
+		                 					 process="@this"
+				                   			 icon="fa fa-tasks"
+				                       		 title="#{bundle['seeProgress']}"/>
+		       			</p:column>
+		       			<p:rowExpansion>
+		       				<div class="Container">
+		       					<div class="Fleft Container50 MarAuto Responsive">
+		       						<p:repeat var="note" value="#{dashBoardController.getProcessNotes(processStep.processId)}" >
+            							<p:panelGrid columns="1" style="width:100%" layout="grid" columnClasses="ui-grid-col-12" styleClass="ui-panelgrid-blank">
+            								<p:row>
+			 									<h:outputText styleClass="FontBold" value="#{note.author}: "/>
+			 									<h:outputText styleClass="FontNormal" value="#{note.note}" escape="false"/>
+			 								</p:row>
+				            			</p:panelGrid>
+				            		</p:repeat>
+					            </div>
+					            <div class="Fleft Container50 MarAuto Responsive">
+		       						<p:repeat var="file" value="#{dashBoardController.getProcessFiles(processStep.processId)}" >
+            							<p:panelGrid columns="1" style="width:100%" layout="grid" columnClasses="ui-grid-col-12" styleClass="ui-panelgrid-blank">
+            								<p:row styleClass="Fright">
+			 									<h:outputText value="#{file.name}"/>
+			 									<p:commandButton ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" style="width:auto;" styleClass="Fright"
+							                     		actionListener="#{file.onDownload}" icon="fa fa-download">
+									              <p:fileDownload value="#{file.content}"/>
+											    </p:commandButton>
+			 								</p:row>
+				            			</p:panelGrid>
+				            		</p:repeat>
+					            </div>
+				            </div>
+        				</p:rowExpansion>
+					</p:dataTable>										      				
+      			</h:panelGroup>
+	               
+     		</div>
+  		</h:panelGroup>
+	</h:panelGroup>
+    </sec:ifAnyGranted>
+
+
+
+
+
+
+
+        
+ 	<sec:ifAnyGranted roles="ROLE_ADMIN,READ_PROCESS,EDIT_PROCESS"> 	       
+	<h:panelGroup id="processMainPanel" layout="block" class="Container100 ui-fluid"
+				  rendered="#{!empty dashBoardController.processItems and dashBoardController.selectedDashboardElements.contains('showAvailablePrcesses')}">
+				  
+        <div class="ContainerIndent">
+      		<div class="Card ShadowEffect HeiAutoOnMobile">
+      			
+      			<p:messages showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+      		
+          		<h2 class="CardTopic TexAlCenter">
+             		<h:outputText value="#{bundle['availableProcesses']}"/>
+          		</h2>
+	            <div class="SeparatorFull"></div>
+               	<div class="EmptyBox20"></div>
+			
+				<sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_PROCESS">
+             	<p:panelGrid id="processPanel" columns="1" columnClasses="ui-grid-col-12" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
+             		             		
+             		<p:row>
+             			<p:selectOneMenu id="processCombo" value="#{dashBoardController.processId}" style="width:250px;">
+             				<f:selectItem itemLabel="#{bundle['selectOne']}"/>
+                        	<f:selectItems value="#{dashBoardController.processItems}"/>
+                    	</p:selectOneMenu>
+	               	
+	               		<p:commandButton actionListener="#{dashBoardController.onStartProcess}"
+	               					 update="stepPanel, processMainPanel"
+	              					 process="processPanel"
+	                				 value="#{bundle['start']}"
+	                				 style="width:auto"	                				 
+	                				 icon="fa fa-youtube-play Fs16 White">
+	                		<p:ajax event="dialogReturn" listener="#{dashBoardController.onReloadProcessSteps}" update="processForm" />
+	                	</p:commandButton>
+	               	</p:row>
+      			</p:panelGrid>
+      			</sec:ifAnyGranted>
+      			      			
+      			<div class="EmptyBox20"></div>
+      			
+      			<h:panelGroup id="processList" layout="block" style="padding-left: 10px; padding-right: 10px;">
+      			
+      				<p:dataTable value="#{dashBoardController.processes}" var="process"
+						paginator="true" rows="5" rowKey="#{process.id}"
+						widgetVar="processTable"
+						paginatorPosition="bottom" selectionMode="single" paginatorAlwaysVisible="false"
+						paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+						rowsPerPageTemplate="5,10,25"
+						rowStyleClass="#{process.currentStepOverDue ? 'overduedStepTableRow' : null}"
+						emptyMessage="#{bundle['noProcessFound']}">
+						
+						<p:column style="width:16px">
+            				<p:rowToggler />
+        				</p:column>				
+						
+						<p:column headerText="#{bundle['name']}" filterBy="#{process.name}" filterMatchMode="contains" filterValue="#{sessionBean.dashbaordProcessesNameDefaultFilter}">
+							<h:outputText value="#{process.name}" style="#{process.currentStepOverDue ? 'color: white;' : ''}"/>
+						</p:column>
+		
+						<p:column headerText="#{bundle['description']}" filterBy="#{process.description}" filterMatchMode="contains" filterValue="#{sessionBean.dashbaordProcessesDescDefaultFilter}">
+							<h:outputText value="#{process.description}" style="#{process.currentStepOverDue ? 'color: white;' : ''}"/>
+						</p:column>
+		
+						<p:column headerText="#{bundle['status']}" style="text-align:center; white-space: nowrap; vertical-align: top;"
+								  filterBy="#{process.statusName}" filterMatchMode="exact" filterValue="#{sessionBean.dashbaordProcessesDefaultFilter}">
+							<f:facet name="filter">				               
+				                <p:selectOneMenu onchange="PF('processTable').filter()" value="#{sessionBean.dashbaordProcessesDefaultFilter}">
+				                    <f:selectItem itemLabel="#{bundle['selectOne']}" noSelectionOption="true" />
+				                    <f:selectItem itemValue="#{bundle['started']}" itemLabel="#{bundle['started']}"/>
+				                    <f:selectItem itemValue="#{bundle['finished']}" itemLabel="#{bundle['finished']}"/>
+				                    <f:selectItem itemValue="#{bundle['terminated']}" itemLabel="#{bundle['terminated']}"/>
+				                </p:selectOneMenu>
+				            </f:facet>
+						
+							<h:outputText value="#{process.statusName}" style="#{process.currentStepOverDue ? 'color: white;' : ''}"/>
+						</p:column>
+						
+						<p:column headerText="#{bundle['date']}" style="text-align:center; white-space: nowrap; vertical-align: top;">
+							<h:outputText value="#{process.statusName == 'Started' ? process.startDate : process.finishDate}" converter="chronoDateTimeConverter" style="#{process.currentStepOverDue ? 'color: white;' : ''}"/>
+						</p:column>					
+						
+						<p:column headerText="#{bundle['progress']}" style="text-align: center; vertical-align: top;">
+	                  		<p:commandButton action="#{dashBoardController.onSeeProgress(process.id, null)}"
+	                  						 process="@this"
+				                   			 icon="fa fa-tasks"
+				                       		 title="#{bundle['seeProgress']}"/>
+				        	
+              			</p:column>
+              			
+              			<p:rowExpansion>
+		       				<div class="Container">
+		       					<div class="Fleft Container50 MarAuto Responsive">
+		       						<p:repeat var="note" value="#{dashBoardController.getProcessNotes(process.id)}" >
+            							<p:panelGrid columns="1" style="width:100%" layout="grid" columnClasses="ui-grid-col-12" styleClass="ui-panelgrid-blank">
+            								<p:row>
+			 									<h:outputText styleClass="FontBold" value="#{note.author}: "/>
+			 									<h:outputText styleClass="FontNormal" value="#{note.note}" escape="false"/>
+			 								</p:row>
+				            			</p:panelGrid>
+				            		</p:repeat>
+					            </div>
+					            <div class="Fleft Container50 MarAuto Responsive">
+		       						<p:repeat var="file" value="#{dashBoardController.getProcessFiles(process.id)}" >
+            							<p:panelGrid columns="1" style="width:100%" layout="grid" columnClasses="ui-grid-col-12" styleClass="ui-panelgrid-blank">
+            								<p:row styleClass="Fright">
+			 									<h:outputText value="#{file.name}"/>
+			 									<p:commandButton ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" style="width:auto;" styleClass="Fright"
+							                     		actionListener="#{file.onDownload}" icon="fa fa-download">
+									              <p:fileDownload value="#{file.content}"/>
+											    </p:commandButton>
+			 								</p:row>
+				            			</p:panelGrid>
+				            		</p:repeat>
+					            </div>
+				            </div>
+        				</p:rowExpansion>
+              			
+					</p:dataTable>
+					<script  type="text/javascript" target="body">
+						$j = jQuery;
+						$j(document).ready( function() {
+							PF('processTable').filter()  
+						});
+					</script> 								      				
+      			</h:panelGroup>
+	               
+     		</div>
+  		</div>
+	</h:panelGroup>
+    </sec:ifAnyGranted>
+    
+    </h:form>       
+    
+    <ui:fragment rendered="#{dashBoardController.chrono}">
+    <sec:ifAnyGranted roles="ROLE_ADMIN,READ_STOCK,EDIT_STOCK,EDIT_FORMULA">
+    <h:panelGroup layout="block" class="Container100" rendered="#{dashBoardController.selectedDashboardElements.contains('showStockInventory')}">
+                <div class="ContainerIndent">
+                    <div class="Card ShadowEffect HeiAutoOnMobile">
+                        <h2 class="CardTopic TexAlCenter">Stock Inventory</h2>
+                        <div class="SeparatorFull"></div>
+                        <div class="EmptyBox20"></div>
+
+                        <div class="Container50 Responsive50">
+                            <div class="ContainerIndent">
+                                <div class="Card SoftGrayBack TexAlCenter">
+                                    <i class="icon-store_mall_directory Fs50 BoldGray DispBlock"></i>
+                                    <div class="EmptyBox5"></div>
+                                    <span class="FontRobotoLight Fs18">Stock Inventory</span>
+                                    <div class="EmptyBox10"></div>
+                                    <button onclick="window.open('#{request.contextPath}/stock/items?type=all','_self')" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-left GreenButton"
+                                    	 type="button" role="button" aria-disabled="false">
+                                    	<span class="ui-button-icon-left ui-icon ui-c fa fa-list-alt Fs16 White"></span><span class="ui-button-text ui-c">All Stock</span>
+                                    </button>
+                                </div>
+                            </div> 
+                        </div>
+
+                        <div class="Container50 Responsive50">
+                            <div class="ContainerIndent">
+                                <div class="Card SoftGrayBack TexAlCenter">
+                                    <i class="fa fa-clock-o Fs50 BoldGray DispBlock"></i>
+                                    <div class="EmptyBox5"></div>
+                                    <span class="FontRobotoLight Fs18">Watches</span>
+                                    <div class="EmptyBox10"></div>
+                                    <button onclick="window.open('#{request.contextPath}/stock/items?type=watches','_self')" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-left GreenButton"
+                                    	 type="button" role="button" aria-disabled="false">
+                                    	<span class="ui-button-icon-left ui-icon ui-c fa fa-clock-o Fs16 White"></span><span class="ui-button-text ui-c">Watches Stock</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>  
+
+                        <div class="Container50 Responsive50">
+                            <div class="ContainerIndent">
+                                <div class="Card SoftGrayBack TexAlCenter">
+                                    <i class="fa fa-yelp Fs50 DispBlock"></i>
+                                    <div class="EmptyBox5"></div>
+                                    <span class="FontRobotoLight Fs18">Jewelry</span>
+                                    <div class="EmptyBox10"></div>
+                                    <button onclick="window.open('#{request.contextPath}/stock/items?type=jewelry','_self')" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-left GreenButton"
+                                    	 type="button" role="button" aria-disabled="false">
+                                    	<span class="ui-button-icon-left ui-icon ui-c fa fa-yelp Fs16 White"></span><span class="ui-button-text ui-c">Jewelry Stock</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="Container50 Responsive50">
+                            <div class="ContainerIndent">
+                                <div class="Card SoftGrayBack TexAlCenter">
+                                    <i class="fa fa-shekel Fs50 DispBlock"></i>
+                                    <div class="EmptyBox5"></div>
+                                    <span class="FontRobotoLight Fs18">Accessories</span>
+                                    <div class="EmptyBox10"></div>
+                                    <button onclick="window.open('#{request.contextPath}/stock/items?type=accessories','_self')" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-left GreenButton"
+                                    	 type="button" role="button" aria-disabled="false">
+                                    	<span class="ui-button-icon-left ui-icon ui-c fa fa-shekel Fs16 White"></span><span class="ui-button-text ui-c">Accessories Stock</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="Container50 Responsive50">
+                            <div class="ContainerIndent">
+                                <div class="Card SoftGrayBack TexAlCenter">
+                                    <i class="fa fa-money Fs50 DispBlock"></i>
+                                    <div class="EmptyBox5"></div>
+                                    <span class="FontRobotoLight Fs18">Formula</span>
+                                    <div class="EmptyBox10"></div>
+                                    <button onclick="window.open('#{request.contextPath}/stock/formula','_self')" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-left GreenButton"
+                                    	 type="button" role="button" aria-disabled="false">
+                                    	<span class="ui-button-icon-left ui-icon ui-c fa fa-money Fs16 White"></span><span class="ui-button-text ui-c">Stock Formulas</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+             </h:panelGroup>
+        </sec:ifAnyGranted>
+        
+        <sec:ifAnyGranted roles="ROLE_ADMIN,VIEW_CUSTOMER_CENTRE,EDIT_CUSTOMER_CENTRE">
+        <h:form id="customerComplainForm">
+    	<h:panelGroup id="complainMainPanel" layout="block" class="Container100" rendered="#{dashBoardController.selectedDashboardElements.contains('showCustomerCenter')}">
+	        <div class="ContainerIndent">
+      		<div class="Card ShadowEffect HeiAutoOnMobile">
+      			
+      			<p:messages showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+      		
+          		<h2 class="CardTopic TexAlCenter">
+             		<h:outputText value="Customer Service"/>
+          		</h2>
+	            <div class="SeparatorFull"></div>
+               	<div class="EmptyBox20"></div>
+			
+				<sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_CUSTOMER_CENTRE"> 	
+             	<p:panelGrid id="complainPanel" columns="2" columnClasses="ui-grid-col-6,ui-grid-col-2" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
+             		             		
+	               	<p:commandButton action="#{dashBoardController.onSeeComplains(null)}"
+	                				 value="New Customer Service Request"
+	                				 style="width:auto"	                				 
+	                				 icon="fa fa-cogs Fs16 White"/>
+      			</p:panelGrid>
+      			</sec:ifAnyGranted>
+      			
+      			<div class="EmptyBox20"></div>
+      			
+      			<h:panelGroup id="complainList" layout="block" style="padding-left: 10px; padding-right: 10px;">
+      			
+      				<p:dataTable value="#{dashBoardController.customerComplains}" var="complain"
+						paginator="true" rows="5" rowKey="#{process.id}"
+						widgetVar="complainTable" lazy="true" id="complainTable"
+						paginatorPosition="bottom" selectionMode="single" paginatorAlwaysVisible="false"
+						paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+						rowsPerPageTemplate="5,10" 
+						sortMode="single"
+						sortBy="#{complain.modifiedAt}"
+						sortOrder="descending"
+						rowStyleClass="#{complain.status.name() == 'PICKUPED' ? 'pickupedItemTableRow' : (complain.overDue ? 'overduedStepTableRow' : null)}"
+						emptyMessage="No Customer Requests">
+						
+						<f:facet name="header">
+            				<p:outputPanel>
+                				<p:selectOneMenu id="type" value="#{dashBoardController.complainType}" 
+                					label="Type" onchange="PF('complainTable').filter()"
+                              		filter="false" panelStyle="width:250px" converter="omnifaces.GenericEnumConverter">
+            						<f:selectItems value="#{dashBoardController.complainTypes}" />
+        						</p:selectOneMenu>
+            				</p:outputPanel>
+        				</f:facet>	
+						
+						<p:column style="width:16px">
+            				<p:rowToggler />
+        				</p:column>					
+						
+						<p:column headerText="Status" filterBy="#{complain.status}">
+							<f:facet name="filter">
+                				<p:selectOneMenu onchange="PF('complainTable').filter()" value="#{sessionBean.dashbaordCompalinsDefaultFilter}">
+                    				<f:selectItem itemLabel="All" itemValue="#{null}" noSelectionOption="true" />
+                    				<f:selectItems value="#{dashBoardController.complainStatuses}" var="status" itemLabel="#{status}" itemValue="#{status}"/>
+                				</p:selectOneMenu>
+            				</f:facet>
+							<h:outputText value="#{complain.status.title}" style="#{(complain.status.name() == 'PICKUPED' || complain.overDue) ? 'color: #F9FDF9 !important;' : ''}"/>
+						</p:column>
+						
+						<p:column headerText="Brand" filterBy="#{complain.fullItem}" sortBy="#{complain.fullItem}">
+							<h:outputText value="#{complain.fullItem}" style="#{(complain.status.name() == 'PICKUPED' || complain.overDue) ? 'color: #F9FDF9 !important;' : ''}"/>
+						</p:column>
+						
+						<p:column headerText="Customer" filterBy="#{complain.fullName}" sortBy="#{complain.fullName}">
+							<h:outputText value="#{complain.fullName}" style="#{(complain.status.name() == 'PICKUPED' || complain.overDue) ? 'color: #F9FDF9 !important;' : ''}"/>
+						</p:column>
+						
+						<p:column headerText="Estimate Ready Date" sortBy="#{complain.estimateReadyDate}">
+							<h:outputText converter="chronoDateTimeConverter" value="#{complain.estimateReadyDate}" style="#{(complain.status.name() == 'PICKUPED' || complain.overDue) ? 'color: #F9FDF9 !important;' : ''}"/>
+						</p:column>
+		
+						<p:column headerText="#{bundle['progress']}" style="text-align: center; vertical-align: top;">
+	                  		<p:commandButton action="#{dashBoardController.onSeeComplains(complain.id)}"
+	                  						 process="@this"
+				                   			 icon="fa fa-info"
+				                       		 title="View Details"/>
+				        	
+              			</p:column>
+              			
+              			<p:rowExpansion>
+		       				<div class="Container">
+		       					<div class="Fleft Container100 MarAuto Responsive">
+		       						<p:timeline id="timeline" value="#{dashBoardController.getComplainTimeline(complain)}" height="250px"
+        										selectable="false" 
+        										zoomable="true" 
+        										moveable="true" 
+        										stackEvents="true" 
+        										axisOnTop="false"              
+        										eventStyle="box" 
+        										showCurrentTime="true"
+        										start="#{of:addDays(complain.recieveDate, -1)}"
+        										end="#{of:addDays(complain.lastActionDate, 1)}"
+        										showNavigation="true" />
+					            </div>
+				            </div>
+        				</p:rowExpansion>
+					</p:dataTable>										      				
+      			</h:panelGroup>
+	               
+     		</div>
+  		</div>
+	</h:panelGroup>
+	</h:form>
+        </sec:ifAnyGranted>
+        
+        </ui:fragment>
+        
+    <sec:ifAnyGranted roles="ROLE_ADMIN,VIEW_HELP_CENTRE,EDIT_HELP_CENTRE,VIEW_EXAM,EDIT_EXAM,PASS_EXAM_ROLE,VIEW_STUFF_PERSONAL,EDIT_STUFF_PERSONAL,VIEW_LEADERBOARD">
+     	<!-- Learning Center Section -->
+   		<h:panelGroup layout="block" class="Container100" rendered="#{dashBoardController.selectedDashboardElements.contains('showHelpCenter')}">
+        	<div class="ContainerIndent">
+          		<div class="Card ShadowEffect HeiAutoOnMobile">
+          			
+          			<h2 class="CardTopic TexAlCenter">
+             			<h:outputText value="Training Centre"/>
+          			</h2>
+	            	<div class="SeparatorFull"></div>
+               		<div class="EmptyBox20"></div>
+          		
+                    <sec:ifAnyGranted roles="ROLE_ADMIN,VIEW_HELP_CENTRE,EDIT_HELP_CENTRE">
+                    	<div class="Container50 Responsive100">
+                        <div class="ContainerIndent">
+                            <h2 class="BigTopic">Information Center</h2>
+                            <h:form>
+                                <p:tree value="#{dashBoardController.rootHelpCategory}" var="doc" id="docs" 
+                                        selectionMode="single" selection="#{dashBoardController.selectedNode}" dynamic="false">
+                                    <p:treeNode expandedIcon="ui-icon-folder-open" collapsedIcon="ui-icon-folder-collapsed">
+                                        <h:outputText value="#{doc.title}"/>
+                                    </p:treeNode>
+                                    <p:treeNode type="document" icon="ui-icon-document">
+                                    	<p:link value="#{doc.title}" href="/learn/documents?category=#{doc.id}"/>
+                                    </p:treeNode>
+                                </p:tree>
+                                
+                                <sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_HELP_CENTRE">
+                                <p:contextMenu for="docs">
+        							<p:menuitem value="Add Item" onclick="PF('dlga').show();" icon="fa fa-folder" />
+        							<p:menuitem value="Rename" onclick="PF('dlgax').show();"  icon="fa fa-pencil"/>
+        							<p:menuitem value="Delete" update="docs" actionListener="#{dashBoardController.deleteNode}" icon="fa fa-trash"/>
+    							</p:contextMenu>
+    							
+    							<p:dialog header="Add Category" widgetVar="dlga" resizable="false">
+        							<h:panelGrid columns="2" cellpadding="5">
+            							<h:outputLabel for="name" value="Name:" />
+            							<p:inputText id="name" value="#{dashBoardController.nodeName}" required="true" label="name" />
+            							
+            							<h:outputLabel for="types" value="Type:" />
+            							<p:selectOneMenu id="types" value="#{dashBoardController.helpType}" filter="true" filterMatchMode="startsWith" 
+                        					converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="Type should be selected.">
+                        					<f:selectItem itemLabel="File" itemValue="FILE" />
+                            				<f:selectItem itemLabel="Folder" itemValue="FOLDER" />
+                        				</p:selectOneMenu>
+                        				
+                        				<h:outputLabel for="isroot" value="Create as Root ?" />
+                        				<p:selectBooleanCheckbox id="isroot" value="#{dashBoardController.createRoot}" />
+ 
+						            	<f:facet name="footer">
+                						<p:commandButton value="Add" update="docs" oncomplete="PF('dlga').hide();" actionListener="#{dashBoardController.addHelpItem}" />
+            						</f:facet>  
+        							</h:panelGrid>
+    							</p:dialog>
+    							<p:dialog header="Rename To" widgetVar="dlgax" resizable="false">
+        							<h:panelGrid columns="2" cellpadding="5">
+            							<h:outputLabel for="rename" value="New Name:" />
+            							<p:inputText id="rename" value="#{dashBoardController.nodeName}" required="true" label="rename" />
+ 
+						            	<f:facet name="footer">
+                						<p:commandButton value="Rename" update="docs" oncomplete="PF('dlgax').hide();" 
+                							actionListener="#{dashBoardController.renameHelpItem}" />
+            						</f:facet>  
+        							</h:panelGrid>
+    							</p:dialog>
+    							</sec:ifAnyGranted>
+                                
+                            </h:form>
+                        </div>
+                    </div>
+                    </sec:ifAnyGranted>
+                    <sec:ifAnyGranted roles="ROLE_ADMIN,VIEW_EXAM,EDIT_EXAM,PASS_EXAM_ROLE,VIEW_STUFF_PERSONAL,EDIT_STUFF_PERSONAL,VIEW_LEADERBOARD">
+		                    <div class="Container50 Responsive100">
+		                        <div class="ContainerIndent">
+		                            <div class="Card SoftGrayBack TexAlCenter">
+			                                <i class="fa fa-graduation-cap Fs50 BoldGray DispBlock"></i>
+			                                <div class="EmptyBox5"></div>
+			                                
+			                                <h:outputText value="Examination Center" styleClass="FontRobotoLight Fs18"/>
+			                                
+			                                <div class="EmptyBox10"></div>
+			                                
+			                                <p:button value="#{bundle['examPass']}" styleClass="GreenButton" icon="fa fa-check-square-o Fs16 White" outcome="/exam/examsEnabled"/>
+			                                
+			                                <sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_EXAM">	                                
+		                                		<p:button value="#{bundle['examManage']}" styleClass="GreenButton" icon="fa fa-calendar-check-o Fs16 White" outcome="/exam/examManagement"/>
+		                                		<p:button value="#{bundle['viewResults']}" styleClass="GreenButton" icon="fa fa-list Fs16 White" outcome="/exam/examResults"/>                                	
+											</sec:ifAnyGranted>
+			                                
+			                                <sec:ifAnyGranted roles="VIEW_LEADERBOARD,VIEW_STUFF_PERSONAL,EDIT_STUFF_PERSONAL">	                                
+		                                		<p:button value="View Leaderboard" styleClass="GreenButton" icon="fa fa-list Fs16 White" outcome="/exam/resultboard"/>                                	
+											</sec:ifAnyGranted>
+		                            </div>
+		                        </div> 
+		                    </div>
+                    </sec:ifAnyGranted>
+	            </div>
+	        </div>
+	   	</h:panelGroup>
+	   	
+     </sec:ifAnyGranted>    
+        
+	<sec:ifAnyGranted roles="ROLE_ADMIN,READ_ROLE,READ_USER,EDIT_ROLE,EDIT_USER,READ_PROCESS,EDIT_PROCESS">
+   		<!-- System Administration Section -->
+   		<h:panelGroup layout="block" class="Container100" rendered="#{dashBoardController.selectedDashboardElements.contains('showSystemAdministration')}">
+        	<div class="ContainerIndent">
+          		<div class="Card ShadowEffect HeiAutoOnMobile">
+                	<h2 class="CardTopic TexAlCenter">
+                  		<h:outputText value="#{bundle['systemAdministration']}"/>
+                  	</h2>
+                    <div class="SeparatorFull"></div>
+                  	<div class="EmptyBox20"></div>
+					
+					<sec:ifAnyGranted roles="ROLE_ADMIN,READ_ROLE,READ_USER,EDIT_ROLE,EDIT_USER">
+                    	<div class="Container50 Responsive50">
+                            <div class="ContainerIndent">
+                                <div class="Card SoftGrayBack TexAlCenter">
+                                    <i class="fa fa-users Fs50 BoldGray DispBlock"></i>
+                                    <div class="EmptyBox5"></div>
+                                    
+                                    <h:outputText value="#{bundle['accessManagement']}" styleClass="FontRobotoLight Fs18"/>
+                                    
+                                    <div class="EmptyBox10"></div>
+                                    <sec:ifAnyGranted roles="ROLE_ADMIN,READ_ROLE,EDIT_ROLE">
+                                    	<p:button value="Roles" styleClass="GreenButton" icon="fa fa-check-square-o Fs16 White" outcome="/admin/roles"/>
+                                    </sec:ifAnyGranted>
+                                    <sec:ifAnyGranted roles="ROLE_ADMIN,READ_USER,EDIT_USER">
+                                    	<p:button value="Users" styleClass="GreenButton" icon="fa fa-user Fs16 White" outcome="/admin/users"/>
+                                    </sec:ifAnyGranted>
+                                </div>
+                            </div> 
+                        </div>
+             		</sec:ifAnyGranted>
+                    
+                    <sec:ifAnyGranted roles="ROLE_ADMIN,READ_PROCESS,EDIT_PROCESS">   
+                    <div class="Container50 Responsive50">
+                        <div class="ContainerIndent">
+                            <div class="Card SoftGrayBack TexAlCenter">
+                                <i class="fa fa-line-chart Fs50 BoldGray DispBlock"></i>
+                                <div class="EmptyBox5"></div>
+                                
+                                <h:outputText value="#{bundle['processManagement']}" styleClass="FontRobotoLight Fs18"/>
+                                
+                                <div class="EmptyBox10"></div>
+                                
+                                
+                                <p:button value="#{bundle['processes']}" styleClass="GreenButton" icon="fa fa-line-chart Fs16 White" outcome="/admin/processManagement"/>
+                                
+                            </div>
+                        </div> 
+                    </div>
+                    </sec:ifAnyGranted>
+                    
+                    <sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_EMAIL_TEMPLATES">
+                    <div class="Container50 Responsive50">
+                        <div class="ContainerIndent">
+                            <div class="Card SoftGrayBack TexAlCenter">
+                                <i class="fa fa-envelope-o Fs50 BoldGray DispBlock"></i>
+                                <div class="EmptyBox5"></div>
+                                
+                                <h:outputText value="Email Management" styleClass="FontRobotoLight Fs18"/>
+                                
+                                <div class="EmptyBox10"></div>
+                                
+                                
+                                <p:button value="Email Management" styleClass="GreenButton" icon="fa fa-envelope-o Fs16 White" outcome="/admin/emails"/>
+                                
+                            </div>
+                        </div> 
+                    </div>
+                    </sec:ifAnyGranted>
+                       
+	            </div>
+	        </div>
+	   	</h:panelGroup>
+	</sec:ifAnyGranted>
+        
+   </h:panelGroup>
+   		<sec:ifAnyGranted roles="ROLE_ADMIN,READ_STOCK,EDIT_STOCK,VIEW_TASKS_OTHERS">
+        <!-- Right Column -->
+        <div class="Container30 Responsive100">
+        	
+            <sec:ifAnyGranted roles="ROLE_ADMIN,VIEW_TASKS_OTHERS">
+            <h:panelGroup id="overdueChartPanel" layout="block" class="Container100" rendered="#{dashBoardController.overdueTasksByUsersHasData}">
+                <div class="ContainerIndent">
+                    <div class="Card ShadowEffect HeiAutoOnMobile">
+                    	<h:form id="overdueChartForm">
+	                    	
+                    		<h2 class="CardTopic">
+	                        	<h:outputText value="#{bundle['overdueTaskReportHeader']}"/>
+	                        </h2>
+	                        
+	                        <p:selectOneMenu id="overdueUserSelect" value="#{dashBoardController.overdueUserId}">
+	                        	<f:selectItem itemLabel="#{bundle['allUsers']}"/>
+		                        <f:selectItems value="#{dashBoardController.overdueUsers}"/>
+		                        
+		                        <p:ajax event="change" listener="#{dashBoardController.onOverdueUserChanged}" update="overdueChartPanel" process="overdueUserSelect"/>
+		                    </p:selectOneMenu>
+		                    <br/>
+		                    <p:calendar id="inline1" value="#{dashBoardController.date1}" showOn="button" >
+		                      <p:ajax event="dateSelect" listener="#{dashBoardController.onOverdueUserChanged}" update="overdueChartPanel" process="overdueUserSelect"/>
+		                    </p:calendar>
+		                    <br/>
+		                    <p:calendar id="inline2" value="#{dashBoardController.date2}" showOn="button">
+		                      <p:ajax event="dateSelect" listener="#{dashBoardController.onOverdueUserChanged}" update="overdueChartPanel" process="overdueUserSelect"/>
+		                    </p:calendar>
+	                        
+	                        <div class="SeparatorFull"></div>
+	                        <div class="EmptyBox10"></div>
+	                        
+	                        <p:chart id="overdueTaskByUserPie" type="pie" model="#{dashBoardController.overdueTasksByUsers}" responsive="true" />
+                        </h:form>                       
+                    </div>
+                </div>
+            </h:panelGroup>
+            </sec:ifAnyGranted>
+            
+        </div>
+        </sec:ifAnyGranted>
+        
+</ui:define>
+
+</ui:composition>

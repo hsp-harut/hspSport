@@ -1,0 +1,138 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:sec="http://www.springframework.org/security"
+	template="/WEB-INF/template.xhtml">
+
+<ui:define name="subheader">
+	<h:outputLink value="../exam/examResults" styleClass="BoldGray">
+		<h:outputText value=" #{bundle['examViewResults']}"/>
+	</h:outputLink>        
+</ui:define>
+
+<ui:define name="content">
+
+<f:loadBundle id="bundle" var="bundle" basename="#{examResultsAllController.currentBundle}"/>
+
+<h:form id="examForm">
+
+<h:panelGroup id="examSearchPanel" layout="block" styleClass="Container100 ui-fluid">
+	<div class="ContainerIndent">
+		<div class="Card ShadowEffect">						
+		
+			<p:messages id="infoErrorMessages" showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+			
+			<h2 class="BigTopic">					
+				<h:outputText value="#{bundle['searchCriteria']}"/>
+			</h2>
+			
+			<div class="EmptyBox20"></div>
+			<p:panelGrid id="examPanel" columns="3" columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
+             		
+				<p:outputLabel for="examTemplates" value="#{bundle['exams']}"/>
+               	<p:selectCheckboxMenu id="examTemplates" filter="true" filterMatchMode="startsWith"
+   								  	  label="#{bundle['searchByExams']}" value="#{examResultsAllController.examBean.examTemplateIds}">
+                    
+	   				<f:converter converterId="javax.faces.Long"/>
+				   	<f:selectItems value="#{examResultsAllController.examBean.examTemplates}"/>
+	        	</p:selectCheckboxMenu>
+               	<h:panelGroup/>
+               	
+               	<p:outputLabel for="candidates" value="#{bundle['candidates']}"/>
+               	<p:selectCheckboxMenu id="candidates" filter="true" filterMatchMode="startsWith"
+   								  	  label="#{bundle['searchByCandidates']}" value="#{examResultsAllController.examBean.canidateIds}">
+                    
+	   				<f:converter converterId="javax.faces.Long"/>
+				   	<f:selectItems value="#{examResultsAllController.examBean.canidates}"/>
+	        	</p:selectCheckboxMenu>
+               	<h:panelGroup/>
+               	
+               	<p:outputLabel for="from" value="#{bundle['from']}"/>
+               	<p:calendar id="from" value="#{examResultsAllController.examBean.startDate}" showOn="button" />
+               	<h:panelGroup/>
+               	
+               	<p:outputLabel for="to" value="#{bundle['to']}"/>
+               	<p:calendar id="to" value="#{examResultsAllController.examBean.finishDate}" showOn="button" />
+               	<h:panelGroup/>
+               
+     		</p:panelGrid>
+         	         	
+      		<div class="EmptyBox20"></div>         	
+                 				 
+           	<p:commandButton actionListener="#{examResultsAllController.onSearch}" 
+           					 update="examList"
+           					 process="examSearchPanel"
+             				 value="#{bundle['search']}" 
+             				 style="width:auto" 
+             				 icon="fa fa-search Fs16 White"/>											
+		</div>
+	</div>
+</h:panelGroup>
+
+</h:form>
+
+
+
+<div class="Container100 ui-fluid">
+	<div class="ContainerIndent">
+		<div class="Card ShadowEffect">
+			
+			<h2 class="BigTopic">					
+				<h:outputText value="#{bundle['exams']}"/>
+			</h2>
+			
+			<p:dataTable id="examList" value="#{examResultsAllController.exams}" var="exam"
+				reflow="true" lazy="true" paginator="true" rows="10" rowKey="#{exam.id}" 
+				paginatorPosition="bottom" selectionMode="single" paginatorAlwaysVisible="false"
+				paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+				rowsPerPageTemplate="10,25,50"
+				emptyMessage="#{bundle['noExamFound']}">
+				
+				<p:column headerText="#{bundle['candidate']}">
+					<h:outputText value="#{exam.candidateName}" />
+				</p:column>
+				
+				<p:column headerText="#{bundle['name']}">
+					<h:outputText value="#{exam.name}" />
+				</p:column>
+
+				<p:column headerText="#{bundle['description']}">
+					<h:outputText value="#{exam.description}" />
+				</p:column>
+				
+				<p:column headerText="#{bundle['questions']}">
+					<h:outputText value="#{exam.questionsCount}" />
+				</p:column>
+				
+				<p:column headerText="#{bundle['points']}">
+					<h:outputText value="#{exam.pointsCandidate}/#{exam.points}" />
+				</p:column>
+				
+				<p:column headerText="#{bundle['startedAt']}" style="text-align:center; white-space: nowrap;">
+					<h:outputText value="#{exam.startDate}" converter="chronoDateTimeConverter"/>
+				</p:column>
+				
+				<p:column headerText="#{bundle['finishedAt']}" style="text-align:center; white-space: nowrap;">
+					<h:outputText value="#{exam.finishDate}" converter="chronoDateTimeConverter"/>
+				</p:column>
+				
+				<p:column headerText="#{bundle['actions']}" style="text-align: center;">
+              		<p:commandButton action="#{examResultsAllController.onShowExamResult(exam.id)}"
+              						 process="@this"
+		                   			 icon="fa fa-file-text-o"
+		                       		 title="#{bundle['viewExamDetails']}"			                       		 
+		                       		 styleClass="BlueButton"/>		        			        	
+       			</p:column>
+			</p:dataTable>
+			
+		</div>
+	</div>
+</div>
+
+			   
+
+</ui:define>
+
+</ui:composition>

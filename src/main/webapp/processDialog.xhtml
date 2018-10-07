@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<title>
+		<h:outputText value="#{processActionsController.processStepBean.name.concat(' (').concat(processActionsController.processStepBean.processName).concat(')')}"/>
+	</title>
+	<style type="text/css">
+.ui-widget {
+	font-size: 90%;
+}
+</style>
+</h:head>
+
+<h:body>
+	<h:form id="processStepForm" onsubmit="return false;">
+		<div class="Container100">
+            <div class="ContainerIndent">
+                <div class="Card ShadowEffect">
+                			<p:editor id="editor" widgetVar="editorWidget" value="#{processActionsController.processStepBean.note}" style="width:97%" />
+							<h:panelGroup id="attachments">
+							          
+							<table cellspacing="0" cellpadding="0" border="0">
+							<h:panelGroup rendered="#{!empty processActionsController.processStepBean.uploadedFiles}">
+							<ui:repeat value="#{processActionsController.processStepBean.uploadedFiles}" var="uploadFileBean">
+							<tr>								
+							<td>
+							<h:outputText value="#{uploadFileBean.name}"/>
+							</td>
+							
+							<td width="5%">
+							<p:commandButton actionListener="#{processActionsController.onRemoveFileUpload(uploadFileBean)}"
+							             update="processStepForm:attachments"
+							                     styleClass="RedButton"
+							                     value="Delete"
+							                     />
+							</td>								
+							
+							<td width="5%">									
+							    <p:commandButton ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+							                     actionListener="#{uploadFileBean.onDownload}"
+							                     value="Download">
+							              <p:fileDownload value="#{uploadFileBean.content}"/>
+							      </p:commandButton>
+							</td>
+							</tr>
+							</ui:repeat>
+							</h:panelGroup>
+							
+							<tr>								
+							<td colspan="3">
+							<p:fileUpload id="fileupload" fileUploadListener="#{processActionsController.onFileUpload}" mode="advanced" dragDropSupport="true"												 
+							                  update="attachments" immediate="true" sizeLimit="10000000" fileLimit="1"
+							                  style="width:auto;"
+							                      multiple="false"
+							                      />
+							</td>
+							</tr>
+							</table>
+							
+							</h:panelGroup>
+							<div class="Fright">
+								<p:commandButton value="Save"
+								 	actionListener="#{processActionsController.onSaveProcessStep}"/>
+								<p:commandButton styleClass="#{processActionsController.action == 'done' ? 'GreenButton' : 'RedButton'}" value="#{processActionsController.action == 'done' ? 'Mark Done' : 'Mark Failed'}"
+									 actionListener="#{processActionsController.onFinishProcessStep}" onclick="if (!confirm('#{processActionsController.action == 'done' ? 'Are your sure you want to mark this task done ?' : 'Are your sure you want to terminate this task ?'}')) return false;"/>
+							</div>
+                </div>
+             </div>
+        </div>
+	</h:form>
+</h:body>
+
+</html>

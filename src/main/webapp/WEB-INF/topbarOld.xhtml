@@ -1,0 +1,122 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+
+<h:form id="alertForm">
+
+<p:poll interval="#{sessionBean.alertBarBean.periodicCallSeconds}" listener="#{sessionBean.initAlertBar(false)}" update="notViewedNumber, alertList"
+/>
+    
+    <!-- TOPBAR START -->
+    <div id="layout-topbar">
+        <a id="mobile-menu-button">
+            <span class="ButtonLine" id="ButtonLine1"></span>
+            <span class="ButtonLine" id="ButtonLine2"></span>
+            <span class="ButtonLine" id="ButtonLine3"></span>
+        </a>
+        <a href="#{request.contextPath}/dashboard" id="logo">
+            <h:graphicImage name="chrono/images/chronograph-logo-name.png" styleClass="Fleft" />
+            <h:graphicImage name="chrono/images/chronograph-logo-image.png" styleClass="Fleft" />
+        </a>
+        
+        <a id="show-top-menu" class="ShowOnMobile ripplelink"><i class="icon-more_vert" id="active"></i><i class="icon-close DispNone" id="passive"></i> </a>
+        
+        <ul id="top-menu">
+       		
+        	<li>
+                <a class="ripplelink">
+                	<i class="icon-notifications_none">
+                		<h:panelGroup id="notViewedNumber">
+	                		<h:outputText styleClass="CartText White" value="#{sessionBean.alertBarBean.notViewedAlertsCount}" style="margin-left: -17px; margin-top: 0px;"
+	                					  rendered="#{sessionBean.alertBarBean.notViewedAlertsCount > 0}"/>
+                		</h:panelGroup>
+                	</i>
+                	                	
+               		<h:outputText styleClass="ShowOnMobile">#{bundle['notifications']}</h:outputText>                	
+               	</a>
+               	
+               	
+                <ul>
+                	<h:panelGroup id="alertList">
+                		<ui:repeat value="#{sessionBean.alertBarBean.alertBeanList}" var="alertBean">
+                			<li>
+		                    	<a href="#{request.contextPath}#{alertBean.url}">
+		                    		<h:outputText value="#{alertBean.message}" styleClass="#{alertBean.viewedTimeAgo == null ? 'Orange' : 'Blue'}"/>
+		                    		
+		                    		<h:panelGroup rendered="#{alertBean.viewedTimeAgo != null}">
+		                    			<br/>
+		                    			<h:outputText value="#{bundle['viewed']} #{alertBean.viewedTimeAgo}." styleClass="Gray Fs14 FontRobotoLight"/>
+       					  			</h:panelGroup>
+	                    		</a>
+	                   		</li>
+                		</ui:repeat>	                    
+	                    
+	                    <li class="TexAlCenter">
+	                    	<p:commandLink actionListener="#{sessionBean.onShowNextAlertGroup}" 
+	                    				   update="alertList"
+	                    				   process="@this"
+	                    				   rendered="#{sessionBean.alertBarBean.showNextGroup}">
+	                    		<i class="icon-keyboard_control Gray Fs30"></i>
+	                    	</p:commandLink>
+                    	</li>	                    
+                    </h:panelGroup>
+                </ul>                                
+            </li>
+            
+            <ui:fragment rendered="#{view.viewId == '/dashboard.xhtml'}">
+            <li>
+                <a class="ripplelink" title="Dashboard Settings"><i class="icon-cog"></i> <span class="ShowOnMobile">Settings</span></a>
+                <ul>
+                    <li>
+                    	<p:selectManyCheckbox layout="responsive" columns="1" value="#{dashBoardController.selectedDashboardElements}">
+                    			<p:ajax listener="#{dashBoardController.onDashboardViewChange}" update="dashboardMainLeftArea" />
+								<f:selectItems value="#{dashBoardController.dashbordElements}" />                    			
+                         </p:selectManyCheckbox>
+                    </li>
+                </ul>
+            </li>
+            </ui:fragment>
+            
+            <ui:fragment rendered="#{dashBoardController.countries.size() gt 1}">
+            <li>
+                <a class="ripplelink" title="Available Countries"><i class="fa fa-globe"></i> <span class="ShowOnMobile">Countries</span></a>
+                <ul>
+                	<p:repeat value="#{dashBoardController.countries}" var="country">
+                		<li>
+                			<p:commandLink id="nonAjax" action="#{dashBoardController.onCountryChange(country.id)}" process="@this">
+        						<h:outputText value="#{country.name}" />
+    						</p:commandLink>
+              			</li>
+                	</p:repeat>
+                </ul>
+            </li>
+            </ui:fragment>
+        
+            <li>
+                <a class="ripplelink"><i class="icon-archive"></i> <span class="ShowOnMobile">Task Manager</span></a>
+                <ul>
+                    <li>
+                    	<a href="#{request.contextPath}/process/processSteps?status=2">
+                    		<i class="icon-alarm_on"></i> #{bundle['completedTasks']}
+                   		</a>
+              		</li>
+                    
+                    <li>
+                    	<a href="#{request.contextPath}/process/processSteps?status=1">
+                    		<i class="icon-alarm_add"></i> #{bundle['newTasks']}
+                  		</a>
+               		</li>                    
+                </ul>
+            </li>
+            <li>
+                <a class="ripplelink" href="#{request.contextPath}/logout"><i class="icon-power"></i> <span class="ShowOnMobile">System</span></a>
+            </li>
+        </ul>
+    </div>
+    <!-- TOPBAR END -->
+    
+</h:form>
+    
+</ui:composition>

@@ -1,0 +1,1 @@
+UPDATE `contract` SET status = NULL WHERE status = 'Overdue';

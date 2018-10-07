@@ -1,0 +1,200 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:sec="http://www.springframework.org/security"
+	template="/WEB-INF/template.xhtml">
+
+<ui:define name="subheader">
+	<h:outputLink value="#{request.contextPath}/importData" styleClass="BoldGray">
+		<h:outputText value=" Բեռնել քաղվածք"/>
+	</h:outputLink>        
+</ui:define>
+
+<ui:define name="content">
+
+<f:loadBundle id="bundle" var="bundle" basename="#{importDataController.currentBundle}"/>
+
+<h:form id="importForm">
+
+<h:panelGroup id="importPanel" layout="block" styleClass="Container100 ui-fluid">
+	<div class="ContainerIndent">
+		<div class="Card ShadowEffect">						
+		
+			<p:messages id="infoErrorMessages" showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+			
+			<h2 class="BigTopic">					
+				<h:outputText value="Բեռնել քաղվածք"/>
+			</h2>
+			
+			<div class="EmptyBox20"></div>
+			
+			<sec:ifAnyGranted roles="ROLE_ADMIN">
+				
+				
+			
+				<p:panelGrid id="excelPanel" columns="2" 
+							 columnClasses="ui-grid-col-5,i-grid-col-5" 
+							 layout="grid" 
+							 styleClass="ui-panelgrid-blank" 
+							 style="border:0px none; 
+							 background-color:transparent;" >
+							 
+					
+					<p:selectCheckboxMenu id="agent" filter="true" filterMatchMode="startsWith"
+		   								  label="Գործակալի տեսակը" 
+		   								  value="#{importDataController.agentTypes}">
+		                    		   				
+					   	<f:selectItem itemLabel="N" itemValue="N"/>
+					   	<f:selectItem itemLabel="T" itemValue="T"/>
+					   	<f:selectItem itemLabel="V" itemValue="V"/>
+					   	<f:selectItem itemLabel="S" itemValue="S"/>
+					   	
+					   	<p:ajax event="change" process="agent"/>
+					   	<p:ajax event="toggleSelect" process="agent"/>
+		        	</p:selectCheckboxMenu>
+		          	<p:message for="agent"/>
+												 
+	             						
+	               	<p:fileUpload id="fileUpload" fileUploadListener="#{importDataController.onFileUpload}"
+	               								  label="Ընտրել ֆայլ"
+	               								  uploadLabel="Բեռնել" 
+	               							      cancelLabel="Հերքել"
+	               							      allowTypes="/(\.|\/)(xls|xlsx)$/"
+				  								  invalidFileMessage="Հարկավոր է բեռնել Excel ֆորմատի ֆայլ։"
+	               							      mode="advanced" dragDropSupport="true"												 
+				                       			  update="importPanel, :importForm:excelList" 
+				                       			  sizeLimit="10000000" fileLimit="5"
+				                       			  style="width:auto;"
+				                                  multiple="false"
+				                                  process="@this"/>
+	               	<p:message for="fileUpload" />    	               	         
+	               
+	     		</p:panelGrid>
+     		</sec:ifAnyGranted>         	         	
+						
+		</div>
+	</div>
+</h:panelGroup>
+
+
+
+<div class="Container100 ui-fluid">
+	<div class="ContainerIndent">
+		<div class="Card ShadowEffect">
+			
+			<h2 class="BigTopic">					
+				<h:outputText value="Բեռնված քաղվածքներ"/>
+			</h2>
+			
+			<p:dataTable id="excelList" value="#{importDataController.importedExcelsModel}" var="excel"
+				reflow="true" lazy="true" paginator="true" rows="10" rowKey="#{excel.id}" 
+				selectionMode="single"
+				paginatorAlwaysVisible="true"
+				paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+				currentPageReportTemplate="(Էջ: {currentPage}/{totalPages}, ընդ. {totalRecords} տող)"
+				rowsPerPageTemplate="10,25,50"
+				emptyMessage="#{bundle['contractsNotFound']}"
+				tableStyle="width: 100%;">				
+				
+				<p:column style="text-align: center;">
+					<f:facet name="header">
+		                <h:outputText value="Անուն"/>
+		            </f:facet>
+		            
+		            <h:outputText value="#{excel.fileName} " title="#{excel.fileName}"/>
+		           	
+		           	<div align="center">
+			           	<p:commandButton ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+	                       			 	 actionListener="#{importDataController.onDownload(excel, true)}"
+	                       			 	 icon="fa fa-download Fs16 White">
+	                 		<p:fileDownload value="#{importDataController.content}"/>
+	     				</p:commandButton>
+     				</div>		            
+				</p:column>
+
+				<p:column>
+					<f:facet name="header">
+		                <h:outputText value="Տողեր"/>
+		            </f:facet>
+		            
+					<h:outputText value="#{excel.rows}" />
+				</p:column>
+				
+				<p:column>
+					<f:facet name="header">
+		                <h:outputText value="Համապատ. տողեր" title="Համապատասխան տողեր"/>
+		            </f:facet>
+		            
+					<h:outputText value="#{excel.rowsUpdated}" />
+				</p:column>
+				
+				<p:column>
+					<f:facet name="header">
+		                <h:outputText value="Անհամապատ. տողեր" title="Անհամապատասխան տողեր"/>
+		            </f:facet>
+		            
+					<h:outputText value="#{excel.rowsNoFound}" />
+				</p:column>
+				
+				<p:column>
+					<f:facet name="header">
+		                <h:outputText value="Անտեսված տողեր"/>
+		            </f:facet>
+					
+					<h:outputText value="#{excel.rowsSkipped}" />
+				</p:column>								
+				
+				<p:column>
+					<f:facet name="header">
+		                <h:outputText value="#{bundle['contractCreatedAt']}"/>
+		            </f:facet>
+					
+					<h:outputText value="#{excel.createdDate}" converter="chronoDateTimeConverter"/>
+				</p:column>
+				
+				<p:column style="text-align: center;">
+					<f:facet name="header">
+		                <h:outputText value="Մնացորդային ֆայլ"/>
+		            </f:facet>
+					
+					<h:outputText value="#{excel.fileRemainName}" title="#{excel.fileRemainName}"/>
+					
+					<h:panelGroup layout="block" style="text-align: center;"
+								  rendered="#{excel.fileRemainName != null}">
+			           	<p:commandButton ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+	                       			 	 actionListener="#{importDataController.onDownload(excel, false)}"
+	                       			 	 icon="fa fa-download Fs16 White">
+	                 		<p:fileDownload value="#{importDataController.content}"/>
+	     				</p:commandButton>
+     				</h:panelGroup>
+				</p:column>
+				
+				<p:column style="text-align: center;" rendered="false"> 
+					<f:facet name="header">
+		                <h:outputText value="#{bundle['contractActions']}"/>
+		            </f:facet>
+		                         			        
+		        	<sec:ifAnyGranted roles="ROLE_ADMIN">		        				        		
+			        	<p:commandButton actionListener="#{importDataController.onRemoveFile(excel)}"
+			        					 process="@this"
+	              						 update="importForm:importPanel, excelList"
+			                   			 icon="fa fa-trash-o"
+			                       		 title="Ջնջել ֆայլը"
+			                       		 styleClass="RedButton"
+			                       		 onclick="if (!confirm('Դուք վստա՞հ եք, որ ուզում եք ջնջել ընտրված ֆայլը։')) return false;"/>
+		        	</sec:ifAnyGranted>
+       			</p:column>
+			</p:dataTable>
+			
+		</div>
+	</div>
+</div>
+
+</h:form>
+			   
+
+</ui:define>
+
+</ui:composition>

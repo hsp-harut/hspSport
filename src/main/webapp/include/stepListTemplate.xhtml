@@ -1,0 +1,50 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:sec="http://www.springframework.org/security">
+	
+<p:dataList id="processFlowGrid" value="#{processFlowController.processSteps}" var="processStepBean"
+							itemType="none" 							
+							emptyMessage="#{bundle['noProcessFlowDefined']}"
+							rendered="#{processFlowController.processFlowViewMode == '0'}">
+					
+	<p:panel header="#{processStepBean.name}" style="width:97%"
+		 	 styleClass="#{processStepBean.status}ColoredPanel HoverEffect">
+		
+		<h:panelGrid columns="2" style="width:100%" columnClasses="panel95Percent, panel5Percent" rowClasses="panelHeight91">
+  			  			  			            			
+  			<h:outputText value="#{processStepBean.description}"/>
+       
+       		<h:panelGrid columns="1">
+       			<p:commandButton actionListener="#{processFlowController.onEditProcessStep(processStepBean)}"
+	        					 update="processStepForm:processStepPanel"
+	   						 	 process="@this"
+		         			 	 icon="fa fa-pencil"
+		             		 	 title="#{bundle['editProcessStepTitle']}"			                       		 
+		             		 	 styleClass="BlueTextButton RaisedButton"/>
+                
+                <sec:ifAnyGranted roles="ROLE_ADMIN, EDIT_PROCESS">       		 
+        		<p:commandButton actionListener="#{processFlowController.onRemoveProcessStep(processStepBean)}"
+	        					 process="@this"
+           						 update="processStepForm:processStepPanel, processStepForm:processFlowPanel"
+	                   			 icon="fa fa-trash-o"
+	                       		 title="#{bundle['deleteProcessStepTitle']}"
+	                       		 styleClass="RedButton"	                       		 
+	                       		 onclick="if (!confirm('#{bundle['deleteProcessStepConfirm']}')) return false;"/>
+	        	</sec:ifAnyGranted>
+          	</h:panelGrid>
+		</h:panelGrid>
+            		               
+       	<f:facet name="footer">		               		 			
+       		<h:outputText value="#{bundle['assignee']}: #{processStepBean.userAssignedName}. #{bundle['created']} #{processStepBean.statusTimeAgo}."/>
+       	</f:facet>
+       	
+	</p:panel>
+	
+	<div class="EmptyBox10"></div>															
+
+</p:dataList>
+
+</ui:composition>

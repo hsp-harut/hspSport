@@ -1,0 +1,121 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:sec="http://www.springframework.org/security"
+	template="/WEB-INF/template.xhtml">
+
+<ui:define name="subheader">
+	<h:outputLink value="../process/processSteps/#{processStepController.status}" styleClass="BoldGray">
+		<h:outputText value=" #{processStepController.status == '1' ? bundle['newTasks'] : bundle['completedTasks']}"/>
+	</h:outputLink>        
+</ui:define>
+
+<ui:define name="content">
+
+<f:loadBundle id="bundle" var="bundle" basename="#{processStepController.currentBundle}"/>
+<h:form id="processForm">
+<div class="Container100 ui-fluid">
+	<div class="ContainerIndent">
+		<div class="Card ShadowEffect">
+			
+			<h2 class="BigTopic">					
+				<h:outputText value="#{processStepController.status == '1' ? bundle['newTasks'] : bundle['completedTasks']}"/>
+			</h2>
+			
+			<p:dataTable id="processList" value="#{processStepController.processSteps}" var="processStep"
+				reflow="true" lazy="true" paginator="true" rows="10" rowKey="#{processStep.id}" 
+				paginatorPosition="bottom" selectionMode="single" paginatorAlwaysVisible="false"
+				paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+				rowsPerPageTemplate="10,25,50"
+				emptyMessage="#{bundle['noProcessFound']}"
+				rowStyleClass="#{processStep.overdued ? 'overduedStepTableRow' : null}">
+				
+				<p:column style="width:16px">
+            		<p:rowToggler />
+        		</p:column>			
+				
+				<p:column headerText="#{bundle['task']}">
+					<h:outputText value="#{processStep.name}" style="#{processStep.overdued ? 'color: white;' : ''}"/>
+				</p:column>
+				
+				<p:column headerText="#{bundle['description']}">
+					<h:outputText value="#{processStep.description}" style="#{processStep.overdued ? 'color: white;' : ''}"/>
+				</p:column>
+				
+				<p:column headerText="#{bundle['startedAt']}" style="text-align:center; white-space: nowrap;">
+					<h:outputText value="#{processStep.startDate}" converter="chronoDateTimeConverter" style="#{processStep.overdued ? 'color: white;' : ''}"/>
+				</p:column>
+				
+				<p:column headerText="Due Date" style="text-align:center; white-space: nowrap;">
+							<h:outputText rendered="#{processStep.estimatedTill != null}" value="#{processStep.estimatedTill}" converter="chronoDateTimeConverter" style="#{processStep.overdued ? 'color: white;' : ''}"/>
+							<h:outputText rendered="#{processStep.estimatedTill == null}" value="No Estimation" style="#{processStep.overdued ? 'color: white;' : ''}"/>
+				</p:column>
+				
+				<p:column headerText="#{bundle['finishedAt']}" style="text-align:center; white-space: nowrap;"
+						  rendered="#{processStepController.status == '2'}">
+					<h:outputText value="#{processStep.finishDate}" converter="chronoDateTimeConverter" style="#{processStep.overdued ? 'color: white;' : ''}"/>
+				</p:column>						
+				
+				<p:column headerText="#{bundle['actions']}" style="text-align: center;">
+					<p:commandButton action="#{processStepController.onMarkProcess(processStep.id,'done')}"
+		                 					 process="@this"
+				                   			 icon="fa fa-check Fs16 White"
+				                   			 styleClass="GreenButton"
+				                       		 title="Mark Done"
+				                       		 rendered="#{processStepController.status == '1' and processStep.userAssignedId == sessionScope['SPRING_SECURITY_CONTEXT'].authentication.principal.id}">
+				                       		 <p:ajax event="dialogReturn" listener="#{processStepController.onReloadProcessSteps}" update="processForm" />
+				            </p:commandButton>
+				            <p:commandButton action="#{processStepController.onMarkProcess(processStep.id,'failed')}"
+		                 					 process="@this"
+				                   			 icon="fa fa-times Fs16 White"
+				                   			 styleClass="RedButton"
+				                       		 title="Mark Failed"
+				                       		 onclick="if (!confirm('#{bundle['terminateProcessStepConfirm']}')) return false;" 	
+				                       		 rendered="#{processStepController.status == '1' and processStep.userAssignedId == sessionScope['SPRING_SECURITY_CONTEXT'].authentication.principal.id and processStep.assigneCanTerminate}">
+				                       		 <p:ajax event="dialogReturn" listener="#{processStepController.onReloadProcessSteps}" update="processForm" />
+				            </p:commandButton>
+              		<p:commandButton action="#{processStepController.onSeeProgress(processStep.processId, processStep.id)}"
+                 					 process="@this"
+		                   			 icon="fa fa-tasks"
+		                       		 title="#{bundle['seeProgress']}"/>
+       			</p:column>
+       			<p:rowExpansion>
+		       				<div class="Container">
+		       					<div class="Fleft Container50 MarAuto Responsive">
+		       						<p:repeat var="note" value="#{processStepController.getProcessNotes(processStep.processId)}" >
+            							<p:panelGrid columns="1" style="width:100%" layout="grid" columnClasses="ui-grid-col-12" styleClass="ui-panelgrid-blank">
+            								<p:row>
+			 									<h:outputText styleClass="FontBold" value="#{note.author}: "/>
+			 									<h:outputText styleClass="FontNormal" value="#{note.note}"/>
+			 								</p:row>
+				            			</p:panelGrid>
+				            		</p:repeat>
+					            </div>
+					            <div class="Fleft Container50 MarAuto Responsive">
+		       						<p:repeat var="file" value="#{processStepController.getProcessFiles(processStep.processId)}" >
+            							<p:panelGrid columns="1" style="width:100%" layout="grid" columnClasses="ui-grid-col-12" styleClass="ui-panelgrid-blank">
+            								<p:row styleClass="Fright">
+			 									<h:outputText value="#{file.name}"/>
+			 									<p:commandButton ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" style="width:auto;" styleClass="Fright"
+							                     		actionListener="#{file.onDownload}" icon="fa fa-download">
+									              <p:fileDownload value="#{file.content}"/>
+											    </p:commandButton>
+			 								</p:row>
+				            			</p:panelGrid>
+				            		</p:repeat>
+					            </div>
+				            </div>
+        				</p:rowExpansion>
+			</p:dataTable>
+			
+		</div>
+	</div>
+</div>
+</h:form>
+			   
+
+</ui:define>
+
+</ui:composition>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="info" name="chrono"
+	packages="">
+	<Appenders>
+		<Console name="CONSOLE" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+		</Console>
+		<Async name="Async">
+			<AppenderRef ref="CONSOLE" />
+		</Async>
+	</Appenders>
+
+	<Loggers>
+<!-- 		<logger name="org.springframework.security" level="DEBUG" includeLocation="true"/> -->
+		<Root level="INFO">
+			<AppenderRef ref="Async" />
+		</Root>
+	</Loggers>
+
+</Configuration>

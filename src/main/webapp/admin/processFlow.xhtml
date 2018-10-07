@@ -1,0 +1,92 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"	
+	template="/WEB-INF/template.xhtml">
+
+<ui:define name="subheader">
+	<h:outputLink value="../admin/processManagement" styleClass="BoldGray" disabled="#{processFlowController.flowProgressView}">
+		<h:outputText value=" #{processFlowController.processBean.name}"/>
+		
+		<f:param name="processId" value="#{processFlowController.processBean.id}"/>
+	</h:outputLink>        
+</ui:define>
+
+<ui:define name="content">
+
+<f:loadBundle id="bundle" var="bundle" basename="#{processFlowController.currentBundle}"/>
+
+<h:form id="processStepForm">
+	
+	<h:panelGroup id="processStepPanel" layout="block" styleClass="Container100 ui-fluid">
+		<ui:include src="#{processFlowController.flowProgressView ? '../include/processFlowProgress.xhtml' : '../include/processFlowTemplate.xhtml'}"/>
+	</h:panelGroup>		
+	
+	<h:panelGroup id="processFlowPanel" layout="block" styleClass="Container100 ui-fluid">
+		<div class="ContainerIndent">
+			<div class="Card ShadowEffect">
+				
+				<h2 class="BigTopic">					
+					<h:outputText value="#{bundle['processFlow']}"/>&#160;
+					
+					<h:panelGroup id="viewModeButtons"
+								  rendered="#{!empty processFlowController.processSteps}">
+								  
+						<p:commandButton actionListener="#{processFlowController.onShowProcessFlowInViewMode(1)}" 
+										 update="processStepForm:processFlowPanel"
+		              					 process="@this"	                				 	                				                      				 
+		                				 icon="fa fa-sitemap"
+		                				 title="#{bundle['showHierarchical']}"
+		                				 rendered="#{processFlowController.processFlowViewMode == '0'}"
+		                				 styleClass="BlueTextButton RaisedButton"/>
+		                				 
+		              	<p:commandButton actionListener="#{processFlowController.onShowProcessFlowInViewMode(0)}" 
+										 update="processStepForm:processFlowPanel"
+		              					 process="@this"	                				 	                				                      				 
+		                				 icon="fa fa-line-chart"
+		                				 title="#{bundle['showLine']}"
+		                				 rendered="#{processFlowController.processFlowViewMode == '1' or processFlowController.processFlowViewMode == '2'}"
+		                				 styleClass="BlueTextButton RaisedButton"/>
+		                
+		                				 
+		              	<p:commandButton actionListener="#{processFlowController.onShowProcessFlowInViewMode(2)}" 
+										 update="processStepForm:processFlowPanel"
+		              					 process="@this"	                				 	                				                      				 
+		                				 icon="fa fa-clock-o"
+		                				 title="#{bundle['showTimeLine']}"		                				 
+		                				 styleClass="BlueTextButton RaisedButton"
+		                				 rendered="#{processFlowController.flowProgressView and (processFlowController.processFlowViewMode == '0' or processFlowController.processFlowViewMode == '1')}"/>
+		                				 
+	           		</h:panelGroup>
+				</h2>
+								
+				<ui:include src="#{processFlowController.flowProgressView ? '../include/stepListProgress.xhtml' : '../include/stepListTemplate.xhtml'}"/>       			       			
+       			
+       			<p:diagram value="#{processFlowController.hierarchicalModel}" style="height:600px" styleClass="ui-widget-content"
+       					   rendered="#{processFlowController.processFlowViewMode == '1'}"/>
+				
+				<p:timeline id="ptimeline" value="#{processFlowController.timeLineModel}" height="250px"  
+				             selectable="true"  
+				             zoomable="true"  
+				             moveable="true"  
+				             stackEvents="true"  
+				             axisOnTop="false"               
+				             eventStyle="box"  
+				             showCurrentTime="false"  
+				             showNavigation="true"
+				             rendered="#{processFlowController.processFlowViewMode == '2'}"/>  				             
+			</div>
+		</div>
+	</h:panelGroup>
+	
+				   
+
+</h:form>	
+
+		
+	
+</ui:define>
+
+</ui:composition>

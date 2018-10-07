@@ -1,0 +1,24 @@
+- hosts: "{{ system }}"
+  remote_user: ubuntu
+  tasks:
+  - service: name="{{ system }}" state=stopped
+    become: yes
+    become_method: sudo
+  - file: path="/home/{{ system }}/tomcat/webapps" state="absent"
+    become: yes
+    become_user: "{{ system }}"
+  - file: path="/home/{{ system }}/tomcat/work" state="absent"
+    become: yes
+    become_user: "{{ system }}"
+  - file: path="/home/{{ system }}/tomcat/webapps" state="directory"
+    become: yes
+    become_user: "{{ system }}"
+  - file: path="/home/{{ system }}/tomcat/work" state="directory"
+    become: yes
+    become_user: "{{ system }}"
+  - copy: src=target/ROOT.war dest="/home/{{ system }}/tomcat/webapps/ROOT.war" owner="{{ system }}" group="{{ system }}" mode=0644
+    become: yes
+    become_method: sudo
+  - service: name="{{ system }}" state=started
+    become: yes
+    become_method: sudo

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <f:facet name="first">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+            <meta name="apple-mobile-web-app-capable" content="yes" />
+        </f:facet>
+        <title><h:outputText value="#{cst['application.title']}" /></title>
+        <ui:insert name="head" />
+    </h:head>
+
+    <h:body styleClass="GrayModena Geometry" style="height:auto;">
+        <h:form id="activationForm">
+        <p:messages showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+        <h:inputHidden value="#{activationController.code}" />
+        <div class="Wid90 DispBlock MarAuto MarTopPerc5 TexAlCenter">
+            <div class="Wid33 MarAuto WidAutoOnMobile">
+                <div class="EmptyBox30"></div>
+                <div class="Card ShadowEffect">
+                    <div class="EmptyBox20"></div>
+                    <div class="Wid100 OvHidden BigTopic Fs30">
+                    	<p:graphicImage name="chrono/images/bonako.png" style="width:40%; max-width:200px;"/>
+                    	<i class="Fs60 DispBlock"></i><h:outputText value="#{msg['login.title']}" />
+                    </div>
+                    <div class="EmptyBox30"></div>
+                    <ui:fragment rendered="#{activationController.user.email != null}">
+	                    <div class="Wid100"><p:inputText disabled="true" value="#{activationController.user.email}" styleClass="Wid80 TexAlCenter Fs18"/></div>
+    	                <div class="EmptyBox10"></div>
+        	            <div class="Wid100">
+        	            	<p:password id="pass1" placeholder="Password" 
+        	            		value="#{activationController.user.password}" match="pass2"
+        	            		required="true" styleClass="Wid80 TexAlCenter Fs18"  feedback="true"
+        	            		requiredMessage="Password should be filled"
+        	            		validatorMessage="Passwords doesnt match"/>
+        	            	<p:message for="pass1" />
+        	            </div>
+            	        <div class="EmptyBox10"></div>
+                	    <div class="Wid100">
+                	    	<p:password id="pass2" placeholder="Re-enter Password" value="#{activationController.user.password}"
+                	    		 required="true" styleClass="Wid80 TexAlCenter Fs18"
+                	    		 requiredMessage="Re-Password should be filled"/>
+                	    	<p:message for="pass2" />
+                	    </div>
+                    	<div class="EmptyBox30"></div>
+                    	<div class="Wid50 Fleft Responsive50">
+                    		<p:commandButton action="#{activationController.activateUser}" update="activationForm" 
+                    			disabled="#{activationController.user.email == null}" value="Register"
+                    			 icon="fa fa-sign-in" styleClass=" Fs18 White RaisedButton Fright FloatNoneOnMobile"/>
+                    	</div>
+                    </ui:fragment>
+                    <ui:fragment rendered="#{activationController.user.email == null}">
+                    	<div class="Wid100">
+                    		<span style="color: #ff0033;">Activation Code is not valid</span>
+                    	</div>
+                    </ui:fragment>
+                    <div class="EmptyBox5 ShowOnMobile"></div>
+                    <div class="EmptyBox20"></div>
+                </div>
+                <div class="Wid100 TexAlCenter MarTop20 Fs14 FontRobotoRegular Gray">
+                        <i class="fa fa-copyright"></i><h:outputText value="#{cst['application.copyright']}" /><br/> 
+						<h:outputText value="#{cst['application.address']}" />                        
+                </div>
+            </div>
+        </div>
+        </h:form>
+        
+        <h:outputStylesheet name="css/core-layout.css" library="modena-layout" />
+        <h:outputStylesheet name="css/animate.css" library="modena-layout" />
+        <h:outputStylesheet name="css/modena-font.css" library="modena-layout" />
+        <h:outputStylesheet name="css/ripple-effect.css" library="modena-layout" />
+        <h:outputStylesheet name="css/font-awesome.css" library="modena-layout" />
+        <h:outputStylesheet name="css/modena-layout.css" library="modena-layout" />
+    </h:body>
+
+</html>

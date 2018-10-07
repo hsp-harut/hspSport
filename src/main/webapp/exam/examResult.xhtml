@@ -1,0 +1,168 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:sec="http://www.springframework.org/security"
+	template="/WEB-INF/template.xhtml">
+
+<ui:define name="subheader">
+	<h:outputLink value="../exam/examResults" styleClass="BoldGray">
+		<h:outputText value=" #{examResultController.examBean.name}"/>
+	</h:outputLink>
+</ui:define>
+
+<ui:define name="content">
+
+<f:loadBundle id="bundle" var="bundle" basename="#{examResultController.currentBundle}"/>
+
+
+<h:panelGroup id="examDetailsPanel" class="Container100 ui-fluid">
+	<div class="ContainerIndent">
+		<h:panelGroup id="mainPanel" layout="block" styleClass="Card ShadowEffect">					
+			
+			<h2 class="BigTopic">								
+				<h:outputText value="#{bundle['score']}(#{bundle['outOf']} #{examResultController.examBean.points}): #{examResultController.examBean.pointsCandidate} #{bundle['points']}."/>&#160;
+				<p:commandButton icon="fa fa-clock-o"
+	                       		 title="#{bundle['timeUp']}"			                       		 
+	                       		 styleClass="RedButton"
+	                       		 rendered="#{examResultController.examBean.finishDate == null}"/>
+			</h2>
+			
+			<div class="EmptyBox5"></div>
+			
+			<table cellpadding="7" width="50%">
+	         		
+       			<tr>
+       				<td>
+       					<p:outputLabel for="candidate" value="#{bundle['candidate']}: "/>
+       				</td>
+       				
+       				<td>
+       					<h:outputText id="candidate" value="#{examResultController.examBean.candidateName}" style="font-family: robotolight"/>
+       				</td>
+       			</tr>
+       			
+       			<tr>
+       				<td>
+       					<p:outputLabel for="exam" value="#{bundle['exam']}: "/>
+       				</td>
+       				
+       				<td>
+       					<h:outputText id="exam" value="#{examResultController.examBean.name}" style="font-family: robotolight"/>
+       				</td>
+       			</tr>
+       			
+       			<h:panelGroup rendered="#{examResultController.examBean.description != ''}">
+       			<tr>
+       				<td>
+       					<p:outputLabel for="description" value="#{bundle['description']}: "/>
+       				</td>
+       				
+       				<td>
+       					<h:outputText id="description" value="#{examResultController.examBean.description}" style="font-family: robotolight"/>
+       				</td>
+       			</tr>
+       			</h:panelGroup>
+       			
+       			<tr>
+       				<td>
+       					<p:outputLabel for="duration" value="#{bundle['duration']}: "/>
+       				</td>
+       				
+       				<td>
+       					<h:outputText id="duration" value="#{examResultController.examBean.minutes} #{bundle['minutes']}" style="font-family: robotolight"/>
+       				</td>
+       			</tr>
+	         		
+         	</table>
+			
+			<h:panelGroup id="answerDetails" layout="block">
+				<h:panelGroup id="answersPanel" layout="block" rendered="#{examResultController.questionBean != null}">
+					
+					<div class="EmptyBox10"></div>
+					
+					<h2 class="BigTopic">								
+						<h:outputText value="#{bundle['answers']}"/>
+					</h2>
+					
+					<div class="EmptyBox5"></div>
+			
+					<h:panelGroup id="answers">
+						<table cellpadding="9" width="50%">
+			         		<ui:repeat value="#{examResultController.questionBean.answers}" var="answer" >
+			         			<tr>
+			         				<td width="10%">
+			         					<h:selectBooleanCheckbox value="#{answer.userChecked}" disabled="true"/>
+			         				</td>
+			         				
+			         				<td>
+			         					<p:outputLabel value="#{answer.answer}" style="#{answer.correct ? 'color: green;' : 'color: red;'}"/>
+			         				</td>
+			         			</tr>
+			         		</ui:repeat>
+			         	</table>
+		         	</h:panelGroup>
+				</h:panelGroup>
+			</h:panelGroup>																			
+                    				             		
+		</h:panelGroup>
+	</div>
+</h:panelGroup>
+
+<div class="Container100 ui-fluid">
+	<div class="ContainerIndent">
+		<div class="Card ShadowEffect">
+			
+			<h2 class="BigTopic">					
+				<h:outputText value="#{bundle['questions']}"/>
+			</h2>
+			
+			<p:dataTable id="examList" value="#{examResultController.examBean.questions}" var="question"
+				reflow="true" lazy="true" paginator="true" rows="10" rowKey="#{question.id}" 
+				paginatorPosition="bottom" selectionMode="single" paginatorAlwaysVisible="false"
+				paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+				rowsPerPageTemplate="10,25,50">
+				
+				<p:ajax event="rowSelect" listener="#{examResultController.onShowQuestionDetails}" update="examDetailsPanel" />
+				
+				<p:column headerText="#{bundle['question']}">
+					<h:outputText value="#{question.question}" />
+				</p:column>
+
+				<p:column headerText="#{bundle['startedAt']}" style="text-align:center; white-space: nowrap;">
+					<h:outputText value="#{question.startDate}" converter="chronoDateTimeConverter"/>
+				</p:column>
+				
+				<p:column headerText="#{bundle['finishedAt']}" style="text-align:center; white-space: nowrap;">
+					<h:outputText value="#{question.finishDate}" converter="chronoDateTimeConverter"/>
+				</p:column>
+							
+				<p:column headerText="#{bundle['points']}">
+					<h:outputText value="#{question.points}" />
+				</p:column>
+				
+				<p:column headerText="#{bundle['result']}" style="text-align: center;">
+              		<p:commandButton icon="#{question.answeredCorrect ? 'fa fa-check' : 'fa fa-times'}"
+		                       		 title="#{question.answeredCorrect ? bundle['answeredCorrect'] : bundle['answeredWrong']}"			                       		 
+		                       		 styleClass="#{question.answeredCorrect ? 'GreenButton' : 'RedButton'}"
+		                       		 rendered="#{question.finishDate != null}"/>
+		                       		 
+		         	<p:commandButton icon="fa fa-clock-o"
+		                       		 title="#{bundle['timeUp']}"			                       		 
+		                       		 styleClass="RedButton"
+		                       		 rendered="#{question.finishDate == null}"/>		                       		 		        	
+       			</p:column>
+			</p:dataTable>
+			
+		</div>
+	</div>
+</div>
+
+
+	   
+
+</ui:define>
+
+</ui:composition>

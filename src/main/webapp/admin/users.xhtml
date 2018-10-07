@@ -1,0 +1,148 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:sec="http://www.springframework.org/security"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="subheader">
+        User Management
+    </ui:define>
+
+	<ui:define name="content">
+
+		<div class="Container100 ui-fluid">
+			<div class="ContainerIndent">
+				<div class="Card ShadowEffect">
+					<h:form id="userListForm">
+					<p:messages showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+					<h2 class="BigTopic">Users 
+						<sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_USER">
+							<p:commandButton update=":userUpdateForm" 
+                        		value="Create User"
+                        		style="width:auto" icon="fa fa-plus Fs16 White" action="#{userAdminController.newUser}"/>
+                        </sec:ifAnyGranted>
+                    </h2>
+					<p:dataTable var="user" value="#{userAdminController.users}" sortMode="single"
+						reflow="true" lazy="true" paginator="true" rows="10" style="" rowKey="#{user.id}" paginatorAlwaysVisible="false"
+						paginatorPosition="bottom" selectionMode="single" selection="#{userAdminController.selectedUser}"
+						paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+						rowsPerPageTemplate="10,25,50" id="users">
+						<f:facet name="header">
+                            Users
+                        </f:facet>
+                        <p:ajax event="rowSelect" listener="#{userAdminController.onRowSelect}" update=":userUpdateForm" />
+        				<p:ajax event="rowUnselect" listener="#{userAdminController.onRowUnselect}" update=":userUpdateForm" />
+						<p:column headerText="First Name" sortBy="#{user.firstName}" sortable="true">
+							<h:outputText value="#{user.firstName}" />
+						</p:column>
+						
+						<p:column headerText="Last Name" sortBy="#{user.lastName}" sortable="true">
+							<h:outputText value="#{user.lastName}" />
+						</p:column>
+						
+						<p:column headerText="Email" sortBy="#{user.email}" sortable="true" style="text-align: center">
+							<h:outputText value="#{user.email}" />
+						</p:column>
+						
+						<p:column headerText="No of Assigned Roles">
+							<h:outputText value="#{user.roles.size()}" />
+						</p:column>
+						
+						<p:column headerText="Actions" style="text-align: center">
+							<sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_USER">
+                    		<p:commandButton icon="fa fa-close Fs16 White" 
+                    			rendered="#{!user.disabled}"
+                        		title="Disable this user"
+                        		style="width:auto"
+                        		update="userListForm :userUpdateForm"
+                        		styleClass="RedButton"
+                        		actionListener="#{userAdminController.disableUser(user)}"/>
+                        	<p:commandButton icon="fa fa-check Fs16 White" 
+                        		rendered="#{user.disabled}"
+                        		title="Enable this user"
+                        		style="width:auto"
+                        		update="userListForm :userUpdateForm"
+                        		actionListener="#{userAdminController.enableUser(user)}"/>
+                        	<p:commandButton icon="fa fa-envelope-o Fs16 White"
+                        		rendered="#{user.password == null}"
+                        		title="Resend the activation email"
+                        		style="width:auto"
+                        		update="userListForm"
+                        		actionListener="#{userAdminController.sendActivationUser(user)}"/>
+                        	</sec:ifAnyGranted>
+                		</p:column>
+					</p:dataTable>
+					</h:form>
+				</div>
+			</div>
+		</div>
+		
+	    <div class="Container100 ui-fluid" id="rootUserInputContainer">
+            <div class="ContainerIndent">
+                <div class="Card ShadowEffect">
+                	<h:form id="userUpdateForm">
+                	<p:messages showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+                    <h2 class="BigTopic">User Details 
+                    <p:commandButton update=":userUpdateForm" immediate="true" rendered="#{userAdminController.selectedUser.id != null and !userAdminController.selectedUser.disabled}"
+                        		value="#{userAdminController.editPass ? 'Hide Password' : 'Edit Password'}"
+                        		style="width:auto" icon="fa #{userAdminController.editPass ? 'fa-lock' : 'fa-unlock-alt'} Fs16 White" action="#{userAdminController.editMode}"/></h2>
+                    <p:panelGrid id="userContainer" columns="3" columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
+                        <p:outputLabel for="email" value="User Email"/>
+                        <p:inputText id="email" value="#{userAdminController.selectedUser.email}" required="true" validatorMessage="Invalid email format" requiredMessage="Email should be filled." validator="#{userAdminController.validateEmail}" maxlength="150">
+                        	<f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+						</p:inputText>
+                        <p:message for="email" />
+                        
+                        <p:outputLabel for="firstName" value="First Name"/>
+                        <p:inputText id="firstName" value="#{userAdminController.selectedUser.firstName}" required="true" requiredMessage="Firstname should be filled." maxlength="100"/>
+                        <p:message for="firstName" />
+                        
+                        <p:outputLabel for="lastName" value="Last Name"/>
+                        <p:inputText id="lastName" value="#{userAdminController.selectedUser.lastName}" required="true" requiredMessage="Lastname should be filled." maxlength="100"/>
+                        <p:message for="lastName" />
+                        
+						<p:outputLabel for="countries" value="Default Country"/>
+                        <p:selectOneMenu id="countries" value="#{userAdminController.selectedUser.lastCounty}" filter="true" filterMatchMode="startsWith" 
+                        	required="true" requiredMessage="Default Country should be selected" converter="omnifaces.SelectItemsConverter">
+                        	<f:selectItem itemLabel="Select One" itemValue="" />
+                            <f:selectItems value="#{userAdminController.countries}" var="country" itemLabel="#{country.name}" itemValue="#{country}"/>
+                        </p:selectOneMenu>
+                        <p:message for="countries" />
+                        
+                        <p:outputLabel for="pass1" value="Password" rendered="#{userAdminController.selectedUser.id != null and userAdminController.editPass}"/>
+                        <p:password id="pass1" placeholder="Password"  rendered="#{userAdminController.selectedUser.id != null and userAdminController.editPass}"
+        	            		value="#{userAdminController.selectedUser.password}" match="pass2"
+        	            		styleClass="Wid80 TexAlCenter Fs18"  feedback="true"
+        	            		requiredMessage="Password should be filled"
+        	            		validatorMessage="Passwords doesnt match"/>
+        	            <p:message for="pass1" rendered="#{userAdminController.selectedUser.id != null and userAdminController.editPass}"/>
+                        
+                        <p:outputLabel for="pass2" value="Re-enter Password" rendered="#{userAdminController.selectedUser.id != null and userAdminController.editPass}"/>
+                        <p:password id="pass2" placeholder="Re-enter Password" value="#{userAdminController.selectedUser.password}"
+                	    		 styleClass="Wid80 TexAlCenter Fs18" rendered="#{userAdminController.selectedUser.id != null and userAdminController.editPass}"
+                	    		 requiredMessage="Re-Password should be filled"/>
+                	    <p:message for="pass2" rendered="#{userAdminController.selectedUser.id != null and userAdminController.editPass}"/>
+                        
+                        <p:outputLabel for="roleList" value="Roles"/>
+                        <p:pickList id="roleList" value="#{userAdminController.roles}" var="role" itemLabel="#{role.name}" itemValue="#{role}"
+                                 showSourceFilter="true" showTargetFilter="true" responsive="true" style="max-width:900px;" filterMatchMode="contains" converter="roleConverter">
+                        	<f:facet name="sourceCaption">All Roles</f:facet>
+                        	<f:facet name="targetCaption">User Roles</f:facet>
+                    	</p:pickList>
+                    	<p:message for="roleList" />
+                    	
+                    	<sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_USER">
+                        <p:commandButton update="userContainer :userListForm :userUpdateForm" styleClass="#{userAdminController.selectedUser.id != null ? 'GreenButton' : ''}" 
+                        	value="#{userAdminController.selectedUser.id != null ? 'Update User' : 'Create User'}"
+                        	style="width:auto" icon="#{userAdminController.selectedUser.id != null ? 'fa fa-pencil' : 'fa fa-plus'} Fs16 White" action="#{userAdminController.save}"/>
+                        </sec:ifAnyGranted>
+                    </p:panelGrid>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,168 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:sec="http://www.springframework.org/security"
+	template="/WEB-INF/template.xhtml">
+
+<ui:define name="subheader">
+	<h:outputLink value="../exam/examManagement" styleClass="BoldGray">
+		<h:outputText value=" #{bundle['examManagement']}"/>
+	</h:outputLink>        
+</ui:define>
+
+<ui:define name="content">
+
+<f:loadBundle id="bundle" var="bundle" basename="#{examTemplateController.currentBundle}"/>
+
+<h:form id="examForm">
+
+<h:panelGroup id="examCreatePanel" layout="block" styleClass="Container100 ui-fluid">
+	<div class="ContainerIndent">
+		<div class="Card ShadowEffect">						
+		
+			<p:messages id="infoErrorMessages" showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+			
+			<h2 class="BigTopic">					
+				<h:outputText value="#{bundle['examDetails']}"/>&#160;					
+                 	<p:commandButton action="#{examTemplateController.onEditExamQuestions(examTemplateController.examBean.id)}"
+             						 process="@this"		                   			 		                       		 
+		                       		 title="#{bundle['manageExamFlow']}"
+		                       		 rendered="#{examTemplateController.examBean.id != null}"
+		                       		 icon="fa fa-file-text-o Fs16 White"
+		                       		 style="width:auto"			                       		 
+		                       		 styleClass="GreenButton"/>
+			</h2>
+			
+			<div class="EmptyBox20"></div>
+			<p:panelGrid id="examPanel" columns="3" columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
+             		
+				<p:outputLabel for="examName" value="#{bundle['examName']} *"/>
+               	<p:inputText id="examName" value="#{examTemplateController.examBean.name}" maxlength="100"/>
+               	<p:message for="examName" />
+               	
+               	<p:outputLabel for="description" value="#{bundle['description']}"/>
+                <p:inputTextarea id="description" value="#{examTemplateController.examBean.description}" maxlength="255"/>
+                <p:message for="description" />
+               	
+               	<p:outputLabel for="duration" value="#{bundle['durationMinutes']} *"/>
+               	<p:spinner id="duration" value="#{examTemplateController.examBean.minutes}" min="5" stepFactor="5" maxlength="3"/>
+               	<p:message for="duration" />
+               	
+               	<p:outputLabel for="repeatable" value="#{bundle['repeatable']} *"/>
+               	<p:selectBooleanCheckbox id="repeatable" value="#{examTemplateController.examBean.repeatable}">
+		            <p:ajax listener="#{examTemplateController.onRepetableChecked}" update="examPanel" process="examPanel"/>
+		        </p:selectBooleanCheckbox>
+		        <p:message for="repeatable" />
+               	
+               	
+               	<p:outputLabel for="repeatInterval" value="#{bundle['repeatIntervalDays']} *" 
+               				   rendered="#{examTemplateController.examBean.repeatable}"/>
+               	<p:spinner id="repeatInterval" value="#{examTemplateController.examBean.repeatInterval}" min="1" stepFactor="1" maxlength="3"
+               			   rendered="#{examTemplateController.examBean.repeatable}"/>
+               	<p:message for="repeatInterval" rendered="#{examTemplateController.examBean.repeatable}"/>                   
+               
+     		</p:panelGrid>
+         	
+         	<sec:ifAnyGranted roles="ROLE_ADMIN, EDIT_EXAM">
+      		<div class="EmptyBox20"></div>
+         		
+      		<h:panelGroup id="buttonsPanel" layout="block">
+          		<p:commandButton actionListener="#{examTemplateController.onCreateUpdateExam}" update="examCreatePanel, examList"
+                    			 value="#{examTemplateController.examBean.id != null ? bundle['update'] : bundle['create']}" 
+                    			 styleClass="#{examTemplateController.examBean.id != null ? 'GreenButton' : ''}"                     				 
+                    			 style="width:auto" icon="#{examTemplateController.examBean.id != null ? 'fa fa-pencil' : 'fa fa-plus'} Fs16 White"/>
+                    				 
+              	<p:commandButton actionListener="#{examTemplateController.onCancel}" update="examCreatePanel, examList"
+              					 process="@this"
+                				 value="#{bundle['cancel']}" 
+                				 styleClass="RedButton"                     				 
+                				 style="width:auto" icon="fa fa-ban Fs16 White"
+                				 rendered="#{examTemplateController.examBean.id != null}"/>
+			</h:panelGroup>
+			</sec:ifAnyGranted>
+						
+		</div>
+	</div>
+</h:panelGroup>
+</h:form>
+
+
+
+<div class="Container100 ui-fluid">
+	<div class="ContainerIndent">
+		<div class="Card ShadowEffect">
+			
+			<h2 class="BigTopic">					
+				<h:outputText value="#{bundle['exams']}"/>
+			</h2>
+			
+			<p:dataTable id="examList" value="#{examTemplateController.exams}" var="exam"
+				reflow="true" lazy="true" paginator="true" rows="10" rowKey="#{exam.id}" 
+				paginatorPosition="bottom" selectionMode="single" paginatorAlwaysVisible="false"
+				paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+				rowsPerPageTemplate="10,25,50"
+				emptyMessage="#{bundle['noExamFound']}">
+				
+				<p:ajax event="rowSelect" listener="#{examTemplateController.onEditExam}" update="examForm:examCreatePanel" />
+				
+				<p:column headerText="#{bundle['name']}">
+					<h:outputText value="#{exam.name}" />
+				</p:column>
+
+				<p:column headerText="#{bundle['description']}">
+					<h:outputText value="#{exam.description}" />
+				</p:column>
+				
+				<p:column headerText="#{bundle['questions']}">
+					<h:outputText value="#{exam.questionsCount}" />
+				</p:column>
+				
+				<p:column headerText="#{bundle['points']}">
+					<h:outputText value="#{exam.points}" />
+				</p:column>
+				
+				<p:column headerText="#{bundle['durationMinutes']}">
+					<h:outputText value="#{exam.minutes}" />
+				</p:column>
+				
+				<p:column headerText="#{bundle['repeatIntervalDays']}">
+					<h:outputText value="#{exam.repeatInterval}" />
+				</p:column>	
+				
+				<p:column headerText="#{bundle['actions']}" style="text-align: center;">
+              		<p:commandButton action="#{examTemplateController.onEditExamQuestions(exam.id)}"
+              						 process="@this"
+		                   			 icon="fa fa-file-text-o"
+		                       		 title="#{bundle['manageExamFlow']}"			                       		 
+		                       		 styleClass="GreenButton"/>
+		        	
+		        	<sec:ifAnyGranted roles="ROLE_ADMIN, EDIT_EXAM">
+		        		<p:commandButton actionListener="#{examTemplateController.onChangeExamState(exam)}"
+			        					 process="@this"
+	              						 update="examForm:infoErrorMessages, examList"
+			                   			 icon="#{exam.disabled ? 'fa fa-check' : 'fa fa-ban'}"
+			                       		 title="#{exam.disabled ? bundle['enableExamTitle'] : bundle['disableExamTitle']}"
+			                       		 styleClass="#{exam.disabled ? 'BlueButton' : 'RedButton'}"/>
+		        		
+			        	<p:commandButton actionListener="#{examTemplateController.onRemoveExam(exam)}"
+			        					 process="@this"
+	              						 update="examForm:examCreatePanel, examList"
+			                   			 icon="fa fa-trash-o"
+			                       		 title="#{bundle['deleteExamTitle']}"
+			                       		 styleClass="RedButton"
+			                       		 onclick="if (!confirm('#{bundle['deleteExamConfirm']}')) return false;"/>
+		        	</sec:ifAnyGranted>
+       			</p:column>
+			</p:dataTable>
+			
+		</div>
+	</div>
+</div>
+
+			   
+
+</ui:define>
+
+</ui:composition>

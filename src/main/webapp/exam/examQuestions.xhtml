@@ -1,0 +1,151 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:sec="http://www.springframework.org/security"
+	template="/WEB-INF/template.xhtml">
+
+<ui:define name="subheader">
+	<h:outputLink value="../exam/examManagement" styleClass="BoldGray">
+		<h:outputText value=" #{questionController.examBean.name}"/>
+		
+		<f:param name="examId" value="#{questionController.examBean.id}"/>
+	</h:outputLink>        
+</ui:define>
+
+<ui:define name="content">
+
+<f:loadBundle id="bundle" var="bundle" basename="#{questionController.currentBundle}"/>
+
+<h:form id="questionForm">
+
+<h:panelGroup id="questionCreatePanel" layout="block" styleClass="Container100 ui-fluid">
+	<div class="ContainerIndent">
+		<div class="Card ShadowEffect">						
+		
+			<p:messages id="infoErrorMessages" showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+			
+			<h2 class="BigTopic">					
+				<h:outputText value="#{bundle['questionDetails']}"/>                 	
+			</h2>
+			
+			<div class="EmptyBox20"></div>
+			<p:panelGrid id="questionPanel" columns="3" columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
+             		
+				<p:outputLabel for="question" value="#{bundle['question']} *"/>
+               	<p:inputTextarea id="question" value="#{questionController.questionBean.question}" placeholder="#{bundle['enterQuestionTooltip']}" rows="2" maxlength="255"/>
+               	<p:message for="question" />
+               	
+               	<p:outputLabel for="points" value="#{bundle['points']}"/>
+                <p:spinner id="points" value="#{questionController.questionBean.points}" min="1" stepFactor="1" maxlength="3"/>
+                <p:message for="points" /> 
+                
+                <p:outputLabel for="answers" value="#{bundle['answers']}"/>           
+               	<h:panelGroup id="answers">
+               		<table>
+		         		<ui:repeat value="#{questionController.questionBean.answers}" var="answer" >
+		         			<tr>
+		         				<td width="5%">
+		         					<h:selectBooleanCheckbox value="#{answer.correct}" title="#{bundle['correctAnswerCheckbox']}"/>
+		         				</td>
+		         				
+		         				<td width="85%">
+		         					<p:inputTextarea id="answer" value="#{answer.answer}" placeholder="#{bundle['enterAnswerTooltip']}" rows="2" maxlength="255"/>
+		         				</td>
+		         				
+		         				<td style="white-space: nowrap;">
+		         					<p:commandButton actionListener="#{questionController.onAddNewAnswer(answer)}"
+						        					 process="questionForm:answers"
+				              						 update="questionForm:answers"
+						                   			 icon="fa fa-plus"
+						                       		 styleClass="GreenButton"
+						                       		 title="#{bundle['addNewAnswerTooltip']}"/>
+						                       		 
+		         					<p:commandButton actionListener="#{questionController.onRemoveAnswer(answer)}"
+						        					 process="questionForm:answers"
+				              						 update="questionForm:answers"
+						                   			 icon="fa fa-trash-o"
+						                       		 styleClass="RedButton"
+						                       		 title="#{bundle['delete']}"/>
+		         				</td>
+		         			</tr>
+		         		</ui:repeat>
+		         	</table>
+               	</h:panelGroup>
+               	<p:message for="answers" />
+     		</p:panelGrid>     		     		
+         	
+         	
+         	<sec:ifAnyGranted roles="ROLE_ADMIN, EDIT_EXAM">
+      		<div class="EmptyBox20"></div>
+         		
+      		<h:panelGroup id="buttonsPanel" layout="block">
+          		<p:commandButton actionListener="#{questionController.onCreateUpdateQuestion}" update="questionCreatePanel, questionList"
+                    			 value="#{questionController.questionBean.id != null ? bundle['update'] : bundle['create']}" 
+                    			 styleClass="#{questionController.questionBean.id != null ? 'GreenButton' : ''}"                     				 
+                    			 style="width:auto" icon="#{questionController.questionBean.id != null ? 'fa fa-pencil' : 'fa fa-plus'} Fs16 White"/>
+                    				 
+              	<p:commandButton actionListener="#{questionController.onCancel}" update="questionCreatePanel, questionList"
+              					 process="@this"
+                				 value="#{bundle['cancel']}" 
+                				 styleClass="RedButton"                     				 
+                				 style="width:auto" icon="fa fa-ban Fs16 White"
+                				 rendered="#{questionController.questionBean.id != null}"/>
+			</h:panelGroup>
+			</sec:ifAnyGranted>						
+						
+		</div>
+	</div>
+</h:panelGroup>
+</h:form>
+
+
+
+<div class="Container100 ui-fluid">
+	<div class="ContainerIndent">
+		<div class="Card ShadowEffect">
+			
+			<h2 class="BigTopic">					
+				<h:outputText value="#{bundle['questions']}"/>
+			</h2>
+			
+			<p:dataTable id="questionList" value="#{questionController.questions}" var="question"
+				reflow="true" lazy="true" paginator="true" rows="10" rowKey="#{question.id}" 
+				paginatorPosition="bottom" selectionMode="single" paginatorAlwaysVisible="false"
+				paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+				rowsPerPageTemplate="10,25,50"
+				emptyMessage="#{bundle['noQuestionFound']}">
+				
+				<p:ajax event="rowSelect" listener="#{questionController.onEditQuestion}" update="questionForm:questionCreatePanel" />
+				
+				<p:column headerText="#{bundle['question']}">
+					<h:outputText value="#{question.question}" />
+				</p:column>
+
+				<p:column headerText="#{bundle['points']}">
+					<h:outputText value="#{question.points}" />
+				</p:column>							
+				
+				<sec:ifAnyGranted roles="ROLE_ADMIN, EDIT_EXAM">
+					<p:column headerText="#{bundle['actions']}" style="text-align: center;">              			        				        			        				        	
+			        	<p:commandButton actionListener="#{questionController.onRemoveQuestion(question)}"
+			        					 process="@this"
+	              						 update="questionForm:questionCreatePanel, questionList"
+			                   			 icon="fa fa-trash-o"
+			                       		 title="#{bundle['deleteQuestionTitle']}"
+			                       		 styleClass="RedButton"
+			                       		 onclick="if (!confirm('#{bundle['deleteQuestionConfirm']}')) return false;"/>		        	
+	       			</p:column>
+       			</sec:ifAnyGranted>
+			</p:dataTable>
+			
+		</div>
+	</div>
+</div>
+
+			   
+
+</ui:define>
+
+</ui:composition>

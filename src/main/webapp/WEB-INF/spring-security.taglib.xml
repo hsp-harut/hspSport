@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<facelet-taglib xmlns="http://java.sun.com/xml/ns/javaee"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facelettaglibrary_2_0.xsd"
+		version="2.0">
+    <description>This is the new Spring JSF Facelets Taglib/JEE 7.</description>
+    <namespace>http://www.springframework.org/security</namespace>
+    <function>
+        <function-name>ifAnyGranted</function-name>
+        <function-class>am.chronograph.web.security.SpringSecurityELLibrary</function-class>
+        <function-signature>boolean ifAnyGranted(java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <function-name>ifAllGranted</function-name>
+        <function-class>am.chronograph.web.security.SpringSecurityELLibrary</function-class>
+        <function-signature>boolean ifAllGranted(java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <function-name>ifNotGranted</function-name>
+        <function-class>am.chronograph.web.security.SpringSecurityELLibrary</function-class>
+        <function-signature>boolean ifNotGranted(java.lang.String)</function-signature>
+    </function>
+    
+    <function>
+        <function-name>ifAnyNotGranted</function-name>
+        <function-class>am.chronograph.web.security.SpringSecurityELLibrary</function-class>
+        <function-signature>boolean ifAnyNotGranted(java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <function-name>isAuthenticated</function-name>
+        <function-class>am.chronograph.web.security.SpringSecurityELLibrary</function-class>
+        <function-signature>boolean isAuthenticated()</function-signature>
+    </function>
+
+    <function>
+        <function-name>isAnonymous</function-name>
+        <function-class>am.chronograph.web.security.SpringSecurityELLibrary</function-class>
+        <function-signature>boolean isAnonymous()</function-signature>
+    </function>
+    <tag>
+        <tag-name>ifAnyGranted</tag-name>
+        <component>
+            <component-type>am.chronograph.web.security.IfAnyGrantedTag</component-type>
+            <handler-class>am.chronograph.web.security.IfAnyGrantedTag</handler-class>
+        </component>
+    </tag>
+    <tag>
+        <tag-name>ifAllGranted</tag-name>
+        <component>
+            <component-type>am.chronograph.web.security.IfAllGrantedTag</component-type>
+            <handler-class>am.chronograph.web.security.IfAllGrantedTag</handler-class>
+        </component>
+    </tag>
+    <tag>
+        <tag-name>ifNotGranted</tag-name>
+        <component>
+            <component-type>am.chronograph.web.security.IfNotGrantedTag</component-type>
+            <handler-class>am.chronograph.web.security.IfNotGrantedTag</handler-class>
+        </component>
+    </tag>
+    <tag>
+        <tag-name>isAuthenticated</tag-name>
+        <component>
+            <component-type>am.chronograph.web.security.IsAuthenticatedTag</component-type>
+            <handler-class>am.chronograph.web.security.IsAuthenticatedTag</handler-class>
+        </component>
+    </tag>
+    <tag>
+        <tag-name>isAnonymous</tag-name>
+        <component>
+            <component-type>am.chronograph.web.security.IsAnonymousTag</component-type>
+            <handler-class>am.chronograph.web.security.IsAnonymousTag</handler-class>
+        </component>
+    </tag>
+</facelet-taglib>

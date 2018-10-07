@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<faces-config version="2.0" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd">
+
+	<name>chronograph</name>
+
+	<application>
+		<action-listener>org.primefaces.application.DialogActionListener</action-listener>
+        <navigation-handler>org.primefaces.application.DialogNavigationHandler</navigation-handler>
+        <view-handler>org.primefaces.application.DialogViewHandler</view-handler>
+		<locale-config>
+			<default-locale>en</default-locale>
+		</locale-config>
+		<resource-bundle>
+			<base-name>messages.messages</base-name>
+			<var>msg</var>
+		</resource-bundle>
+		<resource-bundle>
+			<base-name>messages.custom</base-name>
+			<var>cst</var>
+		</resource-bundle>
+	</application>
+
+	<component>
+		<component-type>org.primefaces.component.ModenaMenu</component-type>
+		<component-class>org.primefaces.modena.component.menu.ModenaMenu</component-class>
+	</component>
+
+	<render-kit>
+		<renderer>
+			<component-family>org.primefaces.component</component-family>
+			<renderer-type>org.primefaces.component.ModenaMenuRenderer</renderer-type>
+			<renderer-class>org.primefaces.modena.component.menu.ModenaMenuRenderer</renderer-class>
+		</renderer>
+	</render-kit>
+	
+	<factory>
+        <exception-handler-factory>
+            am.chronograph.web.ex.ChronoExceptionHandlerFactory
+        </exception-handler-factory>
+	</factory>
+
+</faces-config>

@@ -1,0 +1,83 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:sec="http://www.springframework.org/security"
+	template="/WEB-INF/template.xhtml">
+
+<ui:define name="subheader">	
+	<h:outputText value=" #{examPassController.examBean.name}" styleClass="BoldGray"/>	
+</ui:define>
+
+<ui:define name="content">
+
+<f:loadBundle id="bundle" var="bundle" basename="#{examPassController.currentBundle}"/>
+
+<h:form id="examForm">
+
+<div class="Container100 ui-fluid">
+	<div class="ContainerIndent">
+		<h:panelGroup id="mainPanel" layout="block" styleClass="Card ShadowEffect">
+		
+			<p:messages id="infoErrorMessages" showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+			
+			<h2 class="BigTopic">
+				<h:panelGrid columns="2" cellspacing="0" cellpadding="0" width="100%"
+							 columnClasses="panel90PercentTop, panel10PercentRight">
+							 
+					<h:outputText id="question" value="#{examPassController.currentQuestionNumber}. #{examPassController.currentQuestion.question}"
+				  			  	  style="-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;"/>
+							  			  
+					<pe:timer timeout="#{examPassController.examBean.minutes * 60}" format="HH:mm:ss" 
+						  	  listener="#{examPassController.onTimeout}"
+						  	  update="mainPanel" 
+						  	  style="color: #546e7a; font-weight: normal;"/>
+				</h:panelGrid>
+			</h2>														
+			
+			<div class="EmptyBox5"></div>
+			
+			<h:panelGroup id="answers">
+				<table cellpadding="9">
+	         		<ui:repeat value="#{examPassController.currentQuestion.answers}" var="answer" >
+	         			<tr>
+	         				<td width="5%">
+	         					<h:selectBooleanCheckbox value="#{answer.userChecked}"/>
+	         				</td>
+	         				
+	         				<td>
+	         					<p:outputLabel value="#{answer.answer}"/>
+	         				</td>
+	         			</tr>
+	         		</ui:repeat>
+	         	</table>
+         	</h:panelGroup>
+         	
+         	<div class="EmptyBox20"></div>
+         	
+         	<h:panelGroup id="buttonsPanel" layout="block">	      		
+	       		<p:commandButton actionListener="#{examPassController.onNextQuestion}" 
+	       						 update="question, answers, buttonsPanel"
+	                 			 value="#{bundle['next']}" 
+	                 			 style="width:auto"
+	                 			 icon="fa fa-arrow-right Fs16 White"
+	                 			 rendered="#{examPassController.currentQuestionNumber != examPassController.examBean.questionsCount and examPassController.examBean.status == 'Started'}"/>
+	                 			 
+	         	<p:commandButton action="#{examPassController.onFinishQuestion}" 	       						 
+	                 			 value="#{bundle['finish']}" 
+	                 			 style="width:auto"
+	                 			 icon="fa fa-arrow-right Fs16 White"
+	                 			 rendered="#{examPassController.currentQuestionNumber == examPassController.examBean.questionsCount or examPassController.examBean.status != 'Started'}"/>
+        	</h:panelGroup>
+                    				             		
+		</h:panelGroup>
+	</div>
+</div>
+
+</h:form>			   
+
+</ui:define>
+
+</ui:composition>

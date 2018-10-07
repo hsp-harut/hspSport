@@ -1,0 +1,151 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:sec="http://www.springframework.org/security"
+	template="/WEB-INF/template.xhtml">
+
+<ui:define name="subheader">
+	<h:outputLink value="../admin/processManagement" styleClass="BoldGray">
+		<h:outputText value=" #{bundle['processManagement']}"/>
+	</h:outputLink>        
+</ui:define>
+
+<ui:define name="content">
+
+<f:loadBundle id="bundle" var="bundle" basename="#{processController.currentBundle}"/>
+
+<h:form id="processForm">
+
+<h:panelGroup id="processCreatePanel" layout="block" styleClass="Container100 ui-fluid">
+	<div class="ContainerIndent">
+		<div class="Card ShadowEffect">						
+		
+			<p:messages showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+			
+			<h2 class="BigTopic">					
+				<h:outputText value="#{bundle['processDetails']}"/>&#160;					
+                 	<p:commandButton action="#{processController.onEditProcessFlow(processController.processBean.id)}"
+             						 process="@this"		                   			 		                       		 
+		                       		 title="#{bundle['manageProcessFlow']}"
+		                       		 rendered="#{processController.processBean.id != null}"
+		                       		 icon="fa fa-line-chart Fs16 White"
+		                       		 style="width:auto"			                       		 
+		                       		 styleClass="GreenButton"/>
+			</h2>
+			
+			<div class="EmptyBox20"></div>
+			<p:panelGrid id="processPanel" columns="3" columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
+             		
+				<p:outputLabel for="processName" value="#{bundle['processName']} *"/>
+               	<p:inputText id="processName" value="#{processController.processBean.name}" maxlength="100"/>
+               	<p:message for="processName" />                    
+                   
+                <p:outputLabel for="description" value="#{bundle['description']}"/>
+                <p:inputTextarea id="description" value="#{processController.processBean.description}" maxlength="255"/>
+                <p:message for="description" />
+                
+                <p:outputLabel for="countries" value="Country"/>
+                        <p:selectOneMenu id="countries" disabled="true" value="#{sessionBean.selectedCountry}" filter="true" filterMatchMode="startsWith" 
+                        	required="true" requiredMessage="Country should be selected" converter="omnifaces.SelectItemsConverter">
+                        	<f:selectItem itemLabel="Select One" itemValue="" />
+                            <f:selectItems value="#{roleAdminController.countries}" var="country" itemLabel="#{country.name}" itemValue="#{country}"/>
+                        </p:selectOneMenu>
+                <p:message for="countries" />                                                            
+               
+     		</p:panelGrid>
+         	
+         	<sec:ifAnyGranted roles="ROLE_ADMIN, EDIT_PROCESS">
+      		<div class="EmptyBox20"></div>
+         		
+      		<h:panelGroup id="buttonsPanel" layout="block">
+          		<p:commandButton actionListener="#{processController.onCreateUpdateProcess}" update="processCreatePanel, processList"
+                    			 value="#{processController.processBean.id != null ? bundle['update'] : bundle['create']}" 
+                    			 styleClass="#{processController.processBean.id != null ? 'GreenButton' : ''}"                     				 
+                    			 style="width:auto" icon="#{processController.processBean.id != null ? 'fa fa-pencil' : 'fa fa-plus'} Fs16 White"/>
+                    				 
+              	<p:commandButton actionListener="#{processController.onCancel}" update="processCreatePanel, processList"
+              					 process="@this"
+                				 value="#{bundle['cancel']}" 
+                				 styleClass="RedButton"                     				 
+                				 style="width:auto" icon="fa fa-ban Fs16 White"
+                				 rendered="#{processController.processBean.id != null}"/>
+			</h:panelGroup>
+			</sec:ifAnyGranted>
+						
+		</div>
+	</div>
+</h:panelGroup>
+</h:form>
+
+
+
+<div class="Container100 ui-fluid">
+	<div class="ContainerIndent">
+		<div class="Card ShadowEffect">
+			
+			<h2 class="BigTopic">					
+				<h:outputText value="#{bundle['processes']}"/>
+			</h2>
+			
+			<p:dataTable id="processList" value="#{processController.processes}" var="process"
+				reflow="true" lazy="true" paginator="true" rows="10" rowKey="#{process.id}" 
+				paginatorPosition="bottom" selectionMode="single" paginatorAlwaysVisible="false"
+				paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+				rowsPerPageTemplate="10,25,50"
+				emptyMessage="#{bundle['noProcessFound']}">
+				
+				<p:ajax event="rowSelect" listener="#{processController.onEditProcess}" update="processForm:processCreatePanel" />
+				
+				<p:column headerText="#{bundle['name']}">
+					<h:outputText value="#{process.name}" />
+				</p:column>
+
+				<p:column headerText="#{bundle['description']}">
+					<h:outputText value="#{process.description}" />
+				</p:column>	
+				
+				<p:column headerText="#{bundle['createdAt']}" style="text-align:center; white-space: nowrap;">
+					<h:outputText value="#{process.startDate}" converter="chronoDateTimeConverter"/>
+				</p:column>
+				
+				<p:column headerText="Country" style="text-align:center; white-space: nowrap;">
+					<h:outputText value="#{process.country.name}"/>
+				</p:column>						
+				
+				<p:column headerText="#{bundle['actions']}" style="text-align: center;">
+              		<p:commandButton action="#{processController.onEditProcessFlow(process.id)}"
+              						 process="@this"
+		                   			 icon="fa fa-line-chart"
+		                       		 title="#{bundle['manageProcessFlow']}"			                       		 
+		                       		 styleClass="GreenButton"/>
+		        	
+		        	<sec:ifAnyGranted roles="ROLE_ADMIN, EDIT_PROCESS">
+		        	<p:commandButton actionListener="#{processController.onCopyProcess(process)}"
+		        					 process="@this"
+              						 update="processForm:processCreatePanel, processList"
+		                   			 icon="fa fa-clone"
+		                       		 title="Copy"
+		                       		 styleClass="BlueButton"
+		                       		 />
+		        	<p:commandButton actionListener="#{processController.onRemoveProcess(process)}"
+		        					 process="@this"
+              						 update="processForm:processCreatePanel, processList"
+		                   			 icon="fa fa-trash-o"
+		                       		 title="#{bundle['deleteProcessTitle']}"
+		                       		 styleClass="RedButton"
+		                       		 onclick="if (!confirm('#{bundle['deleteProcessConfirm']}')) return false;"/>
+		        	</sec:ifAnyGranted>
+       			</p:column>
+			</p:dataTable>
+			
+		</div>
+	</div>
+</div>
+
+			   
+
+</ui:define>
+
+</ui:composition>

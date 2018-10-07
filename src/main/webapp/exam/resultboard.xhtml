@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:sec="http://www.springframework.org/security"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="subheader">
+        Stuff Results
+    </ui:define>
+
+	<ui:define name="content">
+
+	    <div class="Container100 ui-fluid">
+			<div class="ContainerIndent">
+				<div class="Card ShadowEffect">
+					<h:form id="stockListForm">
+                    <p:dataTable value="#{levelBoardController.levels}" var="level"
+						paginator="true" rows="15"
+						widgetVar="levelTable" lazy="false" id="levelTable"
+						paginatorPosition="bottom"  paginatorAlwaysVisible="false"
+						paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+						rowsPerPageTemplate="15,25,50"
+						sortMode="single"
+						sortBy="#{level.points}"
+						sortOrder="DESCENDING"
+						emptyMessage="No Data Yet">
+						
+						<p:column headerText="Country" sortBy="#{level.country}" >
+							<h:outputText value="#{level.country}"/>
+						</p:column>
+						
+						<p:column headerText="First Name" sortBy="#{level.firstName}">
+							<h:outputText value="#{level.firstName}"/>
+						</p:column>
+						
+						<p:column headerText="Last Name" sortBy="#{level.lastName}">
+							<h:outputText value="#{level.lastName}"/>
+						</p:column>
+						
+						<p:column headerText="Status" sortBy="#{level.level}">
+							<h:outputText value="#{level.level}"/>
+						</p:column>
+						
+						<p:column headerText="Points" sortBy="#{level.points}">
+							<h:outputText value="#{level.points}"/>
+						</p:column>
+						
+						<p:column headerText="Actions" sortable="false" rendered="#{sec:ifAnyGranted('ROLE_ADMIN,VIEW_STUFF_PERSONAL')}" style="text-align: center">
+							<p:commandButton icon="fa fa-eye Fs16 White" 
+                        		title="View Personal Results"
+                        		style="width:auto"
+                        		process="@this"
+                        		action="#{levelBoardController.viewPersonal(level.userId)}"/>
+						</p:column>
+						
+					</p:dataTable>
+					</h:form>
+				</div>
+			</div>
+		</div>
+	</ui:define>
+
+</ui:composition>	

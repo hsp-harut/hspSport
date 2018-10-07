@@ -1,0 +1,140 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:sec="http://www.springframework.org/security"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="subheader">
+    	<h:outputText value="#{documentCenterController.category.parent.title}"/> <i class="icon-arrow-right"></i> <h:outputText value="#{documentCenterController.category.title}"/>
+    </ui:define>
+
+	<ui:define name="content">
+
+		<div class="Container100 ui-fluid">
+			<div class="ContainerIndent">
+				<div class="Card ShadowEffect">
+					<h:form id="documentListForm">
+					<p:messages showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+					<h2 class="BigTopic">Help Materials 
+						<sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_HELP_CENTRE">
+							<p:commandButton update=":documentUpdateForm" 
+                        		value="Create Document"
+                        		style="width:auto" icon="fa fa-plus Fs16 White" action="#{documentCenterController.newDocument}"/>
+                        </sec:ifAnyGranted>
+                    </h2>
+                    <p:toolbar>
+                    	<f:facet name="right">
+                    	<p:outputPanel>
+                				<p:inputText id="globalFilter" value="#{documentCenterController.query}"
+                					 style="width:200px" placeholder="Enter keyword">
+                					<p:ajax event="keyup" update="documentListForm" delay="1000" />
+                				</p:inputText>
+            				</p:outputPanel>
+            			</f:facet>
+                    </p:toolbar>
+					<p:dataTable var="document" value="#{documentCenterController.documents}" sortMode="single"
+						reflow="true" lazy="true" paginator="true" rows="10" rowKey="#{document.id}" paginatorAlwaysVisible="false"
+						paginatorPosition="bottom" selectionMode="single" selection="#{documentCenterController.selectedDocument}"
+						paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+						rowsPerPageTemplate="10,25,50" id="documents"  widgetVar="documents">
+                        <p:ajax event="rowSelect" listener="#{documentCenterController.onRowSelect}" update=":documentUpdateForm" />
+        				<p:ajax event="rowUnselect" listener="#{documentCenterController.onRowUnselect}" update=":documentUpdateForm" />
+        				
+						<p:column headerText="Title" sortBy="#{document.title}" sortable="true">
+							<h:outputText value="#{document.title}" />
+						</p:column>
+						
+						<p:column headerText="Description" sortBy="#{document.description}" sortable="true">
+							<h:outputText value="#{document.description}" />
+						</p:column>
+						
+						<p:column headerText="Keywords" sortable="false">
+							<h:outputText value="#{document.keywords}" />
+						</p:column>
+						
+						<p:column headerText="Actions" style="text-align: center">
+							<sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_HELP_CENTRE">
+                    		<p:commandButton icon="fa fa-close Fs16 White" 
+                        		title="Delete this document"
+                        		style="width:auto"
+                        		styleClass="RedButton"
+                        		actionListener="#{documentCenterController.removeDocument(document)}"/>
+                        	</sec:ifAnyGranted>
+                		</p:column>
+					</p:dataTable>
+					</h:form>
+				</div>
+			</div>
+		</div>
+		
+	    <div class="Container100 ui-fluid" id="rootDocumentInputContainer">
+            <div class="ContainerIndent">
+                <div class="Card ShadowEffect">
+                	<h:form id="documentUpdateForm">
+                	<p:defaultCommand target="dummy"/>
+					<p:commandButton id="dummy" process="@none" global="false" style="display:none;"/>
+                	<p:messages id="msgs" showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+                    <h2 class="BigTopic">Document Details</h2>
+                    <p:panelGrid id="documentContainer" columns="3" columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
+                        <p:outputLabel for="title" value="Title"/>
+                        <p:inputText id="title" value="#{documentCenterController.selectedDocument.title}" required="true" readonly="#{sec:ifNotGranted('EDIT_HELP_CENTRE')}"
+                        	requiredMessage="Title should be filled." maxlength="150" />
+                        <p:message for="title" />
+                        
+                        <p:outputLabel for="description" value="Description"/>
+                        <p:inputTextarea id="description" value="#{documentCenterController.selectedDocument.description}" required="true" readonly="#{sec:ifNotGranted('EDIT_HELP_CENTRE')}"
+                        	requiredMessage="Description should be filled." maxlength="250" rows="5"/>
+                        <p:message for="description" />
+                        
+                        <p:outputLabel for="keywords" value="Keywords"/>
+                        <p:inputTextarea id="keywords" value="#{documentCenterController.selectedDocument.keywords}" 
+                        		required="true" readonly="#{sec:ifNotGranted('EDIT_HELP_CENTRE')}"
+                        	requiredMessage="Keywords should be filled." maxlength="250" rows="5"/>
+                        <p:message for="keywords" />
+                        
+                        <p:outputLabel for="url" value="External URL" rendered="#{sec:ifAllGranted('EDIT_HELP_CENTRE') or (sec:ifNotGranted('EDIT_HELP_CENTRE') and documentCenterController.selectedDocument.url != '')}"/>
+						<p:inputText id="url" value="#{documentCenterController.selectedDocument.url}" maxlength="250" rendered="#{sec:ifAllGranted('EDIT_HELP_CENTRE')}"/>
+						<p:link value="#{documentCenterController.selectedDocument.url}" href="#{documentCenterController.selectedDocument.url}" target="_BLANK" rendered="#{sec:ifNotGranted('EDIT_HELP_CENTRE') and documentCenterController.selectedDocument.url != ''}" />
+                        <p:message for="url" rendered="#{sec:ifAllGranted('EDIT_HELP_CENTRE') or (sec:ifNotGranted('EDIT_HELP_CENTRE') and documentCenterController.selectedDocument.url != '')}"/>
+                        
+                        <p:outputLabel for="fileupload" value="Attachements" rendered="#{documentCenterController.selectedDocument.id != null and sec:ifAllGranted('EDIT_HELP_CENTRE')}" />
+                       	<p:fileUpload id="fileupload" fileUploadListener="#{documentCenterController.handleFileUpload}" mode="advanced" dragDropSupport="true"
+                       			update=":documentUpdateForm" immediate="true" sizeLimit="50000000" label="Add" 
+                       			rendered="#{documentCenterController.selectedDocument.id != null and sec:ifAllGranted('EDIT_HELP_CENTRE')}" style="width:auto;"
+                                multiple="true" />
+                        <p:message for="fileupload" rendered="#{documentCenterController.selectedDocument.id != null and sec:ifAllGranted('EDIT_HELP_CENTRE')}"/>
+                        
+                        <p:outputLabel for="attachs" value="" rendered="#{documentCenterController.selectedDocument.uploadedFiles.size() > 0}"/>
+                        <p:dataGrid var="file" value="#{documentCenterController.selectedDocument.uploadedFiles}" columns="3" layout="grid" paginatorAlwaysVisible="false" paginatorPosition="bottom"
+        					rows="12" paginator="true" id="attachs" rendered="#{documentCenterController.selectedDocument.uploadedFiles.size() > 0}" >
+        					<p:panel header="#{file.id}" style="text-align:center">
+            					<h:panelGrid columns="1" style="width:100%">
+                					<p:commandLink immediate="true" ajax="false" value="#{of:abbreviate(file.originalName, 20)}" action="#{documentCenterController.downloadFile(file)}" />
+ 
+                					<p:outputLabel value="#{file.size / 1000} KB"/>
+                					
+                					<sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_HELP_CENTRE">
+                						<p:commandButton icon="fa fa-trash Fs16 White" action="#{documentCenterController.removeFile(file)}" styleClass="RedButton"/>
+                					</sec:ifAnyGranted>
+ 
+            					</h:panelGrid>
+        					</p:panel>
+        				</p:dataGrid>
+    					<p:message for="attachs" rendered="#{documentCenterController.selectedDocument.uploadedFiles.size() > 0}"/>
+                        
+                    	<sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_HELP_CENTRE">
+                        <p:commandButton update="documentContainer :documentListForm :documentUpdateForm" styleClass="#{documentCenterController.selectedDocument.id != null ? 'GreenButton' : ''}" 
+                        	value="#{documentCenterController.selectedDocument.id != null ? 'Update Document' : 'Create Document'}"
+                        	style="width:auto" icon="#{documentCenterController.selectedDocument.id != null ? 'fa fa-pencil' : 'fa fa-plus'} Fs16 White" action="#{documentCenterController.save}"/>
+                        </sec:ifAnyGranted>
+                    </p:panelGrid>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+
+	</ui:define>
+
+</ui:composition>

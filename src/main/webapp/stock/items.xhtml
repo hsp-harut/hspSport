@@ -1,0 +1,276 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:sec="http://www.springframework.org/security"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="subheader">
+        Stock Inventory
+    </ui:define>
+
+	<ui:define name="content">
+
+	    <div class="Container100 ui-fluid">
+			<div class="ContainerIndent">
+				<div class="Card ShadowEffect">
+					<h:form id="stockListForm">
+					<p:messages id="msgs" showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+					<p:defaultCommand target="dummy"/>
+					<p:commandButton id="dummy" process="@none" global="false" style="display:none;"/>
+                    <p:toolbar>
+                    	<f:facet name="left">
+							<p:remoteCommand name="reset" update=":stockUpdateForm" actionListener="#{stockController.reset}" />
+								<sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_STOCK">
+									<p:commandButton update=":stockUpdateForm"  rendered="false"
+                        			value="Create Stock Item" id="createNewButton" widgetVar="createNewButton"
+                        			style="width:auto" icon="fa fa-plus Fs16 White" action="#{stockController.newStockItem}"/>
+                        		</sec:ifAnyGranted>
+                        		<h:outputText value="Only Bad Items: " styleClass="Gray" />
+                        		<p:inputSwitch value="#{stockController.onlyBad}" label="Only Bad" style="padding-top:5px;">
+            						<p:ajax listener="#{stockController.onCurrencyChange}" update=":stockListForm" />
+        						</p:inputSwitch>
+                    	</f:facet>
+                    	<f:facet name="right">
+                    	
+                    		<p:commandButton ajax="false" value="Reimport" action="#{stockController.importAll}" rendered="#{sessionScope['SPRING_SECURITY_CONTEXT'].authentication.principal.email eq 'admin@hsp.am'}"
+                            	style="width:auto;" icon="fa fa-cloud-download Fs16 White" update="stockListForm" />
+                    		
+                    		<p:commandButton ajax="false" value="Excel"
+                            	style="width:auto;" icon="fa fa-file-excel-o Fs16 White">
+                            	<pe:exporter type="stock_item_xlsx" target="stockItems" fileName="items" fontName="Arial" cellFontSize="10" facetFontSize="12"/>
+                            </p:commandButton>
+                            
+                            <p:commandButton ajax="false" value="PDF" style="width:auto;"
+                            	 icon="fa fa-file-pdf-o Fs16 White">
+                            	<pe:exporter type="stock_item_pdf" target="stockItems" fileName="items" orientation="Landscape"/>
+                            </p:commandButton>
+                            
+                            <p:commandButton id="filterToggleButton" value="#{stockController.filterable ? 'Hide Filters' : 'Show Filters'}"
+                            	 update=":stockListForm"
+                            	 style="width:auto;" icon="fa fa-filter Fs16 White" action="#{stockController.toggleFilter}"/>
+                            <p:commandButton id="toggler" type="button" value="Columns" style="width:auto;" icon="fa fa-calculator Fs16 White"/>
+                            <p:columnToggler datasource="stockItems" trigger="toggler">
+                            	<p:ajax event="toggle" listener="#{stockController.onToggle}" />
+                            </p:columnToggler>
+                    	</f:facet>
+                    </p:toolbar>
+					<p:dataTable var="stockItem" value="#{stockController.stockItems}" sortMode="single"
+						reflow="true" lazy="true" paginator="true" rows="10" style="" rowKey="#{stockItem.id}" 
+						emptyMessage="No Stock Items" widgetVar="stockItems"  binding="#{stockItems}" rowIndexVar="rowIndex"
+						paginatorPosition="bottom" selectionMode="none"
+						rowStyleClass="#{stockItem.bad ? 'overduedStepTableRow' : null}"
+						paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+						editable="#{sec:ifAnyGranted('ROLE_ADMIN,VIEW_ITEM_DESCRIPTION')}"
+						rowsPerPageTemplate="10,25,50" id="stockItems">
+						
+						<p:ajax event="rowEdit" listener="#{stockController.onRowEdit}" update=":stockListForm:msgs" />
+						
+						<f:facet name="header">
+							<h:outputText value="#{of:capitalize(stockController.type)} Stock" rendered="#{stockController.type != null}"/>
+                            <h:outputText value="All Stock" rendered="#{stockController.type == null}"/>
+                        </f:facet>
+                        
+        				<p:column style="width:16px">
+            				<p:rowToggler />
+        				</p:column>	
+        				
+						<p:column visible="#{stockController.list[0]}" headerText="Image" sortable="false" style="text-align: center">
+							<o:graphicImage value="#{imageStreamer.getStockImagePreviewById(stockItem.id)}" dataFileId="#{stockItem.id}"
+								height="100px" type="jpg"
+                        		/>
+						</p:column>
+        				
+						<p:column visible="#{stockController.list[1]}" headerText="Reference Number" sortBy="#{stockItem.referenceNumber}" filterable="#{stockController.filterable}" 
+								filterBy="#{stockItem.referenceNumber}" sortable="true">
+							<h:outputText value="#{stockItem.referenceNumber}" style="#{stockItem.bad ? 'color: white;' : ''}"/>
+						</p:column>
+						
+						<p:column visible="#{stockController.list[2]}" headerText="Brand" sortBy="#{stockItem.brand}" filterable="#{stockController.filterable}" filterBy="#{stockItem.brand}" sortable="true">
+							<f:facet name="filter">
+                				<p:selectOneMenu onchange="PF('stockItems').filter()">
+                    				<f:selectItem itemLabel="Select One" itemValue="#{null}" noSelectionOption="true" />
+                    				<f:selectItems value="#{stockController.brands}" />
+                				</p:selectOneMenu>
+            				</f:facet>
+							<h:outputText value="#{stockItem.brand}" style="#{stockItem.bad ? 'color: white;' : ''}"/>
+						</p:column>
+						
+						<p:column visible="#{stockController.list[3]}" headerText="Quantity" sortBy="#{stockItem.quantity}" filterable="#{stockController.filterable}" filterBy="#{stockItem.quantity}" sortable="true" style="text-align: right;">
+							<f:facet name="filter">
+                				<p:spinner onchange="PF('stockItems').filter()" onkeyup="PF('stockItems').filter()">
+                    				<f:converter converterId="javax.faces.Long" />
+                				</p:spinner>
+            				</f:facet>
+							<h:outputText value="#{stockItem.quantity}" style="text-align: right;#{stockItem.bad ? 'color: white;' : ''}"/>
+						</p:column>
+						
+						<p:column visible="#{stockController.list[4]}" headerText="Price" sortBy="#{stockItem.price}" filterable="#{stockController.filterable}" filterBy="#{stockItem.price}" sortable="true" style="text-align: right;">
+							<f:facet name="filter">
+                				<p:spinner onchange="PF('stockItems').filter()" onkeyup="PF('stockItems').filter()">
+                    				<f:converter converterId="javax.faces.Double" />
+                				</p:spinner>
+            				</f:facet>
+							<h:outputText value="#{stockItem.price}" style="text-align: right;#{stockItem.bad ? 'color: white;' : ''}">
+								<o:converter converterId="javax.faces.Number" currencySymbol=" AMD " type="currency" />
+							</h:outputText>
+						</p:column>
+						
+						<p:column visible="#{stockController.list[5]}" headerText="Price Internal" sortBy="#{stockItem.priceInternal}"
+							 filterable="#{stockController.filterable}" filterBy="#{stockItem.priceInternal}" sortable="true" style="text-align: right;" rendered="#{sec:ifAnyGranted('ROLE_ADMIN,VIEW_PRICES_INTERNAL')}">
+							<f:facet name="filter">
+                				<p:spinner onchange="PF('stockItems').filter()" onkeyup="PF('stockItems').filter()">
+                    				<f:converter converterId="javax.faces.Double" />
+                				</p:spinner>
+            				</f:facet>
+							<h:outputText value="#{stockItem.priceInternal}" style="text-align: right;#{stockItem.bad ? 'color: white;' : ''}">
+								<o:converter converterId="javax.faces.Number" currencySymbol=" #{stockItem.currency != null ? stockItem.currency.name() : ''} " type="currency" />
+							</h:outputText>
+						</p:column>
+						
+						<p:column visible="#{stockController.list[6]}" exportable="false" headerText="Description" sortBy="#{stockItem.description}" filterable="#{stockController.filterable}" 
+							filterBy="#{stockItem.description}" sortable="true" style="text-align: left;" rendered="#{sec:ifAnyGranted('ROLE_ADMIN,VIEW_ITEM_DESCRIPTION')}">
+							<p:cellEditor>
+               					<f:facet name="output"><h:outputText value="#{stockItem.description}"/></f:facet>
+               					<f:facet name="input"><p:inputText id="modelInput" value="#{stockItem.description}" style="width:100%"/></f:facet>
+           					</p:cellEditor>
+						</p:column>
+						
+						<p:column visible="#{stockController.list[7]}" headerText="Actions" style="text-align: center" sortable="false" exportable="false">
+								<p:panelGrid id="processPanel" columns="1"
+									columnClasses="ui-grid-col-12" layout="grid"
+									styleClass="ui-panelgrid-blank"
+									style="border:0px none; background-color:transparent;">
+									<p:row>
+										<sec:ifAnyGranted roles="ROLE_ADMIN,MARK_BAD_ITEMS">
+											<p:commandButton icon="fa fa-thumbs-down Fs16 White"
+												title="Bad item" style="width:auto"
+												rendered="#{!stockItem.bad}"
+												update=":stockListForm"
+												styleClass="RedButton"
+												actionListener="#{stockController.markBad(stockItem,true)}" />
+											<p:commandButton icon="fa fa-thumbs-up Fs16 White"
+												title="Not Bad item" style="width:auto"
+												update=":stockListForm"
+												rendered="#{stockItem.bad}"
+												actionListener="#{stockController.markBad(stockItem,false)}" />
+										</sec:ifAnyGranted>
+									</p:row>
+								</p:panelGrid>
+						</p:column>
+						
+						<p:column headerText="Edit" rendered="#{sec:ifAnyGranted('ROLE_ADMIN,VIEW_ITEM_DESCRIPTION')}" style="width:32px; text-align: centre;" exportable="false">
+           					<p:rowEditor />
+       					</p:column>
+						
+						<p:rowExpansion>
+		       				<div class="Container">
+		       					<div class="Fleft Container100 MarAuto Responsive">
+		       						<sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_PROCESS">
+
+											<p:selectOneMenu id="processCombo"
+												value="#{stockController.processId}" style="width:250px;">
+												<f:selectItem itemLabel="#{bundle['selectOne']}" />
+												<f:selectItems value="#{stockController.processItems}" />
+											</p:selectOneMenu>
+
+											<p:commandButton
+												actionListener="#{stockController.startProcess(stockItem)}"
+												value="#{bundle['start']}" style="width:auto" update="stockListForm"
+												icon="fa fa-youtube-play Fs16 White">
+											</p:commandButton>
+											</sec:ifAnyGranted>
+					            </div>
+				            </div>
+        				</p:rowExpansion>
+					</p:dataTable>
+					</h:form>
+				</div>
+			</div>
+		</div>
+		
+	    <h:panelGroup layout="block" class="Container100 ui-fluid" id="rootStockInputContainer" rendered="false">
+            <div class="ContainerIndent">
+                <div class="Card ShadowEffect">
+                	<h:form id="stockUpdateForm" enctype="multipart/form-data">
+                	<p:messages showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+                    <h2 class="BigTopic">Stock Item Details</h2>
+                    <p:panelGrid id="stockContainer" columns="3" columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
+                        <p:outputLabel for="types" value="Type"/>
+                        <p:selectOneMenu id="types" value="#{stockController.selectedStockItem.type}" filter="true" filterMatchMode="startsWith" 
+                        	disabled="#{stockController.defaultType != null}"
+                        	required="true" requiredMessage="Type should be selected" converter="omnifaces.SelectItemsConverter">
+                        	<f:selectItem itemLabel="Select One" itemValue="" />
+                            <f:selectItems value="#{stockController.types}" var="type" itemLabel="#{type.name()}" itemValue="#{type}"/>
+                        </p:selectOneMenu>
+                        <p:message for="types" />
+                        
+                        <p:outputLabel for="brand" value="Brand"/>
+                        	<p:autoComplete id="brand" dropdown="true" value="#{stockController.selectedStockItem.brand}" maxlength="150" completeMethod="#{stockController.completeBrand}" required="true" requiredMessage="Brand is required."/>
+                        <p:message for="brand" />
+                        
+                        <p:outputLabel for="referenceNumber" value="Reference Number"/>
+                        <p:inputText id="referenceNumber" value="#{stockController.selectedStockItem.referenceNumber}" 
+                        	required="true" requiredMessage="Reference Number is required." validator="#{stockController.validateReferenceNumber}" maxlength="150"/>
+                        <p:message for="referenceNumber" />
+                        
+                        <p:outputLabel for="quantity" value="Quantity"/>
+                        <p:spinner id="quantity" value="#{stockController.selectedStockItem.quantity}" min="0" stepFactor="1" required="true" maxlength="10" requiredMessage="Quantity is required."/>
+                        <p:message for="quantity" />
+                        
+                        <p:outputLabel for="priceCurrency" value="Price Curency"/>
+                        <p:selectOneMenu id="priceCurrency" value="#{stockController.selectedStockItem.currency}" filter="true" filterMatchMode="startsWith" maxlength="10"
+                        			required="true" requiredMessage="Currency should be selected" converter="omnifaces.SelectItemsConverter">
+                        			<p:ajax update="price" />
+                            		<f:selectItems value="#{stockController.currencies}" var="type" itemLabel="#{type.name()}" itemValue="#{type}"/>
+                        </p:selectOneMenu>
+                        <p:message for="priceCurrency" />
+                        
+                        <p:outputLabel for="price" value="Price"/>
+                        <p:inputNumber id="price" value="#{stockController.selectedStockItem.price}" required="true" requiredMessage="Price is required."
+                    			  maxlength="15" minValue="0" decimalPlaces="2" symbolPosition="s" emptyValue="0.00" symbol="#{' '.concat(stockController.selectedStockItem.currency)}"/>
+                        <p:message for="price" />
+                        
+                        <p:outputLabel for="priceInternal" value="Price Internal"/>
+                        <p:inputNumber id="priceInternal" value="#{stockController.selectedStockItem.priceInternal}"  minValue="0" decimalPlaces="2"
+                    			 emptyValue="0.00" maxlength="15" symbolPosition="s" symbol="#{' '.concat(stockController.selectedStockItem.currency)}"/>
+                        <p:message for="priceInternal" />
+                        
+                        <p:outputLabel for="description" value="Description"/>
+                        <p:inputTextarea rows="5" id="description" value="#{stockController.selectedStockItem.description}" 
+                        	maxlength="250"/>
+                        <p:message for="description" />
+                        
+                        <p:outputLabel for="fileupload" value="Image" rendered="#{stockController.selectedStockItem.id != null and stockController.selectedStockItem.image == null}" />
+                       	<p:fileUpload id="fileupload" fileUploadListener="#{stockController.handleFileUpload}" mode="advanced" dragDropSupport="true"
+                       			update=":stockUpdateForm :stockListForm:stockItems" immediate="true" sizeLimit="1000000" fileLimit="1"
+                       			rendered="#{stockController.selectedStockItem.id != null and stockController.selectedStockItem.image == null}" style="width:auto;"
+                                multiple="false" allowTypes="/(\.|\/)(jpe?g|png)$/" />
+                        <p:message for="fileupload" rendered="#{stockController.selectedStockItem.id != null and stockController.selectedStockItem.image == null}"/>
+                        
+                        <p:outputLabel for="image" value="Image" rendered="#{stockController.selectedStockItem.id != null and stockController.selectedStockItem.image != null}" />
+                        <p:panelGrid id="imageHolder" columns="2" columnClasses="ui-grid-col-10,i-grid-col-2" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent; padding:0px;">
+                        	<o:graphicImage id="image" value="#{imageStreamer.getStockImagePreviewById(stockController.selectedStockItem.image.id)}"
+                        		rendered="#{stockController.selectedStockItem.id != null and stockController.selectedStockItem.image != null}"/>
+                        	<p:commandButton value="Remove Image" styleClass="RedButton" style="width:auto;" immediate="true"
+                        		update=":stockUpdateForm :stockListForm:stockItems" action="#{stockController.removeImage(stockController.selectedStockItem.image)}"
+                        		rendered="#{stockController.selectedStockItem.id != null and stockController.selectedStockItem.image != null}"/>
+                        </p:panelGrid>
+                        <p:message for="image" rendered="#{stockController.selectedStockItem.id != null and stockController.selectedStockItem.image != null}"/>
+                    	<sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_STOCK">
+                        <p:commandButton update=":stockUpdateForm :stockListForm:stockItems" styleClass="#{stockController.selectedStockItem.id != null ? 'GreenButton' : ''}" 
+                        	value="#{stockController.selectedStockItem.id != null ? 'Update' : 'Create'}"
+                        	style="width:auto" icon="#{stockController.selectedStockItem.id != null ? 'fa fa-pencil' : 'fa fa-plus'} Fs16 White" action="#{stockController.save}"/>
+                        </sec:ifAnyGranted>
+                    </p:panelGrid>
+                    </h:form>
+                </div>
+            </div>
+        </h:panelGroup>
+
+	</ui:define>
+
+</ui:composition>	

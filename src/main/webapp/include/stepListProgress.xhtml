@@ -1,0 +1,57 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:sec="http://www.springframework.org/security">
+	
+<p:dataGrid id="processFlowGrid" value="#{processFlowController.processSteps}" var="processStepBean"
+							type="unordered" itemType="none" columns="3" layout="grid"
+							emptyMessage="#{bundle['noProcessFlowDefined']}"
+							rendered="#{processFlowController.processFlowViewMode == '0'}">
+					
+	<p:panel styleClass="#{processStepBean.status}ColoredPanel HoverEffect" style="text-align:center">
+		 	 
+		<f:facet name="header" >
+        	<h:outputLabel value="#{processStepBean.name}" />
+    	</f:facet>
+    	
+    	<h:panelGrid columns="1" style="width:100%">
+        	<h:outputText value="#{processStepBean.description}" styleClass="Fs18 FontRalewaySemiBold" rendered="#{not empty processStepBean.description}"/>
+			<h:outputText value="#{processStepBean.note}" escape="false" styleClass="Fs18 FontRalewaySemiBold" rendered="#{not empty processStepBean.note}"/>
+			
+			<h:panelGroup layout="block" rendered="#{not empty processStepBean.uploadedFiles}">
+			<p:repeat var="file" value="#{processStepBean.uploadedFiles}" >
+				<p:panelGrid columns="1" style="width:100%" layout="grid" columnClasses="ui-grid-col-12" styleClass="ui-panelgrid-blank">
+            		<p:row styleClass="Fright">
+			 			<h:outputText value="#{file.name}   "/>
+			 			<p:commandButton ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" style="width:auto;"
+							  actionListener="#{file.onDownload}" icon="fa fa-download">
+							<p:fileDownload value="#{file.content}"/>
+						</p:commandButton>
+			 		</p:row>
+				</p:panelGrid>
+			</p:repeat>
+			</h:panelGroup>
+			<p:commandButton actionListener="#{processFlowController.onShowProgressStepEditModes(processStepBean)}"
+        					 update="processStepForm:processStepUiPanel"
+   						 	 process="@this"
+	         			 	 icon="fa #{processStepBean.status == 'Started' ? 'fa-pencil' : 'fa-eye'} "
+	             		 	 title="#{bundle['editProcessStepTitle']}"			                       		 
+	             		 	 styleClass="BlueTextButton RaisedButton"/>
+       </h:panelGrid>
+    	
+       	<f:facet name="footer">		               		 			
+       		<h:outputText value="#{bundle['assignee']}: #{processStepBean.userAssignedName}." rendered="#{processStepBean.status == 'Not_Started'}"/>
+       		<h:outputText value="#{bundle['assignee']}: #{processStepBean.userAssignedName}. #{processStepBean.statusInfo}  #{bundle['by']} #{processStepBean.changedByUserName} #{processStepBean.statusTimeAgo}." 
+       					  rendered="#{processStepBean.status != 'Not_Started'}"/>
+       		<h:outputText rendered="#{processStepBean.estimatedTill != null and ( (of:daysBetween(processStepBean.estimatedTill, now) gt 0 and processStepBean.status == 'Started') or (processStepBean.status == 'Finished' and of:daysBetween(processStepBean.estimatedTill, processStepBean.finishDate) gt 0) )}" value=" #{of:daysBetween(processStepBean.estimatedTill != null ? processStepBean.estimatedTill : now, processStepBean.status == 'Started' ? now : processStepBean.finishDate)} day(s) over estimation" styleClass="FontBold"/>
+       	</f:facet>
+	</p:panel>
+	
+	<div class="EmptyBox10"></div>															
+
+</p:dataGrid>
+
+</ui:composition>

@@ -1,0 +1,67 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:sec="http://www.springframework.org/security"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="subheader" >
+		<h:outputLink value="../exam/resultboard" styleClass="BoldGray">
+		Leaderboard
+		</h:outputLink> 
+     	-> <h:outputText value="#{personalResultsController.name}"/> results for year <h:outputText value="#{personalResultsController.year}"/>
+    </ui:define>
+
+	<ui:define name="content">
+
+	    <div class="Container100 ui-fluid">
+			<div class="ContainerIndent">
+				<div class="Card ShadowEffect">
+					<h:form id="form">
+					<p:messages id="msgs" autoUpdate="false"/>
+                    <p:dataTable value="#{personalResultsController.levels}" var="level"
+						paginator="true" rows="15"
+						widgetVar="levelTable" lazy="false" id="levelTable"
+						paginatorPosition="bottom"  paginatorAlwaysVisible="false"
+						paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+						rowsPerPageTemplate="15,25,50"
+						editable="true"
+						emptyMessage="No Data Yet">
+						
+						<p:ajax event="rowEdit" listener="#{personalResultsController.onRowEdit}" update=":form:msgs" />
+						
+						<p:column headerText="Month">
+							<h:outputText value="#{level.monthStr}"/>
+						</p:column>
+						
+						<p:column headerText="Awarded Points" style="text-align: right;">
+							<h:outputText value="#{level.points}"/>
+						</p:column>
+						
+						<p:column headerText="Missing Points" style="text-align: right;">
+							<h:outputText value="#{level.missingPoints}"/>
+						</p:column>
+						
+						<p:column headerText="Status">
+							<h:outputText value="#{level.level}"/>
+						</p:column>
+						
+						<p:column headerText="Mystery Shopping Result">
+							       <p:cellEditor>
+               							<f:facet name="output"><h:outputText value="#{level.mysteryShopping}"/></f:facet>
+               							<f:facet name="input"><p:inputText id="modelInput" value="#{level.mysteryShopping}" style="width:100%"/></f:facet>
+           							</p:cellEditor>
+						</p:column>
+						
+						<p:column headerText="Edit" rendered="#{sec:ifAnyGranted('ROLE_ADMIN,EDIT_STUFF_PERSONAL')}" style="width:32px; text-align: centre;">
+           					<p:rowEditor />
+       					</p:column>
+						
+					</p:dataTable>
+					</h:form>
+				</div>
+			</div>
+		</div>
+	</ui:define>
+
+</ui:composition>	

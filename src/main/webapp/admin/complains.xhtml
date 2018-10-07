@@ -1,0 +1,86 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:sec="http://www.springframework.org/security"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="subheader">
+        Customer Service
+    </ui:define>
+
+	<ui:define name="content">
+
+	    <div class="Container100 ui-fluid">
+			<div class="ContainerIndent">
+				<div class="Card ShadowEffect">
+					<h:form id="stockListForm">
+					<p:messages showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+					<sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_CUSTOMER_CENTRE">
+                    <p:toolbar>
+                    	<f:facet name="left">
+							<p:commandButton action="#{complainsAdminController.onSeeComplains(null)}"
+	                				 value="New Customer Service Request"
+	                				 style="width:auto"	                				 
+	                				 icon="fa fa-cogs Fs16 White"/>
+                    	</f:facet>
+                    </p:toolbar>
+                    </sec:ifAnyGranted>
+                    <p:dataTable value="#{complainsAdminController.customerComplains}" var="complain"
+						paginator="true" rows="15" rowKey="#{process.id}"
+						widgetVar="complainTable" lazy="true" id="complainTable"
+						paginatorPosition="bottom" selectionMode="single" paginatorAlwaysVisible="false"
+						paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+						rowsPerPageTemplate="15,25,50"
+						sortMode="single"
+						sortBy="#{complain.modifiedAt}"
+						sortOrder="descending"
+						rowStyleClass="#{complain.status.name() == 'PICKUPED' ? 'pickupedItemTableRow' : (complain.overDue ? 'overduedStepTableRow' : null)}"
+						emptyMessage="No Customer Requests">
+						
+						<f:facet name="header">
+            				<p:outputPanel>
+                				<p:selectOneMenu id="type" value="#{complainsAdminController.complainType}" 
+                					label="Type" onchange="PF('complainTable').filter()"
+                              		filter="false" panelStyle="width:250px" converter="omnifaces.GenericEnumConverter">
+            						<f:selectItems value="#{complainsAdminController.complainTypes}" />
+        						</p:selectOneMenu>
+            				</p:outputPanel>
+        				</f:facet>				
+						
+						<p:column headerText="Status" filterBy="#{complain.status}">
+							<f:facet name="filter">
+                				<p:selectOneMenu onchange="PF('complainTable').filter()">
+                    				<f:selectItem itemLabel="All" itemValue="#{null}" noSelectionOption="true" />
+                    				<f:selectItems value="#{complainsAdminController.complainStatuses}" var="status" itemLabel="#{status}" itemValue="#{status}"/>
+                				</p:selectOneMenu>
+            				</f:facet>
+							<h:outputText value="#{complain.status.title}" style="#{(complain.status.name() == 'PICKUPED' || complain.overDue) ? 'color: #F9FDF9 !important;' : ''}"/>
+						</p:column>
+						
+						<p:column headerText="Brand" filterBy="#{complain.fullItem}" sortBy="#{complain.fullItem}">
+							<h:outputText value="#{complain.fullItem}" style="#{(complain.status.name() == 'PICKUPED' || complain.overDue) ? 'color: #F9FDF9 !important;' : ''}"/>
+						</p:column>
+						
+						<p:column headerText="Customer" filterBy="#{complain.fullName}" sortBy="#{complain.fullName}">
+							<h:outputText value="#{complain.fullName}" style="#{(complain.status.name() == 'PICKUPED' || complain.overDue) ? 'color: #F9FDF9 !important;' : ''}"/>
+						</p:column>
+						
+						<p:column headerText="Estimate Ready Date" sortBy="#{complain.estimateReadyDate}">
+							<h:outputText converter="chronoDateTimeConverter" value="#{complain.estimateReadyDate}" style="float:right;#{(complain.status.name() == 'PICKUPED' || complain.overDue) ? 'color: #F9FDF9 !important;' : ''}"/>
+						</p:column>
+		
+						<p:column headerText="#{bundle['progress']}" style="text-align: center; vertical-align: top;">
+	                  		<p:commandButton action="#{complainsAdminController.onSeeComplains(complain.id)}"
+				                   			 icon="fa fa-info" ajax="false"
+				                       		 title="View Details"/>
+				        	
+              			</p:column>
+					</p:dataTable>
+					</h:form>
+				</div>
+			</div>
+		</div>
+	</ui:define>
+
+</ui:composition>	

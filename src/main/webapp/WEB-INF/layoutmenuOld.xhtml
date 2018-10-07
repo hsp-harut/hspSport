@@ -1,0 +1,64 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:sec="http://www.springframework.org/security"
+    xmlns:pm="http://primefaces.org/modena">
+
+    <div class="Animated05" id="layout-menu-cover">
+        <h:form id="menuform">
+            <pm:menu>
+            	<p:menuitem id="rm_dashboard" value="Dashboard" icon="icon-dvr" outcome="/dashboard"/>
+            	<sec:ifAnyGranted roles="ROLE_ADMIN,READ_ROLE,READ_USER,EDIT_ROLE,EDIT_USER">
+					<p:submenu id="rm_settings" label="System Administration" icon="fa fa-cog">
+						<sec:ifAnyGranted roles="ROLE_ADMIN,READ_ROLE,EDIT_ROLE">
+    	                	<p:menuitem id="admin_roles" value="Roles" icon="fa fa-check-square-o" outcome="/admin/roles" />
+    	                </sec:ifAnyGranted>
+    	                <sec:ifAnyGranted roles="ROLE_ADMIN,READ_USER,EDIT_USER">
+        	            	<p:menuitem id="admin_users" value="Users" icon="fa fa-user" outcome="/admin/users" />
+        	            </sec:ifAnyGranted>
+        	            <sec:ifAnyGranted roles="ROLE_ADMIN,READ_PROCESS,EDIT_PROCESS">
+        	            	<p:menuitem id="admin_processes" value="Processes" icon="fa fa-line-chart" outcome="/admin/processManagement" />
+        	            </sec:ifAnyGranted>
+        	            <sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_EMAIL_TEMPLATES">
+        	            	<p:menuitem id="admin_emails" value="Email Templates" icon="fa fa-envelope-o" outcome="/admin/emails" />
+        	            </sec:ifAnyGranted>            
+	                </p:submenu>
+                </sec:ifAnyGranted>
+                
+                <sec:ifAnyGranted roles="ROLE_ADMIN,READ_STOCK,EDIT_STOCK">
+					<p:submenu id="rm_inventory" label="Stock Inventory" icon="icon-store_mall_directory" rendered="#{menuController.chrono}">
+    	                <p:menuitem id="mstock_all" value="All Stock" icon="icon-store_mall_directory" url="/stock/items" />
+    	                <p:menuitem id="mstock_watches" value="Watches" icon="fa fa-clock-o" url="/stock/items?type=watches" />
+    	                <p:menuitem id="mstock_jewelry" value="Jewelry" icon="fa fa-yelp" url="/stock/items?type=jewelry" />
+    	                <p:menuitem id="mstock_accessories" value="Accessories" icon="fa fa-shekel" url="/stock/items?type=accessories" />
+    	                <p:menuitem id="mstock_parts" value="Spare Parts" icon="fa fa-link" url="/stock/items?type=parts" />
+    	                <sec:ifAnyGranted roles="EDIT_FORMULA">
+    	                <p:menuitem id="mstock_formulas" value="Formulas" icon="fa fa-money" url="/stock/formula" />
+    	                </sec:ifAnyGranted>
+	                </p:submenu>
+                </sec:ifAnyGranted>
+                
+                <sec:ifAnyGranted roles="ROLE_ADMIN,VIEW_CUSTOMER_CENTRE,EDIT_CUSTOMER_CENTRE">
+					<p:submenu id="rm_complains" label="Customer Service" icon="icon-cog" rendered="#{menuController.chrono}">
+    	                <p:menuitem id="complains_all" value="Customer Service Requests" icon="fa fa-gears" url="/admin/complains" />
+    	                <p:menuitem id="complain_new" value="New Request" icon="icon-circle-plus" url="/admin/complain" />
+	                </p:submenu>
+                </sec:ifAnyGranted>
+                
+                <sec:ifAnyGranted roles="ROLE_ADMIN,VIEW_EXAM,EDIT_EXAM">
+                	<p:submenu id="rm_exams" label="Examination Center" icon="fa fa-graduation-cap">
+                		<p:menuitem id="exams_pass" value="#{bundle['examPass']}" icon="fa fa-check-square-o" url="/exam/examsEnabled" />
+                		<sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_EXAM">
+                			<p:menuitem id="exams_edit" value="#{bundle['examManage']}" icon="fa fa-calendar-check-o" url="/exam/examManagement" />
+                		</sec:ifAnyGranted>
+                		<p:menuitem id="exams_results" value="#{bundle['viewResults']}" icon="fa fa-list" url="/exam/examResults" />
+                	</p:submenu>
+                </sec:ifAnyGranted>
+            </pm:menu>
+        </h:form>
+    </div>
+
+</ui:composition>

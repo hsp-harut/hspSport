@@ -1,0 +1,499 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:sec="http://www.springframework.org/security">
+	
+<div class="ContainerIndent">
+	<div class="Card ShadowEffect">						
+	
+		<p:messages id="messages" showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+		
+		<h2 class="BigTopic">			
+			<h:outputText value="#{bundle['processDetails']}"/>&#160;			
+		</h2>
+		
+		<div class="EmptyBox20"></div>
+		<p:panelGrid id="processPanel" columns="2" columnClasses="ui-grid-col-2,ui-grid-col-5" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
+            
+            <p:outputLabel value="#{bundle['status']}"/>
+            <h:panelGroup id="statusInfo" layout="block" styleClass="ShadowEffect #{processFlowController.processBean.status} TexAlCenter HoverEffect" style="padding: 10px; text-align: left; cursor: pointer;">
+            	<a href="#" class="#{processFlowController.processBean.status} MarRight20 HoverEffect">
+            		<i class="fa fa-info-circle Fs16 #{processFlowController.processBean.status}"></i>
+            		<h:outputText value=" #{processFlowController.processBean.status}" styleClass="#{processFlowController.processBean.status}"/>
+            		<h:outputText value=" #{bundle['by']} #{processFlowController.processBean.changedByUserName} #{processFlowController.processBean.statusTimeAgo}." styleClass="#{processFlowController.processBean.status}" />
+           		</a>
+            </h:panelGroup>            
+            
+            <p:outputLabel value="#{bundle['period']}" rendered="#{processFlowController.processBean.status != 'Started'}"/>
+           	<h:panelGroup layout="block" styleClass="ShadowEffect SoftGrayBack BoldGray TexAlCenter HoverEffect" style="padding: 10px; text-align: left; cursor: pointer;"
+            			  rendered="#{processFlowController.processBean.status != 'Started'}">
+            	<a href="#" class="BoldGray MarRight20 HoverEffect">
+            		<i class="fa fa-clock-o Fs16 BoldGray"></i>
+            		<h:outputText value="#{processFlowController.processBean.startDate}" converter="chronoDateTimeConverter" styleClass="BoldGray" 
+            					  style="padding-left:2px;"/>
+            		-
+            		<h:outputText value="#{processFlowController.processBean.finishDate}" converter="chronoDateTimeConverter" styleClass="BoldGray"/>
+           		</a>
+            </h:panelGroup>
+           	
+            		
+	   		<p:outputLabel for="processName" value="#{bundle['processName']}"/>
+           	<p:inputText id="processName" value="#{processFlowController.processBean.name}" disabled="#{processFlowController.progressProcessEditMode != '1' or processFlowController.processBean.status != 'Started'}"/>
+           	               
+               
+            <p:outputLabel for="description" value="#{bundle['description']}"/>
+            <p:inputTextarea id="description" value="#{processFlowController.processBean.description}" maxlength="255"
+            				 disabled="#{processFlowController.progressProcessEditMode != '1' or processFlowController.processBean.status != 'Started'}"/>
+            				 
+           	<p:outputLabel for="processTerminateNote" value="#{bundle['note']}"
+           				   rendered="#{processFlowController.progressProcessEditMode == '3' or processFlowController.processBean.status != 'Started'}"/>
+            <p:inputTextarea id="processTerminateNote" value="#{processFlowController.processBean.note}" maxlength="255"
+            				 placeholder="#{bundle['terminationNotePlaceholder']}"
+            				 disabled="#{processFlowController.processBean.status != 'Started'}"
+            				 rendered="#{processFlowController.progressProcessEditMode == '3' or processFlowController.processBean.status != 'Started'}"/>
+                         	
+   		</p:panelGrid>
+        		
+  		<div class="EmptyBox10"></div>
+		
+		<sec:ifAnyGranted roles="ROLE_ADMIN, EDIT_PROCESS">
+  		<h:panelGroup id="buttonsPanel" layout="block" rendered="#{processFlowController.processBean.status == 'Started'}">
+  			
+  			
+  			
+  			<h:panelGroup id="processButtonsPanel" layout="block" 
+		     				  rendered="#{processFlowController.progressProcessEditMode == '6'}">
+		     				  
+		    	<p:commandButton actionListener="#{processFlowController.onOpenProcessEditOrTerminateView(1)}"
+	           					 update="processPanel, buttonsPanel"
+	       						 process="@this"		                   			 		                       		 
+		                   		 title="#{bundle['editProcessTitle']}"		        
+		                   		 icon="fa fa-pencil Fs16 White"
+		                   		 style="width:auto"			                       		 
+		                   		 styleClass="GreenButton"/>
+		         
+		       	<sec:ifAnyGranted roles="ROLE_ADMIN">          		 
+			    	<p:commandButton actionListener="#{processFlowController.onOpenProcessEditOrTerminateView(3)}"
+			    					 update="processPanel, buttonsPanel"
+		       						 process="@this"		                   			 		                       		 
+			                   		 title="#{bundle['terminateProcessTitle']}"			        
+			                   		 icon="fa fa-times Fs16 White"
+			                   		 style="width:auto"			                       		 
+			                   		 styleClass="RedButton"/>
+				</sec:ifAnyGranted>		                   		 
+		                   		 
+		 	</h:panelGroup>
+  			
+  			
+  			
+  			
+  			
+  			
+  			
+  			<h:panelGroup id="processActionButtonsPanel" layout="block" 
+		     				  rendered="#{processFlowController.progressProcessEditMode != '6'}">
+	  			
+	  			<p:commandButton value="#{bundle['update']}"
+	  			 				 actionListener="#{processFlowController.onUpdateProcessNameDescription}"
+	  			 				 update="messages, processPanel, buttonsPanel"
+		               			 styleClass="GreenButton"                     				 
+		               			 style="width:auto" 
+		               			 icon="fa fa-pencil Fs16 White"
+		               			 rendered="#{processFlowController.progressProcessEditMode == '1'}"/>
+		               			 
+		   		<p:commandButton value="#{bundle['terminateProcess']}"
+		   						 actionListener="#{processFlowController.onTerminateProcess}" 
+		   						 update="processStepPanel, processFlowPanel"
+		               			 styleClass="RedButton"                     				 
+		               			 style="width:auto" 
+		               			 icon="fa fa-times Fs16 White"
+		               			 onclick="if (!confirm('#{bundle['terminateProcessConfirm']}')) return false;"
+		               			 rendered="#{processFlowController.progressProcessEditMode == '3'}"/>
+		               			 
+		    	
+		    	<p:commandButton value="#{bundle['cancel']}"
+	         					 actionListener="#{processFlowController.onCancelProcess}" 
+	         					 update="processPanel, buttonsPanel"
+	         					 icon="fa fa-ban Fs16 White"
+	         					 process="@this"		               				 
+	               				 styleClass="RedButton"                     				 
+	               				 style="width:auto"/>
+	    	</h:panelGroup>
+	    	
+		</h:panelGroup>
+		</sec:ifAnyGranted>    
+		
+		
+		
+		
+		  				
+         	
+         	
+         	
+		
+		<h:panelGroup id="processStepUiPanel" layout="block">
+			<h:panelGroup layout="block" 
+						  rendered="#{processFlowController.progressStepEditMode > 0}">
+				
+				<div class="EmptyBox20"></div>
+				
+				<h2 class="BigTopic">			
+					<h:outputText value="#{bundle['processStepDetails']}"/>
+				</h2>
+				
+				<div class="EmptyBox20"></div>
+					
+				<p:panelGrid columns="3" columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;">
+		         	
+		         	
+		         	
+		         	
+		         	<p:outputLabel value="#{bundle['status']}"/>
+		            <h:panelGroup layout="block" styleClass="ShadowEffect #{processFlowController.processStepBean.status} TexAlCenter HoverEffect" 
+		            			  style="padding: 10px; text-align: left; cursor: pointer;">
+		            			  		            			  
+		            	<a href="#" class="#{processFlowController.processStepBean.status} MarRight20 HoverEffect">
+		            		<i class="fa fa-info-circle Fs16 #{processFlowController.processStepBean.status}"></i>
+		            		<h:outputText value=" #{processFlowController.processStepBean.statusInfo}" styleClass="#{processFlowController.processStepBean.status}"
+		            					  rendered="#{processFlowController.processStepBean.status != 'Not_Started'}"/>
+		            		<h:outputText value=" #{bundle['by']} #{processFlowController.processStepBean.changedByUserName} #{processFlowController.processStepBean.statusTimeAgo}." styleClass="#{processFlowController.processStepBean.status}"
+		            					  rendered="#{processFlowController.processStepBean.status != 'Not_Started'}"/>
+		            					  
+		            		<h:outputText value=" #{bundle['notStarted']}" styleClass="#{processFlowController.processStepBean.status}"
+		            					  rendered="#{processFlowController.processStepBean.status == 'Not_Started'}"/>
+		           		</a>
+		            </h:panelGroup>
+		            <h:panelGroup layout="block"/>            
+		            
+		            <p:outputLabel value="#{bundle['period']}" 
+		            			   rendered="#{processFlowController.processStepBean.status != 'Started' and processFlowController.processStepBean.status != 'Not_Started'}"/>
+		           	<h:panelGroup layout="block" styleClass="ShadowEffect SoftGrayBack BoldGray TexAlCenter HoverEffect" style="padding: 10px; text-align: left; cursor: pointer;"
+		            			  rendered="#{processFlowController.processStepBean.status != 'Started' and processFlowController.processStepBean.status != 'Not_Started'}">
+		            	<a href="#" class="BoldGray MarRight20 HoverEffect">
+		            		<i class="fa fa-clock-o Fs16 BoldGray"></i>
+		            		<h:outputText value="#{processFlowController.processStepBean.startDate}" converter="chronoDateTimeConverter" styleClass="BoldGray" 
+		            					  style="padding-left:2px;"/>
+		            		-
+		            		<h:outputText value="#{processFlowController.processStepBean.finishDate}" converter="chronoDateTimeConverter" styleClass="BoldGray"/>
+		           		</a>
+		            </h:panelGroup>
+		            <h:panelGroup rendered="#{processFlowController.processStepBean.status != 'Started' and processFlowController.processStepBean.status != 'Not_Started'}"/>
+		         	
+		         	
+		         	
+		         	
+		         	<p:outputLabel for="processStepName" value="#{bundle['processStepName']} *"/>
+					<p:inputText id="processStepName" value="#{processFlowController.processStepBean.name}" maxlength="100" 
+								 disabled="#{processFlowController.progressStepEditMode != '1' or processFlowController.processStepBean.status != 'Started'}"/>
+					<h:panelGroup layout="block"/>
+		        			                	
+		          	<p:outputLabel for="level" value="#{bundle['level']} *" 
+		          				   rendered="#{processFlowController.progressStepEditMode == '1'}"/>
+		  			<p:selectOneMenu id="level" value="#{processFlowController.processStepBean.level}" disabled="true" 
+		  							 rendered="#{processFlowController.progressStepEditMode == '1'}">
+		            	<f:selectItems value="#{processFlowController.processStepBean.levels}"/>
+		          	</p:selectOneMenu>
+		          	<h:panelGroup rendered="#{processFlowController.progressStepEditMode == '1'}"/>
+		                     
+		         	<p:outputLabel for="role" value="#{bundle['role']} *"
+		         				   rendered="#{processFlowController.progressStepEditMode == '1'}"/>
+		   			<p:selectOneMenu id="role" value="#{processFlowController.processStepBean.selectedRoleId}" filter="true" filterMatchMode="startsWith"
+		   							 disabled="#{processFlowController.processStepBean.status != 'Started' and sec:ifNotGranted('ROLE_ADMIN')}"
+		   							 rendered="#{processFlowController.progressStepEditMode == '1'}">
+				        <f:selectItem itemLabel="#{bundle['selectOne']}"/>
+				        <f:selectItems value="#{processFlowController.processStepBean.roles}"/>
+		                   
+		             	<p:ajax event="change" listener="#{processFlowController.onRoleChanged}" update="user" process="role"/>
+		        	</p:selectOneMenu>
+		         	<p:message for="role" rendered="#{processFlowController.progressStepEditMode == '1'}"/>
+		                  
+		          	<p:outputLabel for="user" value="#{bundle['user']} *"
+		          				   rendered="#{processFlowController.progressStepEditMode == '1'}"/>
+		   			<p:selectOneMenu id="user" value="#{processFlowController.processStepBean.userAssignedId}" filter="true" filterMatchMode="startsWith"
+		   							 disabled="#{processFlowController.processStepBean.status != 'Started' and sec:ifNotGranted('ROLE_ADMIN')}"
+		   							 rendered="#{processFlowController.progressStepEditMode == '1'}">
+					    <f:selectItem itemLabel="#{bundle['selectOne']}"/>
+					    <f:selectItems value="#{processFlowController.processStepBean.users}"/>
+		        	</p:selectOneMenu>
+		          	<p:message for="user" rendered="#{processFlowController.progressStepEditMode == '1'}"/>
+		          	
+		          	
+		          	
+		          	<p:outputLabel for="canTerminate" value="#{bundle['terminate']}"
+		          				   rendered="#{processFlowController.progressStepEditMode == '1'}"/>
+		   			<p:selectCheckboxMenu id="canTerminate" filter="true" filterMatchMode="startsWith"
+		   								  label="#{bundle['canTerminateLabel']}" value="#{processFlowController.processStepBean.usersCanTerminate}"
+		   								  rendered="#{processFlowController.progressStepEditMode == '1'}">
+		                    
+		   				<f:converter converterId="javax.faces.Long"/>
+					   	<f:selectItems value="#{processFlowController.processStepBean.allUsers}"/>
+		        	</p:selectCheckboxMenu>
+		          	<p:message for="canTerminate" rendered="#{processFlowController.progressStepEditMode == '1'}"/>
+		          	
+		          	<p:outputLabel for="canSkip" value="#{bundle['skip']}"
+		          				   rendered="#{processFlowController.progressStepEditMode == '1' and !processFlowController.chrono}"/>
+		   			<p:selectCheckboxMenu id="canSkip" filter="true" filterMatchMode="startsWith"
+		   								  label="#{bundle['canSkipLabel']}" value="#{processFlowController.processStepBean.usersCanSkip}"
+		   								  rendered="#{processFlowController.progressStepEditMode == '1' and !processFlowController.chrono}">
+		                    
+		   				<f:converter converterId="javax.faces.Long"/>
+					   	<f:selectItems value="#{processFlowController.processStepBean.allUsers}"/>
+		        	</p:selectCheckboxMenu>
+		          	<p:message for="canSkip" rendered="#{processFlowController.progressStepEditMode == '1' and !processFlowController.chrono}"/>
+		          	
+		          	<p:outputLabel for="canPostpone" value="#{bundle['postpone']}"
+		          				   rendered="#{processFlowController.progressStepEditMode == '1' and !processFlowController.chrono}"/>
+		   			<p:selectCheckboxMenu id="canPostpone" filter="true" filterMatchMode="startsWith"
+		   								  label="#{bundle['canPostponeLabel']}" value="#{processFlowController.processStepBean.usersCanPostpone}"
+		   								  rendered="#{processFlowController.progressStepEditMode == '1' and !processFlowController.chrono}">
+		                    
+		   				<f:converter converterId="javax.faces.Long"/>
+					   	<f:selectItems value="#{processFlowController.processStepBean.allUsers}"/>
+		        	</p:selectCheckboxMenu>
+		          	<p:message for="canPostpone" rendered="#{processFlowController.progressStepEditMode == '1' and !processFlowController.chrono}"/>
+		          			          	
+		          	
+		          	<p:outputLabel for="estimatedDays" value="#{bundle['estimationInDays']}"
+		          				   rendered="#{processFlowController.processStepBean.estimatedDays != null}"/>
+		            <p:spinner id="estimatedDays" value="#{processFlowController.processStepBean.estimatedDays}" min="1" stepFactor="1" maxlength="3"
+		            		   disabled="true"
+		            		   rendered="#{processFlowController.processStepBean.estimatedDays != null}"/>
+		            <p:message for="estimatedDays" rendered="#{processFlowController.processStepBean.estimatedDays != null}"/>
+		            
+		            
+		            <p:outputLabel for="additionalDays" value="#{bundle['additionalDays']} *"
+		            			   rendered="#{processFlowController.progressStepEditMode == '5' or (processFlowController.progressStepEditMode == '1' and processFlowController.processStepBean.postponedDays != null)}"/>
+		            <p:spinner id="additionalDays" value="#{processFlowController.processStepBean.postponedDays}" min="1" stepFactor="1" maxlength="3"
+		            		   rendered="#{processFlowController.progressStepEditMode == '5' or (processFlowController.progressStepEditMode == '1' and processFlowController.processStepBean.postponedDays != null)}"/>
+		            <p:message for="additionalDays" rendered="#{processFlowController.progressStepEditMode == '5' or (processFlowController.progressStepEditMode == '1' and processFlowController.processStepBean.postponedDays != null)}"/>
+		            		            
+		                  
+		         	<p:outputLabel value="#{bundle['description']}"/>
+		  			<p:inputTextarea id="stepDescription" value="#{processFlowController.processStepBean.description}" maxlength="255"
+		  							 disabled="#{processFlowController.progressStepEditMode != '1' or processFlowController.processStepBean.status != 'Started'}"/>
+		  			<h:panelGroup layout="block"/>
+		  			
+		  			<p:outputLabel for="condition" value="#{bundle['startWhen']}" 
+  						   		   rendered="#{processFlowController.processStepBean.level != 'First'}"/>
+		   			<p:selectOneMenu id="condition" value="#{processFlowController.processStepBean.startWhenAnyParentFinished}"
+		   							 disabled="true"
+		   							 rendered="#{processFlowController.processStepBean.level != 'First'}">
+					    <f:selectItem itemLabel="#{bundle['allFinished']}" itemValue="#{false}"/>
+					    <f:selectItem itemLabel="#{bundle['anyFinished']}" itemValue="#{true}"/>
+		        	</p:selectOneMenu>
+		          	<h:panelGroup layout="block" rendered="#{processFlowController.processStepBean.level != 'First'}"/>
+		        			
+		  			<p:outputLabel value="#{bundle['connections']}"
+		  						   rendered="#{processFlowController.progressStepEditMode == '1'}"/>
+		  			<p:selectCheckboxMenu id="startWhenFinish" filter="true" filterMatchMode="startsWith"
+		   								  label="#{bundle['startWhenFinish']}" value="#{processFlowController.processStepBean.selectedStartConnections}"
+		   								  rendered="#{processFlowController.progressStepEditMode == '1'}">
+		                    
+		   				<f:converter converterId="javax.faces.Long"/>
+					   	<f:selectItems value="#{processFlowController.processStepBean.connections}"/>
+		        	</p:selectCheckboxMenu>
+		         	<h:panelGroup layout="block" rendered="#{processFlowController.progressStepEditMode == '1'}"/>
+		                  
+		         	<h:panelGroup layout="block" rendered="#{processFlowController.progressStepEditMode == '1'}"/>
+		           	<p:selectCheckboxMenu id="notifyWhenFinish" filter="true" filterMatchMode="startsWith"
+		          					      label="Notify Users" value="#{processFlowController.processStepBean.usersNotify}"
+		          					      rendered="#{processFlowController.progressStepEditMode == '1'}">
+		                      
+		      			<f:converter converterId="javax.faces.Long"/>
+                        <f:selectItems value="#{processFlowController.processStepBean.allUsers}"/>                     
+		     		</p:selectCheckboxMenu>
+		      		<h:panelGroup layout="block" rendered="#{processFlowController.progressStepEditMode == '1'}"/>
+		         	
+		         	
+		         	<p:outputLabel value="#{bundle['note']}" 
+		         			       rendered="#{(processFlowController.progressStepEditMode != '1' and processFlowController.progressStepEditMode != '6') 
+		         			       			    or (processFlowController.processStepBean.status != 'Started' and processFlowController.processStepBean.status != 'Not_Started')}"/>
+		  			<p:inputTextarea id="note" value="#{processFlowController.processStepBean.note}" maxlength="255"
+		  							 placeholder="#{processFlowController.progressStepEditMode == '2' ? bundle['finishNotePlaceholder'] : processFlowController.progressStepEditMode == '4' ? bundle['skipNotePlaceholder'] : processFlowController.progressStepEditMode == '5' ? bundle['postponeNotePlaceholder'] : bundle['terminationNotePlaceholder']}"
+		  							 disabled="#{processFlowController.processStepBean.status != 'Started'}"
+		  							 rendered="#{(processFlowController.progressStepEditMode != '1' and processFlowController.progressStepEditMode != '6') 
+		         			       				  or (processFlowController.processStepBean.status != 'Started' and processFlowController.processStepBean.status != 'Not_Started')}"/>
+		  			<h:panelGroup layout="block" 
+		  						  rendered="#{(processFlowController.progressStepEditMode != '1' and processFlowController.progressStepEditMode != '6') 
+		         			       			    or (processFlowController.processStepBean.status != 'Started' and processFlowController.processStepBean.status != 'Not_Started')}"/>
+		         	
+		         	
+		         	<p:outputLabel for="attachments" value="#{bundle['attachments']}"/>
+					<h:panelGroup id="attachments">
+														  
+						<table cellspacing="0" cellpadding="0" border="0">
+							<h:panelGroup rendered="#{!empty processFlowController.processStepBean.uploadedFiles}">
+								<ui:repeat value="#{processFlowController.processStepBean.uploadedFiles}" var="uploadFileBean">
+								<tr>								
+									<td>
+										<h:outputText value="#{uploadFileBean.name}"/>
+									</td>
+									
+									<td width="5%">
+										<p:commandButton actionListener="#{processFlowController.onRemoveFileUpload(uploadFileBean)}"
+							        					 process="@this"
+					              						 update="processStepForm:attachments"
+							                   			 icon="fa fa-trash-o"
+							                       		 styleClass="RedButton"
+							                       		 title="#{bundle['delete']}"
+							                       		 rendered="#{processFlowController.progressStepEditMode == '1'}"/>
+									</td>								
+									
+									<td width="5%">									
+							       		<p:commandButton ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+				                        			 	 actionListener="#{uploadFileBean.onDownload}"
+				                        			 	 icon="fa fa-download Fs16 White" 
+				                        			 	 title="#{bundle['download']}">
+			                        		<p:fileDownload value="#{uploadFileBean.content}"/>
+			            				</p:commandButton>
+									</td>
+								</tr>
+								</ui:repeat>
+							</h:panelGroup>
+							
+							<h:panelGroup rendered="#{!(processFlowController.progressStepEditMode == '1' and processFlowController.processStepBean.status == 'Started') and empty processFlowController.processStepBean.uploadedFiles}">
+								<tr>								
+									<td colspan="3">
+										<h:outputText value="#{bundle['nothingAttached']}"/>
+									</td>
+								</tr>
+							</h:panelGroup>
+							
+							<tr>								
+								<td colspan="3">
+									<p:fileUpload id="fileupload" fileUploadListener="#{processFlowController.onFileUpload}" mode="advanced" dragDropSupport="true"												 
+				                       			  update="attachments" immediate="true" sizeLimit="10000000" fileLimit="1"
+				                       			  style="width:auto;"
+				                                  multiple="false"
+				                                  rendered="#{processFlowController.progressStepEditMode == '1' and processFlowController.processStepBean.status == 'Started'}"/>
+								</td>
+							</tr>
+						</table>
+						
+					</h:panelGroup>
+					
+					<h:panelGroup layout="block"/>
+					
+		     	</p:panelGrid>
+		     	
+		     	
+		     	<sec:ifAnyGranted roles="ROLE_ADMIN, EDIT_PROCESS">
+		     	<div class="EmptyBox10"></div>
+		     			     	
+		     	<h:panelGroup id="stepButtonsPanel" layout="block" 
+		     				  rendered="#{processFlowController.processStepBean.showActionButtonsPanel or sec:ifAllGranted('ROLE_ADMIN')}">
+		     		
+		     		<h:panelGroup id="stepEditViewPanel" layout="block" 
+		     					  rendered="#{!processFlowController.showProgressStepUpdateActionButtons}">
+		     			
+		     			<p:commandButton actionListener="#{processFlowController.onEditProgressStep(1)}"
+		        					 	 process="@this"
+		           						 update="processStepPanel"
+			                   			 icon="fa fa-pencil Fs16 White"
+			                       		 title="#{bundle['editProcessStepTitle']}"
+			                       		 styleClass="GreenButton"/>
+		     			
+		     			<p:commandButton actionListener="#{processFlowController.onEditProgressStep(2)}"
+		        					 	 process="@this"
+		           						 update="processStepPanel"
+			                   			 icon="fa fa-check"
+			                       		 title="#{bundle['finishProcessStepTitle']}"
+			                       		 styleClass="BlueButton"
+			                       		 rendered="#{processFlowController.processStepBean.userAssignedId == sessionBean.loggedInUserId}"/>
+			                       		 
+			           	<p:commandButton actionListener="#{processFlowController.onEditProgressStep(4)}"
+		        					 	 process="@this"
+		           						 update="processStepPanel"
+			                   			 icon="fa fa-arrow-right"
+			                       		 title="#{bundle['skipProcessStepTitle']}"
+			                       		 styleClass="OrangeButton"
+			                       		 rendered="#{processFlowController.processStepBean.enableSkip and !processFlowController.chrono}"/>
+			                       		 
+			         	<p:commandButton actionListener="#{processFlowController.onEditProgressStep(5)}"
+		        					 	 process="@this"
+		           						 update="processStepPanel"
+			                   			 icon="fa fa-plus"
+			                       		 title="#{bundle['postponeProcessStepTitle']}"
+			                       		 styleClass="PurpleButton"
+			                       		 rendered="#{processFlowController.processStepBean.enablePostpone and !processFlowController.chrono}"/>
+                       		 
+		        		<p:commandButton actionListener="#{processFlowController.onEditProgressStep(3)}"
+		        					 	 process="@this"
+		           						 update="processStepPanel"
+			                   			 icon="fa fa-times"
+			                       		 title="#{bundle['terminateProcessStepTitle']}"
+			                       		 styleClass="RedButton"
+			                       		 rendered="#{processFlowController.processStepBean.enableTerminate}"/>
+		     		</h:panelGroup>
+		     		
+		     		
+		     		
+		     		<h:panelGroup id="stepActionButtonsPanel" layout="block" rendered="#{processFlowController.showProgressStepUpdateActionButtons}">
+			  			<p:commandButton value="#{bundle['update']}" 
+			  							 actionListener="#{processFlowController.onCreateUpdateProcessStep}" 
+			  							 update="processStepPanel, processFlowPanel"
+			  							 icon="fa fa-pencil Fs16 White"		                   			 
+			                   			 styleClass="GreenButton"
+			                   			 style="width:auto" 		                   			 
+			                   			 rendered="#{processFlowController.progressStepEditMode == '1'}"/>
+			                   			 
+			          	<p:commandButton value="#{bundle['finishStep']}"
+			          					 actionListener="#{processFlowController.onFinishProcessStep}" 
+			  							 update="processStepPanel, processFlowPanel"
+			  							 icon="fa fa-check Fs16 White"
+			                   			 styleClass="BlueButton"
+			                   			 style="width:auto" 
+			                   			 onclick="if (!confirm('#{bundle['finishProcessStepConfirm']}')) return false;"		                   			 
+			                   			 rendered="#{processFlowController.progressStepEditMode == '2'}"/>
+			                   			 
+			           	<p:commandButton value="#{bundle['terminateStep']}"
+			          					 actionListener="#{processFlowController.onTerminateProcessStep}" 
+			  							 update="processStepPanel, processFlowPanel"
+			  							 icon="fa fa-times Fs16 White"
+			                   			 styleClass="RedButton"
+			                   			 style="width:auto"
+			                   			 onclick="if (!confirm('#{bundle['terminateProcessStepConfirm']}')) return false;" 		                   			 
+			                   			 rendered="#{processFlowController.progressStepEditMode == '3'}"/>
+			                   			 
+			         	<p:commandButton value="#{bundle['skip']}"
+			          					 actionListener="#{processFlowController.onSkipProcessStep}" 
+			  							 update="processStepPanel, processFlowPanel"
+			  							 icon="fa fa-arrow-right Fs16 White"
+			                   			 styleClass="OrangeButton"
+			                   			 style="width:auto"
+			                   			 onclick="if (!confirm('#{bundle['skipProcessStepConfirm']}')) return false;" 		                   			 
+			                   			 rendered="#{processFlowController.progressStepEditMode == '4' and !processFlowController.chrono}"/>
+			                   			 			                   			 
+			          	<p:commandButton value="#{bundle['postpone']}"
+			          					 actionListener="#{processFlowController.onPostponeProcessStep}" 
+			  							 update="processStepPanel, processFlowPanel"
+			  							 icon="fa fa-plus Fs16 White"
+			                   			 styleClass="PurpleButton"
+			                   			 style="width:auto"
+			                   			 rendered="#{processFlowController.progressStepEditMode == '5' and !processFlowController.chrono}"/>         
+	                   				 
+			         	<p:commandButton value="#{bundle['cancel']}"
+			         					 actionListener="#{processFlowController.onCancelStep}" 
+			         					 update="processStepPanel"
+			         					 icon="fa fa-ban Fs16 White"
+			         					 process="@this"		               				 
+			               				 styleClass="RedButton"                     				 
+			               				 style="width:auto"/>
+ 					</h:panelGroup>
+		               				 		        			               				 
+				</h:panelGroup>
+				</sec:ifAnyGranted>
+	     	
+	     	</h:panelGroup>
+     	</h:panelGroup>
+		
+		
+		
+		
+					
+	</div>
+</div>
+
+</ui:composition>

@@ -1,0 +1,190 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:sec="http://www.springframework.org/security"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="subheader">
+		<h:outputLink value="complains" styleClass="BoldGray">
+			Customer Service 
+		</h:outputLink>
+		<i class="icon-arrow-right"></i>
+        Customer Service Request <h:outputText rendered="#{complainAdminController.complain.id != null}" value="#{complainAdminController.complain.id}"/>
+    </ui:define>
+
+	<ui:define name="content">
+
+	    <div class="Container100 ui-fluid" id="rootComplainInputContainer">
+            <div class="ContainerIndent">
+                <div class="Card ShadowEffect">
+                	<h:form id="complainDownloadForm" target="_blank">
+                	<p:toolbar rendered="#{complainAdminController.complain.id != null}">
+                    	<f:facet name="left">
+							<p:commandButton action="#{complainAdminController.download('RECIEVE')}"
+								rendered="#{complainAdminController.complain.id != null}"
+								style="width:auto" icon="fa fa-file-pdf-o Fs16 White" value="Receive Contract" ajax="false"/>
+							<p:commandButton action="#{complainAdminController.download('PICKUP')}"
+								rendered="#{complainAdminController.complain.id != null}"
+								style="width:auto" icon="fa fa-file-pdf-o Fs16 White" value="Service Contract" ajax="false"/>
+                    	</f:facet>
+                    </p:toolbar>
+                    </h:form>
+                	<h:form id="complainUpdateForm">
+                	<p:messages showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+                    <h2 class="BigTopic">Customer Service Request
+                    <p:commandButton update=":complainUpdateForm" immediate="true" rendered="#{complainAdminController.complain.id != null}"
+                        		value="#{complainAdminController.showDetails ? 'Hide Deatils' : 'Show Details'}"
+                        		style="width:auto" icon="fa #{complainAdminController.showDetails ? 'fa-eye-slash' : 'fa-eye'} Fs16 White" action="#{complainAdminController.toggleDetails}"/></h2>
+                        		
+                    
+                    <p:timeline id="timeline" value="#{complainAdminController.timeLineModel}" height="250px"
+                    		rendered="#{complainAdminController.complain.id != null and (complainAdminController.showDetails or complainAdminController.complain.status == 'PICKUPED')}"
+        					selectable="false" 
+        					zoomable="true" 
+        					moveable="true" 
+        					stackEvents="true" 
+        					axisOnTop="false"              
+        					eventStyle="box" 
+        					showCurrentTime="true"
+        					start="#{of:addDays(complainAdminController.complain.recieveDate, -1)}"
+        					end="#{of:addDays(complainAdminController.complain.lastActionDate, 1)}"
+        					showNavigation="true" /> 
+                    
+                    <p:panelGrid id="templateContainer" columns="3" columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
+                    	
+						<p:outputLabel for="repairId" value="Repair #"/>
+                        <p:inputText id="repairId" value="#{complainAdminController.complain.repairId}" maxlength="10" required="false" />
+                        <p:message for="repairId" />
+                    	
+                    	<p:outputLabel for="barnd" value="Brand"/>
+                        <p:inputText id="barnd" value="#{complainAdminController.complain.brand}" maxlength="250" required="true" requiredMessage="Brand Should be Filled"/>
+                        <p:message for="barnd" />
+                        
+                        <p:outputLabel for="model" value="Model"/>
+                        <p:inputText id="model" value="#{complainAdminController.complain.model}" maxlength="250" required="false" />
+                        <p:message for="model" />
+                        
+                        <p:outputLabel for="type" value="Type" rendered="#{complainAdminController.showDetails}"/>
+                        <p:selectOneMenu id="type" value="#{complainAdminController.complain.type}" label="Type" rendered="#{complainAdminController.showDetails}"
+                              filter="false" panelStyle="width:250px" converter="omnifaces.GenericEnumConverter">
+            					<f:selectItems value="#{complainAdminController.types}" />
+        				</p:selectOneMenu>
+                        <p:message for="type" rendered="#{complainAdminController.showDetails}"/>
+                        
+                        <p:outputLabel for="referenceNumber" value="Reference Number" rendered="#{complainAdminController.showDetails}"/>
+                        <p:inputText id="referenceNumber" value="#{complainAdminController.complain.referenceNumber}" maxlength="250" rendered="#{complainAdminController.showDetails}"/>
+                        <p:message for="referenceNumber" rendered="#{complainAdminController.showDetails}"/>
+                        
+                        <p:outputLabel for="materials" value="Materials" rendered="#{complainAdminController.showDetails}"/>
+                        <p:selectCheckboxMenu id="materials" value="#{complainAdminController.selectedMaterials}" label="Materials" rendered="#{complainAdminController.showDetails}"
+                              filter="false" panelStyle="width:250px" converter="omnifaces.GenericEnumConverter">
+            					<f:selectItems value="#{complainAdminController.materials}" />
+        				</p:selectCheckboxMenu>
+                        <p:message for="materials" rendered="#{complainAdminController.showDetails}"/>
+                        
+                        <p:outputLabel for="actions" value="Actions" rendered="#{complainAdminController.showDetails}"/>
+                        <p:selectCheckboxMenu id="actions" value="#{complainAdminController.selectedActions}" label="Actions" rendered="#{complainAdminController.showDetails}"
+                              filter="false" panelStyle="width:250px" converter="omnifaces.GenericEnumConverter">
+            					<f:selectItems value="#{complainAdminController.actionTypes}" />
+        				</p:selectCheckboxMenu>
+                        <p:message for="actions" rendered="#{complainAdminController.showDetails}"/>
+                    	
+                        <p:outputLabel for="firstName" value="First Name"/>
+                        <p:inputText id="firstName" value="#{complainAdminController.complain.firstName}" maxlength="250" required="true" requiredMessage="First Name Should be Filled"/>
+                        <p:message for="firstName" />
+                        
+                        <p:outputLabel for="lastName" value="Last Name"/>
+                        <p:inputText id="lastName" value="#{complainAdminController.complain.lastName}" maxlength="250" required="true" requiredMessage="Last Name Should be Filled"/>
+                        <p:message for="lastName" />
+                        
+                        <p:outputLabel for="identificationNumber" value="Passport Number"/>
+                        <p:inputText id="identificationNumber" value="#{complainAdminController.complain.identificationNumber}" maxlength="250"/>
+                        <p:message for="identificationNumber" />
+                        
+                        <p:outputLabel for="phone" value="Phone "/>
+                        <p:inputText id="phone" value="#{complainAdminController.complain.phone}" maxlength="250" required="true" requiredMessage="Phone is required."/>
+                        <p:message for="phone" />
+                        
+						<p:outputLabel for="email" value="Email"/>
+                        <p:inputText id="email" value="#{complainAdminController.complain.email}" maxlength="250"/>
+                        <p:message for="email" />
+                        
+                        <p:outputLabel for="recieveSignature" value="Recieve Signature" rendered="#{complainAdminController.showDetails}"/>
+                        <p:signature id="recieveSignature" style="width:100%;height:200px" value="#{complainAdminController.complain.recieveSignature}" onchange="exportRecieve();"
+                           readonly="#{complainAdminController.complain.id != null}"	required="true" label="Signature" rendered="#{complainAdminController.showDetails}"/>
+                        <p:message for="recieveSignature" rendered="#{complainAdminController.showDetails}"/>
+                        
+                        <p:outputLabel for="estimatePrice" value="Estimate Price" rendered="#{(complainAdminController.complain.id != null and complainAdminController.complain.status.ordinal() > 0 and complainAdminController.showDetails) or complainAdminController.selectedStatus == 'DECISION_MADE'}"/>
+                        <p:inputText id="estimatePrice" value="#{complainAdminController.complain.estimatePrice}"
+                        		 rendered="#{(complainAdminController.complain.id != null and complainAdminController.complain.status.ordinal() > 0 and complainAdminController.showDetails) or complainAdminController.selectedStatus == 'DECISION_MADE'}"
+                    			  maxlength="255"/>
+                        <p:message for="estimatePrice" rendered="#{(complainAdminController.complain.id != null and complainAdminController.complain.status.ordinal() > 0 and complainAdminController.showDetails) or complainAdminController.selectedStatus == 'DECISION_MADE'}"/>
+                        
+                        <p:outputLabel for="estimateReadyDate" value="Estimate Ready Date" rendered="#{(complainAdminController.complain.id != null and complainAdminController.complain.status.ordinal() > 0 and complainAdminController.showDetails) or complainAdminController.selectedStatus == 'DECISION_MADE'}"/>
+                        <p:calendar id="estimateReadyDate" value="#{complainAdminController.complain.estimateReadyDate}" mindate="#{now}"
+                        		 rendered="#{(complainAdminController.complain.id != null and complainAdminController.complain.status.ordinal() > 0 and complainAdminController.showDetails) or complainAdminController.selectedStatus == 'DECISION_MADE'}"
+                    			  timeInput="false" />
+                        <p:message for="estimateReadyDate" rendered="#{(complainAdminController.complain.id != null and complainAdminController.complain.status.ordinal() > 0 and complainAdminController.showDetails) or complainAdminController.selectedStatus == 'DECISION_MADE'}"/>
+                        
+						<p:outputLabel for="description" value="Description" rendered="#{(complainAdminController.complain.id != null and complainAdminController.complain.status.ordinal() > 0 and complainAdminController.showDetails) or complainAdminController.selectedStatus == 'DECISION_MADE'}"/>
+                        <p:inputTextarea id="description" value="#{complainAdminController.complain.description}"
+                        		 rendered="#{(complainAdminController.complain.id != null and complainAdminController.complain.status.ordinal() > 0 and complainAdminController.showDetails) or complainAdminController.selectedStatus == 'DECISION_MADE'}"
+                    			  maxlength="250" rows="5"/>
+                        <p:message for="description" rendered="#{(complainAdminController.complain.id != null and complainAdminController.complain.status.ordinal() > 0 and complainAdminController.showDetails) or complainAdminController.selectedStatus == 'DECISION_MADE'}"/>
+                        
+                       	<p:outputLabel for="deposit" value="Deposit" rendered="#{(complainAdminController.complain.id != null and complainAdminController.complain.status.ordinal() > 2 and complainAdminController.showDetails) or complainAdminController.selectedStatus == 'CUSTOMER_DECISION_ACCEPTED'}"/>
+                        <p:inputNumber id="deposit" value="#{complainAdminController.complain.deposit}"
+                        		 rendered="#{(complainAdminController.complain.id != null and complainAdminController.complain.status.ordinal() > 2 and complainAdminController.showDetails) or complainAdminController.selectedStatus == 'CUSTOMER_DECISION_ACCEPTED'}"
+                    			  maxlength="15" minValue="0" decimalPlaces="2" symbolPosition="s" emptyValue="0.00" symbol=" AMD"/>
+                        <p:message for="deposit" rendered="#{(complainAdminController.complain.id != null and complainAdminController.complain.status.ordinal() > 2 and complainAdminController.showDetails) or complainAdminController.selectedStatus == 'CUSTOMER_DECISION_ACCEPTED'}"/>
+                        
+                        <p:outputLabel for="pickSignature" value="Pickup Signature"
+                         rendered="#{(complainAdminController.complain.id != null and complainAdminController.complain.status.ordinal() > 8 and complainAdminController.showDetails and complainAdminController.complain.pickSignature != null)
+                         	 or complainAdminController.selectedStatus == 'PICKUPED'}"/>
+                        <p:signature id="pickSignature" style="width:100%;height:200px" value="#{complainAdminController.complain.pickSignature}" onchange="exportPickup();"
+                          readonly="#{complainAdminController.selectedStatus != 'PICKUPED'}" 
+                          required="true"
+                          rendered="#{(complainAdminController.complain.id != null and complainAdminController.complain.status.ordinal() > 8 and complainAdminController.showDetails and complainAdminController.complain.pickSignature != null)
+                         	 or complainAdminController.selectedStatus == 'PICKUPED'}" 
+							/>
+                        <p:message for="pickSignature" rendered="#{(complainAdminController.complain.id != null and complainAdminController.complain.status.ordinal() > 8 and complainAdminController.showDetails and complainAdminController.complain.pickSignature != null)
+                         	 or complainAdminController.selectedStatus == 'PICKUPED'}"/>
+                        
+                        <sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_CUSTOMER_CENTRE">
+                        <p:commandButton update="complainUpdateForm" styleClass="GreenButton" 
+                        	value="Save" rendered="#{complainAdminController.complain.status != 'PICKUPED'}"
+                        	style="width:auto" icon="fa fa-pencil Fs16 White" action="#{complainAdminController.save()}" />
+                        
+                        <p:selectOneMenu id="changeStatus" value="#{complainAdminController.selectedStatus}" rendered="#{complainAdminController.complain.id != null and complainAdminController.complain.status != 'PICKUPED'}">
+                        	<p:ajax listener="#{complainAdminController.onStatusChange}" update="complainUpdateForm" />
+            				<f:selectItem itemLabel="Select Status" itemValue="" />
+            				<f:selectItems value="#{complainAdminController.statuses}" var="status" itemLabel="#{status.title}" itemValue="#{status.name()}"/>
+        				</p:selectOneMenu>
+        				</sec:ifAnyGranted>
+                    </p:panelGrid>
+                    <h:inputHidden value="#{complainAdminController.complain.recieveSignatureBase64}" id="recieveSignatureBase64"/>
+                    <h:inputHidden value="#{complainAdminController.complain.pickSignatureBase64}" id="pickSignatureBase64"/>
+                    
+					<script type="text/javascript">
+						function exportRecieve() {
+							var mycanvas = document.getElementById('complainUpdateForm:recieveSignature').getElementsByTagName('canvas')[0];
+							var image = mycanvas.toDataURL("image/png");
+							document.getElementById('complainUpdateForm:recieveSignatureBase64').value = image;
+						}
+						
+						function exportPickup() {
+							var mycanvas = document.getElementById('complainUpdateForm:pickSignature').getElementsByTagName('canvas')[0];
+							var image = mycanvas.toDataURL("image/png");
+							document.getElementById('complainUpdateForm:pickSignatureBase64').value = image;
+						}
+					</script>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+
+	</ui:define>
+
+</ui:composition>

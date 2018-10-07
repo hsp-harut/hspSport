@@ -1,0 +1,115 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:sec="http://www.springframework.org/security"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="subheader">
+        Formula Management
+    </ui:define>
+
+	<ui:define name="content">
+
+		<div class="Container100 ui-fluid">
+			<div class="ContainerIndent">
+				<div class="Card ShadowEffect">
+					<h:form id="formulaListForm">
+					<p:messages showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+					<h2 class="BigTopic">Formulas 
+						<sec:ifAnyGranted roles="EDIT_FORMULA">
+							<p:commandButton update=":formulaUpdateForm" 
+                        		value="Create Formula"
+                        		style="width:auto" icon="fa fa-plus Fs16 White" action="#{formulaController.newFormula}"/>
+                        </sec:ifAnyGranted>
+                    </h2>
+					<p:dataTable var="formula" value="#{formulaController.formulas}" sortMode="single"
+						reflow="true" lazy="true" paginator="true" rows="10" style="" rowKey="#{formula.id}" paginatorAlwaysVisible="false"
+						paginatorPosition="bottom" selectionMode="single" selection="#{formulaController.selectedFormula}"
+						paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+						rowsPerPageTemplate="10,25,50" id="formulas">
+						<f:facet name="header">
+                            Formulas
+                        </f:facet>
+                        <p:ajax event="rowSelect" listener="#{formulaController.onRowSelect}" update=":formulaUpdateForm" />
+        				<p:ajax event="rowUnselect" listener="#{formulaController.onRowUnselect}" update=":formulaUpdateForm" />
+						<p:column headerText="Brand" sortBy="#{formula.brand}" sortable="true">
+							<h:outputText value="#{formula.brand}" />
+						</p:column>
+						
+						<p:column headerText="Currency" sortBy="#{formula.currency}" sortable="true">
+							<h:outputText value="#{formula.currency}" />
+						</p:column>
+						
+						<p:column headerText="Formula" sortBy="#{formula.formula}" sortable="true" style="text-align: center">
+							<h:outputText value="#{formula.formula}" />
+						</p:column>
+						
+						<p:column headerText="Price Name" sortBy="#{formula.priceName}" sortable="true" style="text-align: center">
+							<h:outputText value="#{formula.priceName}" />
+						</p:column>
+						
+						<p:column headerText="Price Item Type" sortBy="#{formula.type}" sortable="true" style="text-align: center">
+							<h:outputText value="#{formula.type}" />
+						</p:column>
+						
+						<p:column headerText="Actions" style="text-align: center">
+                    		<p:commandButton icon="fa fa-close Fs16 White" 
+                        		title="Delete this formula"
+                        		style="width:auto"
+                        		update="formulaListForm :formulaUpdateForm"
+                        		styleClass="RedButton"
+                        		actionListener="#{formulaController.removeFormula(formula)}"/>
+                		</p:column>
+					</p:dataTable>
+					</h:form>
+				</div>
+			</div>
+		</div>
+		
+	    <div class="Container100 ui-fluid" id="rootFormulaInputContainer">
+            <div class="ContainerIndent">
+                <div class="Card ShadowEffect">
+                	<h:form id="formulaUpdateForm">
+                	<p:messages showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+                    <h2 class="BigTopic">Formula Details</h2> 
+                    <p:panelGrid id="formulaContainer" columns="3" columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
+                        <p:outputLabel for="brand" value="Brand"/>
+                        <p:inputText id="brand" value="#{formulaController.selectedFormula.brand}" required="true" requiredMessage="Brand should be filled." validator="#{formulaController.validateBrand}" maxlength="150"/>
+                        <p:message for="brand" />
+                        
+                        <p:outputLabel for="priceCurrency" value="Price Curency"/>
+                        <p:selectOneMenu id="priceCurrency" value="#{formulaController.selectedFormula.currency}" filter="true" filterMatchMode="startsWith" maxlength="10"
+                        			required="true" requiredMessage="Currency should be selected" converter="omnifaces.SelectItemsConverter">
+                            		<f:selectItems value="#{formulaController.currencies}" var="type" itemLabel="#{type.name()}" itemValue="#{type}"/>
+                        </p:selectOneMenu>
+                        <p:message for="priceCurrency" />
+                        
+                        <p:outputLabel for="formula" value="Formula"/>
+                        <p:inputText id="formula" value="#{formulaController.selectedFormula.formula}" required="true" requiredMessage="Formula should be filled." maxlength="255"/>
+                        <p:message for="formula" />
+                        
+                        <p:outputLabel for="priceName" value="Price Name"/>
+                        <p:inputText id="priceName" value="#{formulaController.selectedFormula.priceName}" required="true" requiredMessage="Price Name should be filled" maxlength="255"/>
+                        <p:message for="priceName" />
+                        
+                        <p:outputLabel for="types" value="Type"/>
+                        <p:selectOneMenu id="types" value="#{formulaController.selectedFormula.type}" filter="true" filterMatchMode="startsWith" 
+                        	converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="Type should be selected.">
+                        	<f:selectItem itemLabel="Select One" itemValue="" />
+                            <f:selectItems value="#{formulaController.types}" var="type" itemLabel="#{type.name()}" itemValue="#{type}"/>
+                        </p:selectOneMenu>
+                        <p:message for="types" />
+                        
+                        <p:commandButton update="formulaContainer :formulaListForm :formulaUpdateForm" styleClass="#{formulaController.selectedFormula.id != null ? 'GreenButton' : ''}" 
+                        	value="#{formulaController.selectedFormula.id != null ? 'Update Formula' : 'Create Formula'}"
+                        	style="width:auto" icon="#{formulaController.selectedFormula.id != null ? 'fa fa-pencil' : 'fa fa-plus'} Fs16 White" action="#{formulaController.save}"/>
+                    </p:panelGrid>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+
+	</ui:define>
+
+</ui:composition>

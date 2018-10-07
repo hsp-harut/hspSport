@@ -1,0 +1,2 @@
+UPDATE contract con SET con.peiodic_last_updated_at = (SELECT MAX(`date_in_excel`) FROM `excel_contract_income` exIn WHERE exIn.contract_id = con.id)
+WHERE id IN (SELECT contract_id FROM `excel_contract_income`);

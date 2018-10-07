@@ -1,0 +1,94 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:sec="http://www.springframework.org/security"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="subheader">
+        Email Management
+    </ui:define>
+
+	<ui:define name="content">
+
+		<div class="Container100 ui-fluid">
+			<div class="ContainerIndent">
+				<div class="Card ShadowEffect">
+					<h:form id="templateListForm">
+					<p:messages showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+					<h2 class="BigTopic">Email Templates 
+                    </h2>
+					<p:dataTable var="template" value="#{emailAdminController.templates}" sortMode="single"
+						reflow="true" lazy="true" paginator="true" rows="10" style="" rowKey="#{template.id}" paginatorAlwaysVisible="false"
+						paginatorPosition="bottom" selectionMode="single" selection="#{emailAdminController.emailTemplate}"
+						paginatorTemplate="{FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+						id="emails">
+						<f:facet name="header">
+                            Emails
+                        </f:facet>
+                        <p:ajax event="rowSelect" listener="#{emailAdminController.onRowSelect}" update=":templateUpdateForm" />
+        				<p:ajax event="rowUnselect" listener="#{emailAdminController.onRowUnselect}" update=":templateUpdateForm" />
+						<p:column headerText="Template Name" sortBy="#{template.type}" sortable="true">
+							<h:outputText value="#{template.type.name()}" />
+						</p:column>
+						
+						<p:column headerText="Subject" sortBy="#{template.subject}" sortable="true">
+							<h:outputText value="#{template.subject}" />
+						</p:column>
+						
+						<p:column headerText="Title" sortBy="#{template.title}" sortable="true" style="text-align: center">
+							<h:outputText value="#{template.title}" />
+						</p:column>
+						
+					</p:dataTable>
+					</h:form>
+				</div>
+			</div>
+		</div>
+		
+	    <div class="Container100 ui-fluid" id="rootTemplateInputContainer">
+            <div class="ContainerIndent">
+                <div class="Card ShadowEffect">
+                	<h:form id="templateUpdateForm">
+                	<p:messages showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+                    <h2 class="BigTopic">Email Template</h2>
+                    <p:panelGrid id="templateContainer" columns="3" columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
+                        <p:outputLabel for="type" value="Template Type"/>
+                        <p:inputText id="type" value="#{emailAdminController.emailTemplate.type}" disabled="true" maxlength="150" />
+                        <p:message for="type" />
+                        
+                        <p:outputLabel for="subject" value="Subject"/>
+                        <p:inputText id="subject" value="#{emailAdminController.emailTemplate.subject}" required="true" requiredMessage="Subject should be filled." maxlength="200"/>
+                        <p:message for="subject" />
+                        
+                        <p:outputLabel for="title" value="Title"/>
+                        <p:inputText id="title" value="#{emailAdminController.emailTemplate.title}" required="true" requiredMessage="Title should be filled." maxlength="200"/>
+                        <p:message for="title" />
+                        
+                        <p:outputLabel for="body" value="Body"/>
+                		<p:inputTextarea id="body" value="#{emailAdminController.emailTemplate.body}" required="true" requiredMessage="Body should be filled."/>
+                		<p:message for="body" />
+                		
+                		<p:outputLabel for="helpParams" value="Parameters"/>
+                		<p:dataList id="helpParams" value="#{emailAdminController.emailTemplate.type.params}" var="params" rowIndexVar="rowIndex" type="none">
+        				<div class="TexAlLeft Container100">
+        					<h:outputText value="Parameter {#{rowIndex}} is #{params}"/>
+        					<br/>
+        				</div>
+    					</p:dataList>
+    					<p:message for="helpParams" />
+                        
+                    	<sec:ifAnyGranted roles="ROLE_ADMIN,EDIT_USER">
+                        <p:commandButton update="templateContainer :templateListForm :templateUpdateForm" styleClass="GreenButton" 
+                        	value="Update Email Template" rendered="#{emailAdminController.emailTemplate.type != null}"
+                        	style="width:auto" icon="fa fa-pencil Fs16 White" action="#{emailAdminController.save}"/>
+                        </sec:ifAnyGranted>
+                    </p:panelGrid>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+
+	</ui:define>
+
+</ui:composition>
