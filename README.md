@@ -3,7 +3,7 @@
 
 2. Add ``myhost`` envoirement property
 
-3. Add ``setting`` file with ``$myhost`` value
+3. Add ``setting`` file with ``$myhost`` value (for example see config.harut.properties file)
 
 4. Run on Tomcat 8+ 
 
