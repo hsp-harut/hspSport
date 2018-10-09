@@ -10,10 +10,11 @@ import org.springframework.core.io.FileSystemResource;
 public class DrawingApp {
 
 	public static void main(String[] args) {
-		BeanFactory factory = new XmlBeanFactory(new FileSystemResource("/home/davit/projects/hspSport/src/main/resources/testSpringBeans.xml"));
-		Triangle triangle = (Triangle) factory.getBean("triangle");
+//		BeanFactory factory = new XmlBeanFactory(new FileSystemResource("/home/davit/projects/hspSport/src/main/resources/testSpringBeans.xml"));
+//		Triangle triangle = (Triangle) factory.getBean("triangle");
 		
-		//ApplicationContext context = new ClassPathXmlApplicationContext("testSpringBeans.xml");		
+		ApplicationContext context = new ClassPathXmlApplicationContext("testSpringBeans.xml");	
+		Triangle triangle = (Triangle) context.getBean("triangle");
 		
 //		AbstractApplicationContext context = new ClassPathXmlApplicationContext("testSpringBeans.xml");
 //		context.registerShutdownHook();
