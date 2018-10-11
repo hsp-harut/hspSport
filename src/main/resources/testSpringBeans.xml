@@ -15,6 +15,7 @@
 		
 		
 	<bean id="triangle" class="am.chronograph.test.Triangle">
+		<property name="type" value="Equilateral"/>
 	</bean>
 		
 		
