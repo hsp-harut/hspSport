@@ -13,7 +13,7 @@ public class DrawingApp {
 //		BeanFactory factory = new XmlBeanFactory(new FileSystemResource("/home/harut/projects/chronograph/src/main/resources/testSpringBeans.xml"));
 //		Triangle triangle = (Triangle) factory.getBean("triangle");
 		
-		ApplicationContext context = new ClassPathXmlApplicationContext("testSpringBeans.xml");		
+		ApplicationContext context = new ClassPathXmlApplicationContext("testSpringBeans.xml");
 		
 //		AbstractApplicationContext context = new ClassPathXmlApplicationContext("testSpringBeans.xml");
 //		context.registerShutdownHook();

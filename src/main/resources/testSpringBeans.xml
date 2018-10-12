@@ -14,8 +14,35 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 		
 		
-	<bean id="triangle" class="am.chronograph.test.Triangle">
-		<property name="type" value="Equilateral"/>
+	<bean id="parentTriangle" class="am.chronograph.test.Triangle" init-method="myInit" abstract="true">
+		<property name="points">
+			<list>
+				<ref bean="pointA"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="triangle" class="am.chronograph.test.Triangle" parent="parentTriangle">
+		<property name="points">
+			<list merge="true">
+				<ref bean="pointB"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="pointA" class="am.chronograph.test.Point">
+		<property name="x" value="0"></property>
+		<property name="y" value="0"></property>
+	</bean>
+	
+	<bean id="pointB" class="am.chronograph.test.Point">
+		<property name="x" value="-20"></property>
+		<property name="y" value="0"></property>
+	</bean>
+	
+	<bean id="pointC" class="am.chronograph.test.Point">
+		<property name="x" value="0"></property>
+		<property name="y" value="20"></property>
 	</bean>
 		
 		
