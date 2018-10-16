@@ -49,7 +49,7 @@
               	</f:facet>
 			
             	<f:facet name="right">
-            		<p:commandButton value="Նոր պայմանագիր"
+            		<p:commandButton value="Նոր պայմանագիր" 
             					     actionListener="#{contractController.onScrollToCreateContract}" update="contractCreatePanel"
                     			 	 process="@this"                    			 	                     				
                     			 	 style="width:auto" 
@@ -497,7 +497,7 @@
 	            <h:panelGroup layout="block" rendered="#{contractController.contractBean.status != null or contractController.contractBean.copy}"/>
              		
 				<p:outputLabel for="enterDate" value="#{bundle['contractCreatedAt']} *"/>
-               	<p:calendar id="enterDate" value="#{contractController.contractBean.enterDate}" showOn="button" pattern="dd/MM/yyyy" tabindex="1"/>
+               	<p:calendar id="enterDate" value="#{contractController.contractBean.enterDate}" showOn="button" pattern="dd/MM/yyyy" tabindex="1" />
                	<p:message for="enterDate" />             		
              		
 				<p:outputLabel for="contractNumber" value="Պայմ․ համար *"/>
@@ -594,13 +594,15 @@
       		<div class="EmptyBox20"></div>
          		
       		<h:panelGroup id="buttonsPanel" layout="block">      			      			
-          		<p:commandButton id="createUpdateContract" actionListener="#{contractController.onCreateUpdateContract}" update="contractCreatePanel, contractListPanel"
+          		<p:commandButton id="createUpdateContract" actionListener="#{contractController.onCreateUpdateContract}" 
+          					     update="contractCreatePanel, contractListPanel"
                     			 value="#{contractController.contractBean.id != null ? 'Թարմացնել' : 'Ավելացնել'}" 
                     			 styleClass="#{contractController.contractBean.id != null ? 'GreenButton' : ''}"                     				 
                     			 style="width:auto" icon="#{contractController.contractBean.id != null ? 'fa fa-pencil' : 'fa fa-plus'} Fs16 White"
                     			 oncomplete="if (#{contractController.existsWithSameBankAccount}) { if (!confirm('Նշված բանկային հաշվով տվյալ արդեն առկա է։ Շարունակելու դեպքում համապատասխան պայմանագրերը կստանան կրկնօրինակ կարգավիճակ։ Շարունակե՞լ։')) return false; else {onCreateUpdateConfirmed();}}"/>
                     				 
-              	<p:commandButton actionListener="#{contractController.onCancel}" update="contractCreatePanel"
+              	<p:commandButton actionListener="#{contractController.onCancel}" 
+              				     update="contractCreatePanel"
               					 process="@this"
                 				 value="Հերքել" 
                 				 styleClass="RedButton"                     				 

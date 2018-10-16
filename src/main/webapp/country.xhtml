@@ -1,0 +1,101 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:of="http://omnifaces.org/functions"
+                xmlns:sec="http://www.springframework.org/security"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                template="/WEB-INF/template.xhtml">
+  
+<ui:define name="subheader">
+	<h:outputLink value="#{request.contextPath}/dashboard" styleClass="BoldGray">
+		<h:outputText value=" #{bundle['dashboard']}"/>
+	</h:outputLink>        
+</ui:define>
+    
+<ui:define name="content">
+  
+    
+<f:loadBundle id="bundle" var="bundle" basename="#{countryController.currentBundle}"/>
+
+
+
+
+
+
+<h:form id="contractForm">
+
+<sec:ifAnyGranted roles="ROLE_ADMIN">
+	<p:defaultCommand target="createUpdateCountry" />
+</sec:ifAnyGranted>
+
+<h:panelGroup id="contractListPanel" layout="block" styleClass="Container100 ui-fluid">
+	<div class="ContainerIndent">
+		<div class="Card ShadowEffect">
+		
+			<h2 class="BigTopic">					
+				<h:outputText value="#{bundle['countries']}"/>
+			</h2>
+						   
+								
+						
+		</div>
+	</div>
+</h:panelGroup>
+
+
+
+
+
+
+<h:panelGroup id="countryCreatePanel" layout="block" styleClass="Container100 ui-fluid">
+	<div class="ContainerIndent">
+		<div class="Card ShadowEffect">						
+		
+			<p:messages id="infoErrorMessages" showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+			
+			<h2 class="BigTopic">					
+				<h:outputText value="Պայմանագրի տվյալներ"/>&#160;					                 
+			</h2>
+			
+			<div class="EmptyBox20"></div>
+			<p:panelGrid id="countryPanel" columns="3" columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
+             				
+				<p:outputLabel for="contractNumber" value="Պայմ․ համար *"/>
+               	<p:inputText id="contractNumber" value="#{countryController.countryBean.name}" maxlength="30" tabindex="2"/>
+               	<p:message for="contractNumber" />   
+               	
+     		</p:panelGrid>
+         	
+         	<sec:ifAnyGranted roles="ROLE_ADMIN">
+      		<div class="EmptyBox20"></div>
+         		
+      		<h:panelGroup id="buttonsPanel" layout="block">      			      			
+          		<p:commandButton id="createUpdateCountry" actionListener="#{countryController.oncreateUpdateCountry}" 
+          					     update="countryCreatePanel, contractListPanel"
+                    			 value="#{countryController.countryBean.id != null ? 'Թարմացնել' : 'Ավելացնել'}" 
+                    			 styleClass="#{countryController.countryBean.id != null ? 'GreenButton' : ''}"                     				 
+                    			 style="width:auto" icon="#{countryController.countryBean.id != null ? 'fa fa-pencil' : 'fa fa-plus'} Fs16 White"/>
+                    				 
+              	<p:commandButton actionListener="#{countryController.onCancel}" 
+              				     update="countryCreatePanel"
+              					 process="@this"
+                				 value="Հերքել" 
+                				 styleClass="RedButton"                     				 
+                				 style="width:auto" icon="fa fa-ban Fs16 White"
+                				 rendered="#{countryController.countryBean.id != null}"/>
+                				             	
+			</h:panelGroup>
+			</sec:ifAnyGranted>						
+						
+		</div>
+	</div>
+</h:panelGroup>
+
+</h:form>
+
+        
+</ui:define>
+
+</ui:composition>

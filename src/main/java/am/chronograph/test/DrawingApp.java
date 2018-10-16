@@ -10,16 +10,23 @@ import org.springframework.core.io.FileSystemResource;
 public class DrawingApp {
 
 	public static void main(String[] args) {
-//		BeanFactory factory = new XmlBeanFactory(new FileSystemResource("/home/harut/projects/chronograph/src/main/resources/testSpringBeans.xml"));
-//		Triangle triangle = (Triangle) factory.getBean("triangle");
-		
+		// BeanFactory factory = new XmlBeanFactory(new
+		// FileSystemResource("/home/harut/projects/chronograph/src/main/resources/testSpringBeans.xml"));
+		// Triangle triangle = (Triangle) factory.getBean("triangle");
+
 		ApplicationContext context = new ClassPathXmlApplicationContext("testSpringBeans.xml");
-		
-//		AbstractApplicationContext context = new ClassPathXmlApplicationContext("testSpringBeans.xml");
-//		context.registerShutdownHook();
-		
-		Triangle triangle = (Triangle) context.getBean("triangle");
-		
-		triangle.draw();
+
+		// AbstractApplicationContext context = new
+		// ClassPathXmlApplicationContext("testSpringBeans.xml");
+		// context.registerShutdownHook();
+
+		// Triangle triangle = (Triangle) context.getBean("triangle");
+		// triangle.draw();
+
+		// Circle circle = (Circle) context.getBean("center");
+		// circle.draw();
+
+		Shape shape = (Shape) context.getBean("triangle"); // "triangle"
+		shape.draw();
 	}
 }

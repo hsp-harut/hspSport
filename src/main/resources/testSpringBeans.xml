@@ -14,7 +14,7 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 		
 		
-	<bean id="parentTriangle" class="am.chronograph.test.Triangle" init-method="myInit" abstract="true">
+	<!-- <bean id="parentTriangle" class="am.chronograph.test.Triangle" init-method="myInit" abstract="true">
 		<property name="points">
 			<list>
 				<ref bean="pointA"/>
@@ -28,6 +28,12 @@
 				<ref bean="pointB"/>
 			</list>
 		</property>
+	</bean> -->
+	
+	<bean id="triangle" class="am.chronograph.test.Triangle">
+		<property name="pointA" ref="pointA"></property>
+		<property name="pointB" ref="pointB"></property>
+		<property name="pointC" ref="pointC"></property>
 	</bean>
 	
 	<bean id="pointA" class="am.chronograph.test.Point">
@@ -45,5 +51,8 @@
 		<property name="y" value="20"></property>
 	</bean>
 		
+	<bean id="center" class="am.chronograph.test.Circle">
+		<property name="center" ref="pointA"></property>
+	</bean>
 		
 </beans>

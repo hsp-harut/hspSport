@@ -20,7 +20,7 @@
 			<base-name>messages.custom</base-name>
 			<var>cst</var>
 		</resource-bundle>
-	</application>
+	</application>		
 
 	<component>
 		<component-type>org.primefaces.component.ModenaMenu</component-type>
