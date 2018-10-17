@@ -9,8 +9,8 @@
                 template="/WEB-INF/template.xhtml">
   
 <ui:define name="subheader">
-	<h:outputLink value="#{request.contextPath}/dashboard" styleClass="BoldGray">
-		<h:outputText value=" #{bundle['dashboard']}"/>
+	<h:outputLink value="#{request.contextPath}/country" styleClass="BoldGray">
+		<h:outputText value=" #{bundle['countries']}"/>
 	</h:outputLink>        
 </ui:define>
     
@@ -26,10 +26,6 @@
 
 <h:form id="contractForm">
 
-<sec:ifAnyGranted roles="ROLE_ADMIN">
-	<p:defaultCommand target="createUpdateCountry" />
-</sec:ifAnyGranted>
-
 <h:panelGroup id="contractListPanel" layout="block" styleClass="Container100 ui-fluid">
 	<div class="ContainerIndent">
 		<div class="Card ShadowEffect">
@@ -38,7 +34,17 @@
 				<h:outputText value="#{bundle['countries']}"/>
 			</h2>
 						   
-								
+			<p:dataTable value="#{countryController.countries}"
+						 var="country" emptyMessage="No countries found">
+			    <p:column headerText="#{bundle['id']}">
+			        <h:outputText value="#{country.id}" />
+			    </p:column>
+			 
+			    <p:column headerText="#{bundle['name']}">
+			        <h:outputText value="#{country.name}" />
+			    </p:column>
+			 
+			</p:dataTable>					
 						
 		</div>
 	</div>
@@ -56,13 +62,13 @@
 			<p:messages id="infoErrorMessages" showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
 			
 			<h2 class="BigTopic">					
-				<h:outputText value="Պայմանագրի տվյալներ"/>&#160;					                 
+				<h:outputText value="#{countryController.countryBean.id != null ? bundle['updateCountry'] : bundle['createCountry']}"/>&#160;					                 
 			</h2>
 			
 			<div class="EmptyBox20"></div>
 			<p:panelGrid id="countryPanel" columns="3" columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
              				
-				<p:outputLabel for="contractNumber" value="Պայմ․ համար *"/>
+				<p:outputLabel for="contractNumber" value="#{bundle['name']}"/>
                	<p:inputText id="contractNumber" value="#{countryController.countryBean.name}" maxlength="30" tabindex="2"/>
                	<p:message for="contractNumber" />   
                	
@@ -72,11 +78,22 @@
       		<div class="EmptyBox20"></div>
          		
       		<h:panelGroup id="buttonsPanel" layout="block">      			      			
-          		<p:commandButton id="createUpdateCountry" actionListener="#{countryController.oncreateUpdateCountry}" 
+          		<p:commandButton id="createCountry" actionListener="#{countryController.onCreateCountry}" 
           					     update="countryCreatePanel, contractListPanel"
-                    			 value="#{countryController.countryBean.id != null ? 'Թարմացնել' : 'Ավելացնել'}" 
-                    			 styleClass="#{countryController.countryBean.id != null ? 'GreenButton' : ''}"                     				 
-                    			 style="width:auto" icon="#{countryController.countryBean.id != null ? 'fa fa-pencil' : 'fa fa-plus'} Fs16 White"/>
+                    			 value="#{bundle['create']}"                     			                      				
+                    			 style="width:auto" 
+                    			 icon="fa fa-plus Fs16 White"
+                    			 rendered="#{countryController.countryBean.id == null}"/>
+                    			 
+               	
+               	<p:commandButton id="updateCountry" actionListener="#{countryController.onUpdateCountry}" 
+          					     update="countryCreatePanel, contractListPanel"
+                    			 value="#{bundle['update']}" 
+                    			 styleClass="GreenButton"                     				 
+                    			 style="width:auto" 
+                    			 icon="fa fa-pencil Fs16 White"
+                    			 rendered="#{countryController.countryBean.id != null}"/>
+               	
                     				 
               	<p:commandButton actionListener="#{countryController.onCancel}" 
               				     update="countryCreatePanel"

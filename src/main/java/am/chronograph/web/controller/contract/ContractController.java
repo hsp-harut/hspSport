@@ -12,9 +12,6 @@ import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -42,7 +39,10 @@ import am.chronograph.web.model.SearchAwareBeanLazyModel;
 public class ContractController extends BaseController implements Serializable {
 
 	/** use serialVersionUID from JDK 1.0.2 for interoperability */
-	private static final long serialVersionUID = 6304423142083144352L;
+	private static final long serialVersionUID = -5789665108121498023L;
+
+	
+	
 	
 //	private static final Map<String, Integer> BANK_ACCOUNT_LENGTH_MAP = new HashMap<String, Integer>();
 //	static{
