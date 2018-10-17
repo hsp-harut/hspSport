@@ -403,5 +403,32 @@
  		<addNotNullConstraint columnName="name" columnDataType="VARCHAR(30)" tableName="country"/>
  	</changeSet>
  	
+ 	 	<changeSet id="2018-10-17/003" author="davit">
+ 			<createTable tableName="tournamnet">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            
+            <column name="name" type="VARCHAR(30)">
+            	 <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="startDate" type="DATETIME"/>
+            <column name="maxPartCount" type="BIGINT"/>
+            
+            <column name="created_at" type="DATETIME">
+            	<constraints nullable="false"/>
+            </column>
+            
+            <column name="modified_at" type="DATETIME"/>
+            
+            <column name="created_by" type="BIGINT">
+            	<constraints nullable="false"/>
+            </column>
+            
+            <column name="modified_by" type="BIGINT" />
+            
+        </createTable>
+ 	</changeSet>
+ 	
     
 </databaseChangeLog>
