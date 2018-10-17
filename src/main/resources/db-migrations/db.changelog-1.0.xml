@@ -373,5 +373,35 @@
     	</sql>
  	</changeSet>
  	
+ 	
+ 	<changeSet id="2018-10-17/001" author="gevorg">
+ 		<createTable tableName="country">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            
+            <column name="name" type="VARCHAR(30)"/>
+            
+        </createTable>
+ 	</changeSet>
+ 	
+ 	<changeSet id="2018-10-17/002" author="gevorg">
+ 		<addColumn tableName="country">
+ 			<column name="created_at" type="DATETIME">
+            	<constraints nullable="false"/>
+            </column>
+            
+            <column name="modified_at" type="DATETIME"/>
+            
+            <column name="created_by" type="BIGINT">
+            	<constraints nullable="false"/>
+            </column>
+            
+            <column name="modified_by" type="BIGINT" />
+ 		</addColumn>
+ 		
+ 		<addNotNullConstraint columnName="name" columnDataType="VARCHAR(30)" tableName="country"/>
+ 	</changeSet>
+ 	
     
 </databaseChangeLog>

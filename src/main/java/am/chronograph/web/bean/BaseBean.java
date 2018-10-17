@@ -12,7 +12,7 @@ public abstract class BaseBean implements Serializable {
     /** use serialVersionUID from JDK 1.0.2 for interoperability */
     private static final long serialVersionUID = 2274719932286031938L;
     
-    private Long id;
+    protected Long id;
 
     /**
      * @return the id
