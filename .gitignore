@@ -25,5 +25,5 @@ log/
 hs_err_pid*
 /target/
 /.classpath
-/.project
+
 /bin/
