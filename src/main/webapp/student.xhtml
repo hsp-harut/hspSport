@@ -50,7 +50,8 @@
 							
 							<p:column headerText="#{bundle['birthday']}">
 								<h:outputText value="#{student.birthday}" converter="chronoDateConverter"/>
-							</p:column>
+							</p:column>				
+							
 
 						</p:dataTable>
 
@@ -85,19 +86,21 @@
 
 							<p:outputLabel for="firstName" value="#{bundle['firstName']}" />
 							<p:inputText id="firstName"
-								value="#{studentController.studentBean.firstName}" maxlength="30"
-								tabindex="2" />
+										 value="#{studentController.studentBean.firstName}" maxlength="30"
+										 tabindex="1" />
 							<p:message for="firstName"/>
 							
 							<p:outputLabel for="lastName" value="#{bundle['lastName']}" />
 							<p:inputText id="lastName"
-								value="#{studentController.studentBean.lastName}" maxlength="30"
-								tabindex="2" />
-							<p:message for="lastName"/>
+								   		 value="#{studentController.studentBean.lastName}" maxlength="30"
+								 		 tabindex="2" />
+							<p:message for="lastName"/>							
 							
-							<p:outputLabel for="button" value="#{bundle['birthday']}" />
-       						<p:calendar id="button" value="#{studentController.studentBean.birthday}" showOn="button"/>
-
+							<p:outputLabel for="birthday" value="#{bundle['birthday']} *"/>
+              			 	<p:calendar id="birthday" value="#{studentController.studentBean.birthday}" 
+              			 				showOn="button" pattern="dd/MM/yyyy" tabindex="3"/>
+              			 	<p:message for="birthday" />
+							
 						</p:panelGrid>
 
 						<sec:ifAnyGranted roles="ROLE_ADMIN">
