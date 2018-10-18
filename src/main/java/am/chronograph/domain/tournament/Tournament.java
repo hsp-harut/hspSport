@@ -27,47 +27,30 @@ public class Tournament extends AuditAwareEntity {
 	private LocalDateTime startDate;
 
 	@Column(name = "maxPartCount", nullable = false, insertable = true, updatable = true)
-	private int maxPartCount;
+	private Integer maxPartCount;
 
-	/**
-	 * @return the name
-	 */
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * @param name the name to set
-	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	/**
-	 * @return the startDate
-	 */
 	public LocalDateTime getStartDate() {
 		return startDate;
 	}
 
-	/**
-	 * @param startDate the startDate to set
-	 */
 	public void setStartDate(LocalDateTime startDate) {
 		this.startDate = startDate;
 	}
 
-	/**
-	 * @return the maxPartCount
-	 */
-	public int getMaxPartCount() {
+	public Integer getMaxPartCount() {
 		return maxPartCount;
 	}
 
-	/**
-	 * @param maxPartCount the maxPartCount to set
-	 */
-	public void setMaxPartCount(int maxPartCount) {
+	public void setMaxPartCount(Integer maxPartCount) {
 		this.maxPartCount = maxPartCount;
 	}
+
 }

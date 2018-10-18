@@ -4,7 +4,9 @@ import java.util.Date;
 import am.chronograph.web.bean.BaseBean;
 
 /**
- * Bean class corresponds to Tournaments. Will contain presentation layer related data...
+ * Bean class corresponds to Tournaments. Will contain presentation layer
+ * related data...
+ * 
  * @author davitpetrosyan
  *
  */
@@ -15,7 +17,7 @@ public class TournamentBean extends BaseBean {
 
 	private String name;
 	private Date startDate;
-	private int maxPartCount;
+	private Integer maxPartCount;
 
 	/**
 	 * Default constructor...
@@ -34,46 +36,27 @@ public class TournamentBean extends BaseBean {
 		maxPartCount = tournamentBean.getMaxPartCount();
 	}
 
-	/**
-	 * @return the name
-	 */
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * @param name the name to set
-	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	/**
-	 * @return the startDate
-	 */
 	public Date getStartDate() {
 		return startDate;
 	}
 
-	/**
-	 * @param startDate the startDate to set
-	 */
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
 	}
 
-	/**
-	 * @return the maxPartCount
-	 */
-	public int getMaxPartCount() {
+	public Integer getMaxPartCount() {
 		return maxPartCount;
 	}
 
-	/**
-	 * @param maxPartCount the maxPartCount to set
-	 */
-	public void setMaxPartCount(int maxPartCount) {
+	public void setMaxPartCount(Integer maxPartCount) {
 		this.maxPartCount = maxPartCount;
 	}
-
 }

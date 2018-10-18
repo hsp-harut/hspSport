@@ -35,7 +35,7 @@
 			</h2>
 						   
 			<p:dataTable value="#{tournamentController.tournaments}"
-						 var="country" emptyMessage="No countries found">
+						 var="tournament" emptyMessage="No countries found">
 			    <p:column headerText="#{bundle['id']}">
 			        <h:outputText value="#{tournament.id}" />
 			    </p:column>
@@ -76,9 +76,18 @@
 			<div class="EmptyBox20"></div>
 			<p:panelGrid id="tournamentPanel" columns="3" columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
              				
-				<p:outputLabel for="contractNumber" value="#{bundle['name']}"/>
-               	<p:inputText id="contractNumber" value="#{tournamentController.tournamentBean.name}" maxlength="30" tabindex="2"/>
-               	<p:message for="contractNumber" />   
+				<p:outputLabel for="name" value="#{bundle['name']}"/>
+               		<p:inputText id="name" value="#{tournamentController.tournamentBean.name}" maxlength="30" tabindex="1"/>
+               	<p:message for="name" />   
+               	
+               	<p:outputLabel for="startDate" value="#{bundle['startDate']}"/>
+               		<p:calendar id="startDate" value="#{tournamentController.tournamentBean.startDate}" showOn="button" pattern="dd/MM/yyyy" tabindex="2"/>
+               	<p:message for="startDate" />   
+               	
+               	<p:outputLabel for="maxCount" value="#{bundle['maxPartCount']}"/>
+               		<p:inputText id="maxCount" value="#{tournamentController.tournamentBean.maxPartCount}" maxlength="30" tabindex="3"/>
+               	<p:message for="maxCount" />  
+           
                	
      		</p:panelGrid>
          	
