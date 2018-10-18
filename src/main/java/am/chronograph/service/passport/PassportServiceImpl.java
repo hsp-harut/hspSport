@@ -120,6 +120,9 @@ public class PassportServiceImpl implements PassportService {
 
 		passportBean.setId(passport.getId());
 		passportBean.setFirstName(passport.getFirstName());
+		passportBean.setLastName(passport.getLastName());
+		passportBean.setPassNumber(passport.getPassNumber());
+		passportBean.setBirthDay(passport.getBirthDay());
 
 		return passportBean;
 	}

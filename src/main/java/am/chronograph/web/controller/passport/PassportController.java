@@ -18,7 +18,7 @@ import am.chronograph.web.integration.Spring;
  * @author vahagn
  *
  */
-@Named("countryController")
+@Named("passportController")
 @ViewScoped
 public class PassportController extends BaseController implements Serializable {
 
