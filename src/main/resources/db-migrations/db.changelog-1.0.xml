@@ -403,5 +403,42 @@
  		<addNotNullConstraint columnName="name" columnDataType="VARCHAR(30)" tableName="country"/>
  	</changeSet>
  	
+ 	<changeSet id="2018-10-19/001" author="vahagn">
+ 		<createTable tableName="passport">
+ 		    <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+ 		
+ 		    <column name="firstName" type="VARCHAR(30)">
+            	<constraints nullable="false"/>
+            </column>
+            
+            <column name="lastName" type="VARCHAR(30)">
+            	<constraints nullable="false"/>
+            </column>
+            
+            <column name="passNumber" type="VARCHAR(30)">
+            	<constraints nullable="false"/>
+            </column>
+            
+             <column name="birthDay" type="DATETIME">
+            	<constraints nullable="false"/>
+            </column>
+            
+ 			<column name="created_at" type="DATETIME">
+            	<constraints nullable="false"/>
+            </column>
+            
+            <column name="modified_at" type="DATETIME"/>
+            
+            <column name="created_by" type="BIGINT">
+            	<constraints nullable="false"/>
+            </column>
+            
+            <column name="modified_by" type="BIGINT" />
+ 		</createTable>
+ 		
+ 		<addNotNullConstraint columnName="name" columnDataType="VARCHAR(30)" tableName="passport"/>
+ 	</changeSet>
     
 </databaseChangeLog>

@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import am.chronograph.dao.passport.PassportDao;
 import am.chronograph.domain.passport.Passport;
 import am.chronograph.web.bean.passport.PassportBean;
+import am.chronograph.web.util.DateUtil;
 
 /**
  * Implements PassportService interface
@@ -90,6 +91,9 @@ public class PassportServiceImpl implements PassportService {
 		Passport passport = (passportBean.getId() != null) ? passportDao.getById(passportBean.getId()) : new Passport();
 
 		passport.setFirstName(passportBean.getFirstName());
+		passport.setLastName(passportBean.getLastName());
+		passport.setPassNumber(passportBean.getPassNumber());
+		passport.setFirstName(passportBean.getFirstName());
 
 		return passport;
 	}
@@ -112,7 +116,7 @@ public class PassportServiceImpl implements PassportService {
 	/**
 	 * Initialize Bean by given Domain...
 	 * 
-	 * @param country
+	 * @param passport
 	 * @return
 	 */
 	private PassportBean initBeanByDomain(Passport passport) {
