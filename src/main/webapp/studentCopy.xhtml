@@ -1,0 +1,164 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:sec="http://www.springframework.org/security"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="/WEB-INF/template.xhtml">
+
+	<ui:define name="subheader">
+		<h:outputLink value="#{request.contextPath}/student"
+			styleClass="BoldGray">
+			<h:outputText value=" #{bundle['students']}" />
+		</h:outputLink>
+	</ui:define>
+
+	<ui:define name="content">
+
+
+		<f:loadBundle id="bundle" var="bundle"
+			basename="#{studentController.currentBundle}" />
+
+
+
+		<h:form id="studentForm">
+
+			<h:panelGroup id="studentListPanel" layout="block"
+				styleClass="Container100 ui-fluid">
+				<div class="ContainerIndent">
+					<div class="Card ShadowEffect">
+
+						<h2 class="BigTopic">
+							<h:outputText value="#{bundle['students']}" />
+						</h2>
+
+						<p:dataTable value="#{studentController.students}" var="student"
+							emptyMessage="No students found">
+							<p:column headerText="#{bundle['id']}">
+								<h:outputText value="#{student.id}" />
+							</p:column>
+
+							<p:column headerText="#{bundle['firstName']}">
+								<h:outputText value="#{student.firstName}" />
+							</p:column>
+							
+							<p:column headerText="#{bundle['lastName']}">
+								<h:outputText value="#{student.lastName}" />
+							</p:column>
+							
+							<p:column headerText="#{bundle['birthday']}">
+								<h:outputText value="#{student.birthday}" converter="chronoDateConverter"/>
+							</p:column>				
+							
+							<sec:ifAnyGranted roles="ROLE_ADMIN">
+					<p:column style="text-align: center; white-space: nowrap;" exportable="false">
+						<f:facet name="header">
+			                <h:outputText value="#{bundle['actions']}"/>
+			            </f:facet>
+			            			            			            
+			            <p:commandButton actionListener="#{studentController.onEditStudent(student)}"
+			           					 update="studentForm:studentCreatePanel"
+			       						 process="@this"		                   			 		                       		 
+				                   		 title="#{bundle['editStudentData']}"		        
+				                   		 icon="fa fa-pencil Fs16 White"
+				                   		 style="width:auto"			                       		 
+				                   		 styleClass="GreenButton"/>
+				                  				        			        			        
+			        	<p:commandButton actionListener="#{studentController.onRemoveStudent(student)}"
+			        					 process="@this"
+	              						 update="studentForm:studentListPanel, studentForm:studentCreatePanel"
+			                   			 icon="fa fa-trash-o"
+			                       		 title="#{bundle['removeStudent']}"
+			                       		 styleClass="RedButton"
+			                       		 onclick="if (!confirm('#{bundle['sureToRemoveStudent']}')) return false;"/>		        	
+	       			</p:column>
+       			</sec:ifAnyGranted>
+
+						</p:dataTable>
+
+					</div>
+				</div>
+			</h:panelGroup>
+
+
+
+
+
+
+			<h:panelGroup id="studentCreatePanel" layout="block"
+				styleClass="Container100 ui-fluid">
+				<div class="ContainerIndent">
+					<div class="Card ShadowEffect">
+
+						<p:messages id="infoErrorMessages" showDetail="true"
+							autoUpdate="false" closable="true" globalOnly="true" />
+
+						<h2 class="BigTopic">
+							<h:outputText
+								value="#{studentController.studentBean.id != null ? bundle['updateCountry'] : bundle['createCountry']}" />
+							
+						</h2>
+
+						<div class="EmptyBox20"></div>
+						<p:panelGrid id="studentPanel" columns="3"
+							columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5"
+							layout="grid" styleClass="ui-panelgrid-blank"
+							style="border:0px none; background-color:transparent;">
+
+							<p:outputLabel for="firstName" value="#{bundle['firstName']}" />
+							<p:inputText id="firstName"
+										 value="#{studentController.studentBean.firstName}" maxlength="30"
+										 tabindex="1" />
+							<p:message for="firstName"/>
+							
+							<p:outputLabel for="lastName" value="#{bundle['lastName']}" />
+							<p:inputText id="lastName"
+								   		 value="#{studentController.studentBean.lastName}" maxlength="30"
+								 		 tabindex="2" />
+							<p:message for="lastName"/>							
+							
+							<p:outputLabel for="birthday" value="#{bundle['birthday']} *"/>
+              			 	<p:calendar id="birthday" value="#{studentController.studentBean.birthday}" 
+              			 				showOn="button" pattern="dd/MM/yyyy" tabindex="3"/>
+              			 	<p:message for="birthday" />
+							
+						</p:panelGrid>
+
+
+							<h:panelGroup id="buttonsPanel" layout="block">
+								<p:commandButton id="createStudent"
+									actionListener="#{studentController.onCreateStudent}"
+									update="studentCreatePanel, studentListPanel"
+									value="#{bundle['create']}" style="width:auto"
+									icon="fa fa-plus Fs16 White"
+									rendered="#{studentController.studentBean.id == null}" />
+
+
+								<p:commandButton id="updateStudent"
+									actionListener="#{studentController.onUpdateStudent}"
+									update="studentCreatePanel, studentListPanel"
+									value="#{bundle['update']}" styleClass="GreenButton"
+									style="width:auto" icon="fa fa-pencil Fs16 White"
+									rendered="#{studentController.studentBean.id != null}" />
+
+
+								<p:commandButton actionListener="#{studentController.onCancel}"
+									update="studentCreatePanel" process="@this" value="#{bundle['cancel']}"
+									styleClass="RedButton" style="width:auto"
+									icon="fa fa-ban Fs16 White"
+									rendered="#{studentController.studentBean.id != null}" />
+
+							</h:panelGroup>
+
+					</div>
+				</div>
+			</h:panelGroup>
+
+		</h:form>
+
+
+	</ui:define>
+
+</ui:composition>

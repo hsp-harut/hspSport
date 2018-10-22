@@ -8,8 +8,9 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
+
 import am.chronograph.service.student.StudentService;
-import am.chronograph.web.bean.country.CountryBean;
 import am.chronograph.web.bean.student.StudentBean;
 import am.chronograph.web.controller.base.BaseController;
 import am.chronograph.web.integration.Spring;
@@ -45,9 +46,21 @@ public class StrudentController extends BaseController implements Serializable{
 		students = studentService.getAll();
 	}
 	
+	/**
+	 * method called from jsf actionListener when create button is submited...
+	 */
 	public void onCreateStudent() {
-		
+		if(!isValidStudent()) {
+            return;
+        }      
+        studentService.create(studentBean);
+        
+        studentBean = new StudentBean();        
+        
+        addInfoMessage("studentSuccessSave");
 	}
+
+	
 
 	/**
 	 * @return the studentBean
@@ -76,4 +89,25 @@ public class StrudentController extends BaseController implements Serializable{
 	public void setStudents(List<StudentBean> students) {
 		this.students = students;
 	}	
+	
+	private boolean isValidStudent() {
+        boolean noError = true;
+        
+        if(StringUtils.isBlank(studentBean.getFirstName())) {
+        	 addErrorMessage("studentForm:firstName", "studentValidationMandatory");             
+             noError = false;
+        }
+        
+        if(StringUtils.isBlank(studentBean.getLastName())) {
+       	 addErrorMessage("studentForm:lastName", "studentValidationMandatory");             
+            noError = false;
+       }
+        
+        if(studentBean.getBirthday() == null) {
+       	 addErrorMessage("studentForm:lastName", "studentValidationMandatory");             
+            noError = false;
+       }
+
+		return noError;
+	}
 }
