@@ -8,7 +8,11 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
+
 import am.chronograph.service.tournament.TournamentService;
+import am.chronograph.util.ChronoUtil;
+import am.chronograph.web.bean.contract.ContractBean;
 import am.chronograph.web.bean.tournament.TournamentBean;
 import am.chronograph.web.controller.base.BaseController;
 import am.chronograph.web.integration.Spring;
@@ -45,6 +49,53 @@ public class TournamentController extends BaseController implements Serializable
 		tournamentBean = new TournamentBean();
 
 		tournaments = tournamentService.getAll();
+	}
+
+	/**
+	 * ActionListener method called when 'Create' or 'Update' clicked - to create
+	 * new/update process...
+	 */
+	public void onCreateTournament() {
+		if (!isValidTournament()) {
+			return;
+		}
+
+		tournamentService.create(tournamentBean);
+		tournaments = tournamentService.getAll();
+
+		tournamentBean = new TournamentBean();
+
+		addInfoMessage("contractSuccessSave");
+	}
+
+	/**
+	 * Method for Person validation -- for inserting/updating corresponding data
+	 * into database...
+	 * 
+	 * @return
+	 */
+	private boolean isValidTournament() {
+		boolean noError = true;
+
+		if (StringUtils.isBlank(tournamentBean.getName())) {
+			addErrorMessage("tournamentForm:name", "contractValidationMandatory");
+
+			noError = false;
+		}
+		
+		if (tournamentBean.getStartDate() == null) {
+			addErrorMessage("tournamentForm:startDate", "contractValidationMandatory");
+
+			noError = false;
+		}
+
+		if (tournamentBean.getMaxPartCount() == null) {
+			addErrorMessage("tournamentForm:maxPartCount", "contractValidationMandatory");
+
+			noError = false;
+		}
+
+		return noError;
 	}
 
 	/**

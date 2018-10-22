@@ -24,9 +24,9 @@
 
 
 
-<h:form id="contractForm">
+<h:form id="tournamentForm">
 
-<h:panelGroup id="contractListPanel" layout="block" styleClass="Container100 ui-fluid">
+<h:panelGroup id="tournamentListPanel" layout="block" styleClass="Container100 ui-fluid">
 	<div class="ContainerIndent">
 		<div class="Card ShadowEffect">
 		
@@ -35,7 +35,7 @@
 			</h2>
 						   
 			<p:dataTable value="#{tournamentController.tournaments}"
-						 var="tournament" emptyMessage="No countries found">
+						 var="tournament" emptyMessage="No tournaments found">
 			    <p:column headerText="#{bundle['id']}">
 			        <h:outputText value="#{tournament.id}" />
 			    </p:column>
@@ -96,7 +96,7 @@
          		
       		<h:panelGroup id="buttonsPanel" layout="block">      			      			
           		<p:commandButton id="createTournament" actionListener="#{tournamentController.onCreateTournament}" 
-          					     update="tournamentCreatePanel, contractListPanel"
+          					     update="tournamentForm:tournamentCreatePanel, tournamentForm:tournamentListPanel"
                     			 value="#{bundle['create']}"                     			                      				
                     			 style="width:auto" 
                     			 icon="fa fa-plus Fs16 White"
@@ -104,7 +104,7 @@
                     			 
                	
                	<p:commandButton id="updateTournamnet" actionListener="#{tournamentController.onUpdateTournament}" 
-          					     update="tournamentUpdatePanel, contractListPanel"
+          					     update="tournamentUpdatePanel, tournamentListPanel"
                     			 value="#{bundle['update']}" 
                     			 styleClass="GreenButton"                     				 
                     			 style="width:auto" 
@@ -113,7 +113,7 @@
                	
                     				 
               	<p:commandButton actionListener="#{tournamentController.onCancel}" 
-              				     update="countryCreatePanel"
+              				     update="tournamentCreatePanel"
               					 process="@this"
                 				 value="Հերքել" 
                 				 styleClass="RedButton"                     				 

@@ -86,10 +86,10 @@ public class TournamentServiceImpl implements TournamentService {
 		Tournament tournament = (tournamentBean.getId() != null) ? tournamentDao.getById(tournamentBean.getId())
 				: new Tournament();
 
-		tournamentBean.setId(tournament.getId());
-		tournamentBean.setName(tournament.getName());
-		tournamentBean.setStartDate(DateUtil.getDateByLocalDateTime(tournament.getStartDate()));
-		tournamentBean.setMaxPartCount(tournament.getMaxPartCount());
+		tournament.setId(tournamentBean.getId());
+		tournament.setName(tournamentBean.getName());
+		tournament.setStartDate(DateUtil.getLocalDateTimeByDate(tournamentBean.getStartDate()));
+		tournament.setMaxPartCount(tournamentBean.getMaxPartCount());
 
 		return tournament;
 	}
