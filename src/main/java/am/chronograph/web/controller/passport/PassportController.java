@@ -28,7 +28,6 @@ public class PassportController extends BaseController implements Serializable {
 	@Inject
 	@Spring
 	private transient PassportService passportService;
-
 	private PassportBean passportBean;
 	private List<PassportBean> passports;
 
@@ -47,7 +46,7 @@ public class PassportController extends BaseController implements Serializable {
 	}
 
 	/**
-	 * @return the countryBean
+	 * @return the passportBean
 	 */
 	public PassportBean getPassportBean() {
 		return passportBean;
@@ -55,24 +54,40 @@ public class PassportController extends BaseController implements Serializable {
 
 	/**
 	 * @param passportBean
-	 *            the countryBean to set
+	 *            the passportBean to set
 	 */
-	public void setCountryBean(PassportBean passportBean) {
+	public void setPassportBean(PassportBean passportBean) {
 		this.passportBean = passportBean;
 	}
 
 	/**
-	 * @return the countries
+	 * @return the passports
 	 */
-	public List<PassportBean> getCountries() {
+	public List<PassportBean> getPassports() {
 		return passports;
 	}
 
 	/**
-	 * @param countries
-	 *            the countries to set
+	 * @param passports
+	 *            the passports to set
 	 */
-	public void setCountries(List<PassportBean> passports) {
+	public void setPassports(List<PassportBean> passports) {
 		this.passports = passports;
 	}
+
+	/**
+	 * @return the passportService
+	 */
+	public PassportService getPassportService() {
+		return passportService;
+	}
+
+	/**
+	 * @param passportService
+	 *            the passportService to set
+	 */
+	public void setPassportService(PassportService passportService) {
+		this.passportService = passportService;
+	}
+
 }

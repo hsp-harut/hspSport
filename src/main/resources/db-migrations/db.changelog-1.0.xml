@@ -374,7 +374,7 @@
  	</changeSet>
  	
  	
- 	<changeSet id="2018-10-17/001" author="gevorg">
+ 	<changeSet id="2018-10-17/001" author="vahagn">
  		<createTable tableName="country">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
@@ -403,7 +403,7 @@
  		<addNotNullConstraint columnName="name" columnDataType="VARCHAR(30)" tableName="country"/>
  	</changeSet>
  	
- 	<changeSet id="2018-10-19/001" author="vahagn">
+ 	<changeSet id="2018-10-22/001" author="vahagn">
  		<createTable tableName="passport">
  		    <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
@@ -438,7 +438,6 @@
             <column name="modified_by" type="BIGINT" />
  		</createTable>
  		
- 		<addNotNullConstraint columnName="name" columnDataType="VARCHAR(30)" tableName="passport"/>
  	</changeSet>
     
 </databaseChangeLog>

@@ -7,22 +7,15 @@
                 xmlns:sec="http://www.springframework.org/security"
                 xmlns:pe="http://primefaces.org/ui/extensions"
                 template="/WEB-INF/template.xhtml">
-  
 <ui:define name="subheader">
-	<h:outputLink value="#{request.contextPath}/passport" styleClass="BoldGray">
+    <h:outputLink value="#{request.contextPath}/passport" styleClass="BoldGray">
 		<h:outputText value=" #{bundle['passports']}"/>
 	</h:outputLink>        
 </ui:define>
     
 <ui:define name="content">
-  
-    
+      
 <f:loadBundle id="bundle" var="bundle" basename="#{passportController.currentBundle}"/>
-
-
-
-
-
 
 <h:form id="contractForm">
 
@@ -40,36 +33,42 @@
 			        <h:outputText value="#{passport.id}" />
 			    </p:column>
 			 
-			    <p:column headerText="#{bundle['name']}">
-			        <h:outputText value="#{passport.name}" />
+			    <p:column headerText="#{bundle['firstName']}">
+			        <h:outputText value="#{passport.firstName}" />
 			    </p:column>
-			 
+			     <p:column headerText="#{bundle['lastName']}">
+			        <h:outputText value="#{passport.lastName}" />
+			    </p:column>
+			     <p:column headerText="#{bundle['passNumber']}">
+			        <h:outputText value="#{passport.passNumber}" />
+			    </p:column>
+			 <p:column headerText="#{bundle['birthDay']}">
+			        <h:outputText value="#{passport.birthDay}" />
+			    </p:column>
 			</p:dataTable>					
 						
 		</div>
 	</div>
 </h:panelGroup>
 
-
-
-
-
-
-<h:panelGroup id="countryCreatePanel" layout="block" styleClass="Container100 ui-fluid">
+<h:panelGroup id="passportCreatePanel" layout="block" styleClass="Container100 ui-fluid">
 	<div class="ContainerIndent">
 		<div class="Card ShadowEffect">						
 		
 			<p:messages id="infoErrorMessages" showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
 			
 			<h2 class="BigTopic">					
-				<h:outputText value="#{passportController.passportBean.id != null ? bundle['updateCountry'] : bundle['createCountry']}"/>&#160;					                 
+				<h:outputText value="#{passportController.passportBean.id != null ? bundle['updatePassport'] : bundle['createPassport']}"/>&#160;					                 
 			</h2>
 			
 			<div class="EmptyBox20"></div>
 			<p:panelGrid id="passportPanel" columns="3" columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
              				
 				<p:outputLabel for="contractNumber" value="#{bundle['name']}"/>
-               	<p:inputText id="contractNumber" value="#{passportController.passportBean.name}" maxlength="30" tabindex="2"/>
+               		<p:inputText id="contractNumber" value="#{passportController.passportBean.firstName}" maxlength="30" tabindex="2"/>
+               		<p:inputText id="contractNumber" value="#{passportController.passportBean.lastName}" maxlength="30" tabindex="2"/>
+               		<p:inputText id="contractNumber" value="#{passportController.passportBean.passNumber}" maxlength="30" tabindex="2"/>
+               		<p:inputText id="contractNumber" value="#{passportController.passportBean.birthDay}" maxlength="30" tabindex="2"/>
                	<p:message for="contractNumber" />   
                	
      		</p:panelGrid>
@@ -78,16 +77,16 @@
       		<div class="EmptyBox20"></div>
          		
       		<h:panelGroup id="buttonsPanel" layout="block">      			      			
-          		<p:commandButton id="createCountry" actionListener="#{passportController.onCreateCountry}" 
-          					     update="countryCreatePanel, contractListPanel"
+          		<p:commandButton id="createCountry" actionListener="#{passportController.onCreatePassport}" 
+          					     update="passportCreatePanel, contractListPanel"
                     			 value="#{bundle['create']}"                     			                      				
                     			 style="width:auto" 
                     			 icon="fa fa-plus Fs16 White"
                     			 rendered="#{passportController.passportBean.id == null}"/>
                     			 
                	
-               	<p:commandButton id="updateCountry" actionListener="#{countryController.onUpdateCountry}" 
-          					     update="countryCreatePanel, contractListPanel"
+               	<p:commandButton id="updatePassport" actionListener="#{passportController.onUpdatePassport}" 
+          					     update="passportCreatePanel, contractListPanel"
                     			 value="#{bundle['update']}" 
                     			 styleClass="GreenButton"                     				 
                     			 style="width:auto" 
@@ -96,7 +95,7 @@
                	
                     				 
               	<p:commandButton actionListener="#{passportController.onCancel}" 
-              				     update="countryCreatePanel"
+              				     update="passportCreatePanel"
               					 process="@this"
                 				 value="Հերքել" 
                 				 styleClass="RedButton"                     				 
@@ -111,7 +110,6 @@
 </h:panelGroup>
 
 </h:form>
-
         
 </ui:define>
 
