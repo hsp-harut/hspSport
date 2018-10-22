@@ -22,7 +22,7 @@ import am.chronograph.web.integration.Spring;
  */
 @Named("studentController")
 @ViewScoped
-public class StrudentController extends BaseController implements Serializable{
+public class StudentController extends BaseController implements Serializable{
 	
 	/** use serialVersionUID from JDK 1.0.2 for interoperability */
 	private static final long serialVersionUID = -6666406060400783367L;
@@ -54,6 +54,8 @@ public class StrudentController extends BaseController implements Serializable{
             return;
         }      
         studentService.create(studentBean);
+        
+        students = studentService.getAll();
         
         studentBean = new StudentBean();        
         

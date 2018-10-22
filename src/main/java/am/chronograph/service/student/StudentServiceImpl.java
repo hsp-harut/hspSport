@@ -73,7 +73,8 @@ public class StudentServiceImpl implements StudentService{
 		Student student = (studentBean.getId() != null) ? studentDao.getById(studentBean.getId()) : new Student();
 		
 		student.setFirstName(studentBean.getFirstName());
-		
+		student.setLastName(studentBean.getLastName());
+		student.setBirthday(DateUtil.getLocalDateTimeByDate(studentBean.getBirthday()));
 		return student;
 	}
 	
