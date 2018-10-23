@@ -49,6 +49,7 @@ public class TournamentController extends BaseController implements Serializable
 		tournamentBean = new TournamentBean();
 
 		tournaments = tournamentService.getAll();
+		
 	}
 
 	/**
@@ -65,8 +66,34 @@ public class TournamentController extends BaseController implements Serializable
 
 		tournamentBean = new TournamentBean();
 
-		addInfoMessage("contractSuccessSave");
+		addInfoMessage("tournamentSuccessSave");
 	}
+
+	/**
+	 * ActionListener method called when Delete icon is clicked to delete selected
+	 * ContractBean...
+	 * 
+	 * @param selectedContractBean
+	 */
+	public void onRemoveTournament(TournamentBean selectedTournamentBean) {
+		tournamentService.delete(selectedTournamentBean.getId());
+		tournaments = tournamentService.getAll();
+
+		if (selectedTournamentBean.getId().equals(tournamentBean.getId())) {
+			tournamentBean = new TournamentBean();
+		}
+	}
+	
+	
+	/**
+     * Method called when user clicks on any row in contracts table,
+     * to edit selected exam...
+     */
+    public void onEditTournament(TournamentBean selectedTournamentBean) {
+    	tournamentBean = new TournamentBean(selectedTournamentBean);
+       
+//        scrollTo("tournamentForm:tournamentCreatePanel");
+    }
 
 	/**
 	 * Method for Person validation -- for inserting/updating corresponding data
@@ -82,7 +109,7 @@ public class TournamentController extends BaseController implements Serializable
 
 			noError = false;
 		}
-		
+
 		if (tournamentBean.getStartDate() == null) {
 			addErrorMessage("tournamentForm:startDate", "contractValidationMandatory");
 
@@ -125,5 +152,4 @@ public class TournamentController extends BaseController implements Serializable
 	public void setTournaments(List<TournamentBean> tournaments) {
 		this.tournaments = tournaments;
 	}
-
 }

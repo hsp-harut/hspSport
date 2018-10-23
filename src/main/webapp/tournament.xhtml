@@ -51,6 +51,31 @@
 			     <p:column headerText="#{bundle['maxPartCount']}">
 			        <h:outputText value="#{tournament.maxPartCount}" />
 			    </p:column>
+			    
+			    <sec:ifAnyGranted roles="ROLE_ADMIN">
+			  	  <p:column style="text-align: center; white-space: nowrap;" exportable="false">
+						<f:facet name="header">
+			                <h:outputText value="#{bundle['tournamentActions']}"/>
+			            </f:facet>
+			            			            			            
+			            <p:commandButton actionListener="#{tournamentController.onEditTournament(tournament)}"
+			           					 update="tournamentForm:tournamentCreatePanel"
+			       						 process="@this"		                   			 		                       		 
+				                   		 title="Փոփոխել մրցաշարի տվյալները"		        
+				                   		 icon="fa fa-pencil Fs16 White"
+				                   		 style="width:auto"			                       		 
+				                   		 styleClass="GreenButton"/>
+				                        		 
+					              				        			        			        
+			        	<p:commandButton actionListener="#{tournamentController.onRemoveTournament(tournament)}"
+			        					 process="@this"
+	              						 update="tournamentForm:tournamentListPanel,tournamentForm:tournamentCreatePanel"
+			                   			 icon="fa fa-trash-o"
+			                       		 title="Ջնջել մրցաշարը"
+			                       		 styleClass="RedButton"
+			                       		 onclick="if (!confirm('Դուք վստա՞հ եք, որ ուզում եք ջնջել ընտրված մրցաշարը։')) return false;"/>		        	
+	       			</p:column>
+	       		</sec:ifAnyGranted>
 			 
 			</p:dataTable>					
 						
@@ -76,33 +101,32 @@
 			<div class="EmptyBox20"></div>
 			<p:panelGrid id="tournamentPanel" columns="3" columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
              				
-				<p:outputLabel for="name" value="#{bundle['name']}"/>
+				<p:outputLabel for="name" value="#{bundle['name']} *"/>
                		<p:inputText id="name" value="#{tournamentController.tournamentBean.name}" maxlength="30" tabindex="1"/>
                	<p:message for="name" />   
                	
-               	<p:outputLabel for="startDate" value="#{bundle['startDate']}"/>
+               	<p:outputLabel for="startDate" value="#{bundle['startDate']} *"/>
                		<p:calendar id="startDate" value="#{tournamentController.tournamentBean.startDate}" showOn="button" pattern="dd/MM/yyyy" tabindex="2"/>
                	<p:message for="startDate" />   
                	
-               	<p:outputLabel for="maxCount" value="#{bundle['maxPartCount']}"/>
-               		<p:inputText id="maxCount" value="#{tournamentController.tournamentBean.maxPartCount}" maxlength="30" tabindex="3"/>
-               	<p:message for="maxCount" />  
+               	<p:outputLabel for="maxPartCount" value="#{bundle['maxPartCount']} *"/>
+               		<p:inputText id="maxPartCount" value="#{tournamentController.tournamentBean.maxPartCount}" maxlength="30" tabindex="3"/>
+               	<p:message for="maxPartCount" />  
            
                	
      		</p:panelGrid>
          	
          	<sec:ifAnyGranted roles="ROLE_ADMIN">
-      		<div class="EmptyBox20"></div>
-         		
+      		<div class="EmptyBox20"></div>  		
+      		         		
       		<h:panelGroup id="buttonsPanel" layout="block">      			      			
           		<p:commandButton id="createTournament" actionListener="#{tournamentController.onCreateTournament}" 
           					     update="tournamentForm:tournamentCreatePanel, tournamentForm:tournamentListPanel"
-                    			 value="#{bundle['create']}"                     			                      				
-                    			 style="width:auto" 
-                    			 icon="fa fa-plus Fs16 White"
+                    			 value="#{tournamentController.tournamentBean.id != null ? 'Թարմացնել' : 'Ավելացնել'}"                     			                      				
+                    			 styleClass="#{tournamentController.tournamentBean.id != null ? 'GreenButton' : ''}" 
+                    			 style="width:auto" icon="#{tournamentController.tournamentBean.id != null ? 'fa fa-pencil' : 'fa fa-plus'} Fs16 White"
                     			 rendered="#{tournamentController.tournamentBean.id == null}"/>
-                    			 
-               	
+                    			                	
                	<p:commandButton id="updateTournamnet" actionListener="#{tournamentController.onUpdateTournament}" 
           					     update="tournamentUpdatePanel, tournamentListPanel"
                     			 value="#{bundle['update']}" 
@@ -110,8 +134,7 @@
                     			 style="width:auto" 
                     			 icon="fa fa-pencil Fs16 White"
                     			 rendered="#{tournamentController.tournamentBean.id != null}"/>
-               	
-                    				 
+               	                    				 
               	<p:commandButton actionListener="#{tournamentController.onCancel}" 
               				     update="tournamentCreatePanel"
               					 process="@this"

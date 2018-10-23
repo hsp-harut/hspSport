@@ -36,27 +36,46 @@ public class TournamentBean extends BaseBean {
 		maxPartCount = tournamentBean.getMaxPartCount();
 	}
 
+	/**
+	 * @return the name
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * @param name the name to set
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * @return the startDate
+	 */
 	public Date getStartDate() {
 		return startDate;
 	}
 
+	/**
+	 * @param startDate the startDate to set
+	 */
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
 	}
 
+	/**
+	 * @return the maxPartCount
+	 */
 	public Integer getMaxPartCount() {
 		return maxPartCount;
 	}
 
+	/**
+	 * @param maxPartCount the maxPartCount to set
+	 */
 	public void setMaxPartCount(Integer maxPartCount) {
 		this.maxPartCount = maxPartCount;
 	}
+
 }
