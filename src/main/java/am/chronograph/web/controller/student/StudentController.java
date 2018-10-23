@@ -11,6 +11,7 @@ import javax.inject.Named;
 import org.apache.commons.lang3.StringUtils;
 
 import am.chronograph.service.student.StudentService;
+import am.chronograph.web.bean.contract.ContractBean;
 import am.chronograph.web.bean.student.StudentBean;
 import am.chronograph.web.controller.base.BaseController;
 import am.chronograph.web.integration.Spring;
@@ -61,6 +62,30 @@ public class StudentController extends BaseController implements Serializable{
         
         addInfoMessage("studentSuccessSave");
 	}
+	
+	
+	 /**
+     * ActionListener method called when Delete icon is clicked to delete selected studentBean...
+     * @param selectedContractBean
+     */
+    public void onRemoveStudent(StudentBean selectedStudentBean) {
+        studentService.delete(selectedStudentBean.getId());
+        
+        if(selectedStudentBean.getId().equals(studentBean.getId())) {
+            studentBean = new StudentBean();
+        }
+        students = studentService.getAll();
+    }
+    
+    /**
+     * Method called when user clicks on any row in contracts table,
+     * to edit selected exam...
+     */
+    public void onEditStudent(StudentBean selectedStudentBean) {
+        studentBean = new StudentBean(selectedStudentBean);
+     
+        scrollTo("studentForm:studentCreatePanel");
+    }
 
 	
 
