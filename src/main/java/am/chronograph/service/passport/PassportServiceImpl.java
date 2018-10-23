@@ -93,7 +93,7 @@ public class PassportServiceImpl implements PassportService {
 		passport.setFirstName(passportBean.getFirstName());
 		passport.setLastName(passportBean.getLastName());
 		passport.setPassNumber(passportBean.getPassNumber());
-		passport.setFirstName(passportBean.getFirstName());
+		passport.setBirthDay(DateUtil.getLocalDateTimeByDate(passportBean.getBirthDay()));
 
 		return passport;
 	}
@@ -126,7 +126,7 @@ public class PassportServiceImpl implements PassportService {
 		passportBean.setFirstName(passport.getFirstName());
 		passportBean.setLastName(passport.getLastName());
 		passportBean.setPassNumber(passport.getPassNumber());
-		passportBean.setBirthDay(passport.getBirthDay());
+		passportBean.setBirthDay(DateUtil.getDateByLocalDateTime(passport.getBirthDay()));
 
 		return passportBean;
 	}

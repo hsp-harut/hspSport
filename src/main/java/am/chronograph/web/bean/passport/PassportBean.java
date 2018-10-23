@@ -1,6 +1,7 @@
 package am.chronograph.web.bean.passport;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import am.chronograph.web.bean.BaseBean;
 
@@ -19,7 +20,7 @@ public class PassportBean extends BaseBean {
 	private String firstName;
 	private String lastName;
 	private String passNumber;
-	private LocalDateTime birthDay;
+	private Date birthDay;
 
 	/**
 	 * Default constructor...
@@ -48,8 +49,7 @@ public class PassportBean extends BaseBean {
 	}
 
 	/**
-	 * @param firstName
-	 *            the firstName to set
+	 * @param firstName the firstName to set
 	 */
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
@@ -63,8 +63,7 @@ public class PassportBean extends BaseBean {
 	}
 
 	/**
-	 * @param lastName
-	 *            the lastName to set
+	 * @param lastName the lastName to set
 	 */
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
@@ -78,8 +77,7 @@ public class PassportBean extends BaseBean {
 	}
 
 	/**
-	 * @param passNumber
-	 *            the passNumber to set
+	 * @param passNumber the passNumber to set
 	 */
 	public void setPassNumber(String passNumber) {
 		this.passNumber = passNumber;
@@ -88,15 +86,14 @@ public class PassportBean extends BaseBean {
 	/**
 	 * @return the birthDay
 	 */
-	public LocalDateTime getBirthDay() {
+	public Date getBirthDay() {
 		return birthDay;
 	}
 
 	/**
-	 * @param birthDay
-	 *            the birthDay to set
+	 * @param birthDay the birthDay to set
 	 */
-	public void setBirthDay(LocalDateTime birthDay) {
+	public void setBirthDay(Date birthDay) {
 		this.birthDay = birthDay;
 	}
 
