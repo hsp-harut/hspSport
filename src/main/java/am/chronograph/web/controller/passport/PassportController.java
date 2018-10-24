@@ -8,6 +8,7 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import am.chronograph.service.passport.PassportService;
+import am.chronograph.web.bean.contract.ContractBean;
 import am.chronograph.web.bean.passport.PassportBean;
 import am.chronograph.web.controller.base.BaseController;
 import am.chronograph.web.integration.Spring;
@@ -43,6 +44,28 @@ public class PassportController extends BaseController implements Serializable {
 		passportBean = new PassportBean();
 
 		passports = passportService.getAll();
+	}
+
+	/**
+	 * create passport
+	 */
+	public void onCreatePassport() {
+		/*
+		 * if(!isValidContract()) { return; }
+		 */
+
+		passportService.create(passportBean);
+		passports = passportService.getAll();
+		passportBean = new PassportBean();
+
+		addInfoMessage("passportSuccessSave");
+	}
+
+	/**
+	 * validate all inputs
+	 */
+	private boolean isValid() {
+
 	}
 
 	/**

@@ -16,13 +16,7 @@
     
 <ui:define name="content">
   
-    
 <f:loadBundle id="bundle" var="bundle" basename="#{contractController.currentBundle}"/>
-
-
-
-
-
 
 <h:form id="contractForm">
 
@@ -79,8 +73,7 @@
 			<p:remoteCommand name="refreshFooter" 
 							 update=":contractForm:contractList:totalOfAmountTotal, :contractForm:contractList:totalOfPeriodicPayment, :contractForm:contractList:totalOfAmountOld, :contractForm:contractList:totalOfAmountNew, :contractForm:contractList:totalOfAmountRelax, :contractForm:contractList:totalOfAmountPersonal, :contractForm:contractList:totalOfAmountRemains" 
 						     process="@this"/>
-						     									    
-			
+						     								    
 			<p:dataTable id="contractList" widgetVar="contractTable" value="#{contractController.contractsModel}" var="contract"
 				reflow="true" lazy="true" paginator="true" rows="10" rowKey="#{contract.id}" 
 				selectionMode="single" paginatorAlwaysVisible="true"
@@ -465,11 +458,6 @@
 	</div>
 </h:panelGroup>
 
-
-
-
-
-
 <h:panelGroup id="contractCreatePanel" layout="block" styleClass="Container100 ui-fluid">
 	<div class="ContainerIndent">
 		<div class="Card ShadowEffect">						
@@ -670,7 +658,6 @@
 
 </h:form>
 
-        
-</ui:define>
+  </ui:define>
 
 </ui:composition>
