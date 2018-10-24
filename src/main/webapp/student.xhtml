@@ -106,13 +106,13 @@
 							layout="grid" styleClass="ui-panelgrid-blank"
 							style="border:0px none; background-color:transparent;">
 
-							<p:outputLabel for="firstName" value="#{bundle['firstName']}" />
+							<p:outputLabel for="firstName" value="#{bundle['firstName']} *"/>
 							<p:inputText id="firstName"
 										 value="#{studentController.studentBean.firstName}" maxlength="30"
 										 tabindex="1" />
 							<p:message for="firstName"/>
 							
-							<p:outputLabel for="lastName" value="#{bundle['lastName']}" />
+							<p:outputLabel for="lastName" value="#{bundle['lastName']} *" />
 							<p:inputText id="lastName"
 								   		 value="#{studentController.studentBean.lastName}" maxlength="30"
 								 		 tabindex="2" />

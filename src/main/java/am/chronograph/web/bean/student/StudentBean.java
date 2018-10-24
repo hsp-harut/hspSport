@@ -30,6 +30,7 @@ public class StudentBean extends BaseBean {
 	 * @param contractBean
 	 */
 	public StudentBean(StudentBean studentBean) {
+		id = studentBean.getId();
 		firstName = studentBean.getFirstName();
 		lastName = studentBean.getLastName();
 		birthday = studentBean.getBirthday();

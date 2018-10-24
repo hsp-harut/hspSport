@@ -102,7 +102,7 @@ public class StudentServiceImpl implements StudentService{
 		
 		studentBean.setId(student.getId());
 		studentBean.setFirstName(student.getFirstName());
-		studentBean.setLastName(student.getFirstName());
+		studentBean.setLastName(student.getLastName());
 		studentBean.setBirthday(DateUtil.getDateByLocalDateTime(student.getBirthday()));
 		
 		return studentBean;
