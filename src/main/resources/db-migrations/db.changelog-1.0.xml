@@ -435,5 +435,13 @@
             
         </createTable>
  	</changeSet>	
+ 	
+ 	<changeSet id="2018-10-24/001" author="mona">
+ 		<addColumn tableName="student">
+ 			<column name="country" type="VARCHAR(30)" afterColumn="birthday">
+            	<constraints nullable="false"/>
+            </column>           
+ 		</addColumn>		
+ 	</changeSet>
     
 </databaseChangeLog>
