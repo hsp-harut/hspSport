@@ -49,7 +49,7 @@ public class TournamentController extends BaseController implements Serializable
 		tournamentBean = new TournamentBean();
 
 		tournaments = tournamentService.getAll();
-		
+
 	}
 
 	/**
@@ -68,6 +68,23 @@ public class TournamentController extends BaseController implements Serializable
 
 		addInfoMessage("tournamentSuccessSave");
 	}
+	
+	/**
+	 * ActionListener method called when 'Create' or 'Update' clicked - to create
+	 * new/update process...
+	 */
+	public void onUpdateTournament() {
+		if (!isValidTournament()) {
+			return;
+		}
+
+		tournamentService.update(tournamentBean);
+		tournaments = tournamentService.getAll();
+
+		tournamentBean = new TournamentBean();
+
+		addInfoMessage("tournamentSuccessUpdate");
+	}
 
 	/**
 	 * ActionListener method called when Delete icon is clicked to delete selected
@@ -83,17 +100,25 @@ public class TournamentController extends BaseController implements Serializable
 			tournamentBean = new TournamentBean();
 		}
 	}
-	
-	
+
 	/**
-     * Method called when user clicks on any row in contracts table,
-     * to edit selected exam...
-     */
-    public void onEditTournament(TournamentBean selectedTournamentBean) {
-    	tournamentBean = new TournamentBean(selectedTournamentBean);
-       
-//        scrollTo("tournamentForm:tournamentCreatePanel");
-    }
+	 * Method called when user clicks on any row in contracts table, to edit
+	 * selected exam...
+	 */
+	public void onEditTournament(TournamentBean selectedTournamentBean) {
+		tournamentBean = new TournamentBean(selectedTournamentBean);
+
+		scrollTo("tournamentForm:tournamentCreatePanel");
+	}
+
+	/**
+	 * Method called when 'Cancel' button clicked.
+	 */
+	public void onCancel() {
+		tournamentBean = new TournamentBean();
+
+		scrollTo("tournamentForm:tournamentListPanel");
+	}
 
 	/**
 	 * Method for Person validation -- for inserting/updating corresponding data

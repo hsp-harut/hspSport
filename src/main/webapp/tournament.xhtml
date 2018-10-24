@@ -128,8 +128,8 @@
                     			 rendered="#{tournamentController.tournamentBean.id == null}"/>
                     			                	
                	<p:commandButton id="updateTournamnet" actionListener="#{tournamentController.onUpdateTournament}" 
-          					     update="tournamentUpdatePanel, tournamentListPanel"
-                    			 value="#{bundle['update']}" 
+          					     update="tournamentForm:tournamentCreatePanel, tournamentForm:tournamentListPanel"
+                    			 value="#{bundle['updateTournament']}" 
                     			 styleClass="GreenButton"                     				 
                     			 style="width:auto" 
                     			 icon="fa fa-pencil Fs16 White"
@@ -138,7 +138,7 @@
               	<p:commandButton actionListener="#{tournamentController.onCancel}" 
               				     update="tournamentCreatePanel"
               					 process="@this"
-                				 value="Հերքել" 
+                				 value="#{bundle['denied']}" 
                 				 styleClass="RedButton"                     				 
                 				 style="width:auto" icon="fa fa-ban Fs16 White"
                 				 rendered="#{tournamentController.tournamentBean.id != null}"/>

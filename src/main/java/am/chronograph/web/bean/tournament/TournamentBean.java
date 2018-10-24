@@ -31,6 +31,7 @@ public class TournamentBean extends BaseBean {
 	 * @param contractBean
 	 */
 	public TournamentBean(TournamentBean tournamentBean) {
+		id = tournamentBean.getId();
 		name = tournamentBean.getName();
 		startDate = tournamentBean.getStartDate();
 		maxPartCount = tournamentBean.getMaxPartCount();
