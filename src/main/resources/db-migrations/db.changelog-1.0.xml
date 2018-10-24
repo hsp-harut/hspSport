@@ -463,6 +463,16 @@
 
 		</createTable>
 	</changeSet>
+	
+	<changeSet id="2018-10-24/001" author="davit">
+		<addColumn tableName="tournamnet">
+			<column name="country" type="VARCHAR(30)">
+				<constraints nullable="false" />
+			</column>
+		</addColumn>
+	</changeSet>
+	
+	
 
 
 
