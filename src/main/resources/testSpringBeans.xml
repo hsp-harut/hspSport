@@ -15,6 +15,11 @@
 		
 		
 	<bean id="triangle" class="am.chronograph.test.Triangle">
+	<!-- <property name="type" value = "havasarasrun"></property> -->
+	<!-- <constructor-arg value = " constructorov"></constructor-arg> -->
+	
+	<constructor-arg value = "1 constructor" />
+	<constructor-arg value = "20" />
 	</bean>
 		
 		
