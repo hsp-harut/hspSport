@@ -1,4 +1,4 @@
-package am.chronograph.test;
+package am.chronograph.testWithXML;
 
 public interface Shape {
 
