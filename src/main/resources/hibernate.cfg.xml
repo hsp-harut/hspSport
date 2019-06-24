@@ -17,6 +17,12 @@
 <property name="hbm2ddl.auto">update</property>
 
 <mapping class="am.chronograph.testing_hibernate.UserDetails"/> 
+<mapping class="am.chronograph.testing_hibernate.UserDetailsTest"/> 
+<mapping class="am.chronograph.testing_hibernate.Vehicle"/> 
+<mapping class="am.chronograph.testing_hibernate.TwoWheeler"/> 
+<mapping class="am.chronograph.testing_hibernate.FourWheeler"/> 
+
+
 
 </session-factory>
 
