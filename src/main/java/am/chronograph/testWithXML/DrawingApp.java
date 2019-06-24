@@ -12,22 +12,23 @@ public class DrawingApp {
 	public static void main(String[] args) {
 //		BeanFactory factory = new XmlBeanFactory(new FileSystemResource("/home/harut/projects/chronograph/src/main/resources/testSpringBeans.xml"));
 //		Triangle triangle = (Triangle) factory.getBean("triangle");
-
-		ApplicationContext context = new ClassPathXmlApplicationContext("testSpringBeans.xml");
-
+		
+		
+		
 //		AbstractApplicationContext context = new ClassPathXmlApplicationContext("testSpringBeans.xml");
-//		context.registerShutdownHook();   // for closing Application context
-
+//		context.registerShutdownHook();    // for closing Application context
+		
 		/*
-		 * Triangle triangle = (Triangle) context.getBean("triangle"); 
-		 * triangle.draw();     // draw triangle
+		 * Triangle triangle = (Triangle) context.getBean("triangle");
 		 * 
-		 * Circle circle = (Circle) context.getBean("circle");
-		 *  circle.draw(); //draw  circle.
+		 * triangle.draw();  // draw triangle
 		 */
-
-		Shape shape = (Shape) context.getBean("triangle");
-		shape.draw();
-
+		AbstractApplicationContext context = new ClassPathXmlApplicationContext("testSpringBeans.xml");
+		context.registerShutdownHook();
+		
+		 Shape shape = (Shape) context.getBean("circle");
+		 shape.draw();
+		
+		// System.out.println(context.getMessage("greeting", null, "Default Greeting....", null));
 	}
 }
