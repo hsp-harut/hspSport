@@ -1,4 +1,4 @@
-package am.chronograph.testWithXML;
+package am.chronograph.testing_spring_testWithXML;
 
 import java.util.List;
 

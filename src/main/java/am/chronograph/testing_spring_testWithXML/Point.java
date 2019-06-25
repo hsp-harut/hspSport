@@ -1,4 +1,4 @@
-package am.chronograph.testWithXML;
+package am.chronograph.testing_spring_testWithXML;
 
 public class Point {
 

@@ -1,4 +1,4 @@
-package am.chronograph.testWithXML;
+package am.chronograph.testing_spring_testWithXML;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;

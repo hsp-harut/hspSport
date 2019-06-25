@@ -1,4 +1,4 @@
-package am.chronograph.testWithXML;
+package am.chronograph.testing_spring_testWithXML;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
