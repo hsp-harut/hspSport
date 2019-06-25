@@ -3,6 +3,7 @@ package am.chronograph.testing_hibernate;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -10,6 +11,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * UserDetails for testing annotation.
@@ -19,6 +23,8 @@ import javax.persistence.Table;
  */
 @Entity
  //  @Table(name = "User_Details_Test")
+@Cacheable   // use cache level
+@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL)
 public class UserDetailsTest {
 
 	@Id

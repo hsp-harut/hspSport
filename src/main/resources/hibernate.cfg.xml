@@ -10,8 +10,15 @@
 <property name="connection.username">root</property>
 <property name="connection.password">root</property>
 
+<!-- select data base -->
 <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
 
+<!-- use second cache level  -->
+<property name="cache.use_second_level_cache">true</property>
+<property name="cache.use_query_cache">true</property>
+<property name="cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
+
+<!-- show sql code  -->
 <property name="show_sql">true</property>
 
 <property name="hbm2ddl.auto">update</property>
