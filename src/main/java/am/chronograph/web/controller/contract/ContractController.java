@@ -181,7 +181,7 @@ public class ContractController extends BaseController implements Serializable {
         
         scrollTo("contractForm:contractCreatePanel");
     }
-    
+   
     /**
      * Method called when user clicks on any row in contracts table,
      * to edit selected exam...
