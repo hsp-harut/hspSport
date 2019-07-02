@@ -1,4 +1,4 @@
-package am.chronograph.test;
+package am.chronograph.testing_spring_testWithXML;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -11,13 +11,28 @@ public class DrawingApp {
 	
 		triangle.draw();*/
 		
+
 		//ApplicationContext context = new ClassPathXmlApplicationContext("testSpringBeans.xml");		
 		
 		/*AbstractApplicationContext context = new ClassPathXmlApplicationContext("testSpringBeans.xml");
+
+
+//		AbstractApplicationContext context = new ClassPathXmlApplicationContext("testSpringBeans.xml");
+//		context.registerShutdownHook();    // for closing Application context
+		
+		/*
+		 * Triangle triangle = (Triangle) context.getBean("triangle");
+		 * 
+		 * triangle.draw();  // draw triangle
+		 */
+		AbstractApplicationContext context = new ClassPathXmlApplicationContext("testSpringBeans.xml");
+
 		context.registerShutdownHook();
 		
-		Triangle triangle = (Triangle) context.getBean("triangle");
+		 Shape shape = (Shape) context.getBean("circle");
+		 shape.draw();
 		
+
 		triangle.draw();*/
 		
 		ApplicationContext context = new ClassPathXmlApplicationContext("testSpringBeans.xml");
@@ -26,5 +41,8 @@ public class DrawingApp {
 		
 		
 		
+
+		// System.out.println(context.getMessage("greeting", null, "Default Greeting....", null));
+
 	}
 }

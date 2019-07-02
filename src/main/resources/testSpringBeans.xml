@@ -12,15 +12,97 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
-		
-		
+
+	<!-- Use Parent bean...
+	   <bean id = "parrentTriangle" class = "am.chronograph.test.Triangle"> 
+		<property name="pointA" ref="firstPoint" /> </bean> <bean id = "triangle2" 
+		class = "am.chronograph.test.Triangle" parent = "parrentTriangle" > <property 
+		name="pointA" ref="firstPoint" /> <property name="pointB" ref="secPoint" 
+		/> </bean> -->
+
+
+
 	<bean id="triangle" class="am.chronograph.test.Triangle">
+
 	<!-- <property name="type" value = "havasarasrun"></property> -->
 	<!-- <constructor-arg value = " constructorov"></constructor-arg> -->
 	
 	<constructor-arg value = "1 constructor" />
 	<constructor-arg value = "20" />
 	</bean>
+
+
+		<!-- <property name="points"> <list> <ref bean = "firstPoint" /> <ref bean 
+			= "secPoint" /> <ref bean = "threePoint" /> </list> </property> -->
+
+
+		<property name="pointA" ref="firstPoint" />
+		<property name="pointB" ref="secPoint" />
+		<property name="pointC" ref="threePoint" />
+
+		<!-- Nested bean, which can use only Triangle -->
+		<!-- <property name="pointB"> coordinate for second point <bean id="secPoint" 
+			class="am.chronograph.test.Point"> <property name="x" value="10" /> <property 
+			name="y" value="5" /> </bean> </property> -->
+
+
+
+
+	</bean>
+
+	<!-- coordinate for first point, for a Triangle -->
+	<bean id="firstPoint" class="am.chronograph.test.Point">
+		<property name="x" value="0" />
+		<property name="y" value="0" />
 		
-		
+		<!-- Use pointsconfig file, which give value dinamic...
+		<property name="y" value="${pointA.pointX}" />
+		<property name="y" value="${pointA.pointY}" />
+		 -->
+		 
+	</bean>
+
+
+	<!-- coordinate for second point -->
+	<bean id="secPoint" class="am.chronograph.test.Point">
+		<property name="x" value="10" />
+		<property name="y" value="5" />
+	</bean>
+
+
+	<!-- coordinate for three point -->
+	<bean id="threePoint" class="am.chronograph.test.Point">
+		<property name="x" value="7" />
+		<property name="y" value="6" />
+	</bean>
+	
+
+<!--  Use for call BeanPostProcessor class.
+<bean class = "org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" >
+<property name = "locations" value = "pointsconfig.properties" />
+</bean>
+ -->
+ 
+
+<!--  Use for call MyBeanFactoryPostProcessor class.
+<bean class = "am.chronograph.test.MyBeanFactoryPostProcessor" ></bean>
+ -->
+
+<!--  Use for call pointsconfig  file... class.
+<bean class = "am.chronograph.test.MyBeanFactoryPostProcessor" ></bean>
+ -->
+
+<!-- 
+Use Circle class and declared point center value...
+
+	<bean id="circle" class="am.chronograph.test.Circle">
+		<property name="center" ref="firstPoint" />
+    </bean> -->
+    
+    
+    <bean class = "org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor">
+    
+    </bean>
+
 </beans>
+
