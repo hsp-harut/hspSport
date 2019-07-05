@@ -25,7 +25,7 @@ public class DrawingApp {
 		 * 
 		 * triangle.draw();  // draw triangle
 		 */
-		AbstractApplicationContext context = new ClassPathXmlApplicationContext("testSpringBeans.xml");
+		/*AbstractApplicationContext context = new ClassPathXmlApplicationContext("testSpringBeans.xml");
 
 		context.registerShutdownHook();
 		

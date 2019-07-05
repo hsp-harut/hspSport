@@ -1,4 +1,4 @@
-package am.chronograph.web.controller.contract;
+package am.chronograph.web.controller.student;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -37,9 +37,9 @@ import am.chronograph.web.model.SearchAwareBeanLazyModel;
  * 
  * @author HARUT
  */
-@Named("contractController")
+@Named("studentController")
 @ViewScoped
-public class ContractController extends BaseController implements Serializable {
+public class StudentController extends BaseController implements Serializable {
 
 	/** use serialVersionUID from JDK 1.0.2 for interoperability */
 	private static final long serialVersionUID = 6304423142083144352L;
@@ -269,7 +269,7 @@ public class ContractController extends BaseController implements Serializable {
                 continue;
             }
             
-            /*//Old Amount
+            //Old Amount
             setNumberTypeToCell(row.getCell(10));
             
             //New Amount
@@ -288,7 +288,7 @@ public class ContractController extends BaseController implements Serializable {
             setNumberTypeToCell(row.getCell(15));
             
             //Remaining Amount
-            setNumberTypeToCell(row.getCell(16));*/
+            setNumberTypeToCell(row.getCell(16));
         }                 
     }
     
