@@ -1,20 +1,139 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui"
-                xmlns:of="http://omnifaces.org/functions"
-                xmlns:sec="http://www.springframework.org/security"
-                xmlns:pe="http://primefaces.org/ui/extensions"
-                template="/WEB-INF/template.xhtml">
-  
-<ui:define name="subheader">
-	<h:outputLink value="#{request.contextPath}/student" styleClass="BoldGray">
-		<h:outputText value=" #{bundle['dashboard']}"/>
-	</h:outputLink>        
-</ui:define>
-  
-    
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:sec="http://www.springframework.org/security"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="/WEB-INF/template.xhtml">
 
+	<ui:define name="subheader">
+		<h:outputLink value="#{request.contextPath}/student"
+			styleClass="BoldGray">
+			<h:outputText value=" #{bundle['students']}" />
+
+		</h:outputLink>
+	</ui:define>
+
+	<ui:define name="content">
+
+
+		<h2 class="BigTopic">
+			<h:outputText value="Պայմանագրեր" />
+		</h2>
+
+		<f:loadBundle id="bundle" var="bundle"
+			basename="#{studentController.currentBundle}" />
+
+
+
+
+
+
+		<h:form id="studentForm">
+
+			<h:panelGroup id="studentListPanel" layout="block"
+				styleClass="Container100 ui-fluid">
+				<div class="ContainerIndent">
+					<div class="Card ShadowEffect">
+
+
+						<h2 class="BigTopic">
+							<h:outputText value="Պայմանագրեր" />
+							</h22>
+							;
+
+
+
+							<h2 class="BigTopic">
+								<h:outputText value="#{bundle['students']}" />
+							</h2>
+
+							<p:dataTable value="#{studentController.students}" var="student"
+								emptyMessage="chkaaaaaaaaaaaaaaaaaa">
+								<p:column headerText="#{bundle['id']}">
+									<h:outputText value="#{student.id}" />
+								</p:column>
+
+								<p:column headerText="#{bundle['name']}">
+									<h:outputText value="#{student.name}" />
+								</p:column>
+
+							</p:dataTable>
+					</div>
+				</div>
+			</h:panelGroup>
+
+
+
+
+
+
+			<h:panelGroup id="studentCreatePanel" layout="block"
+				styleClass="Container100 ui-fluid">
+				<div class="ContainerIndent">
+					<div class="Card ShadowEffect">
+
+						<p:messages id="infoErrorMessages" showDetail="true"
+							autoUpdate="false" closable="true" globalOnly="true" />
+
+						<h2 class="BigTopic">
+							<h:outputText
+								value="#{studentController.studentBean.id != null ? bundle['updateStudent'] : bundle['createStudent']}" />
+							&#160;
+						</h2>
+
+						<div class="EmptyBox20"></div>
+						<p:panelGrid id="studentPanel" columns="3"
+							columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5"
+							layout="grid" styleClass="ui-panelgrid-blank"
+							style="border:0px none; background-color:transparent;">
+
+							<p:outputLabel for="contractNumber" value="#{bundle['name']}" />
+							<p:inputText id="contractNumber"
+								value="#{studentController.studentBean.name}" maxlength="30"
+								tabindex="2" />
+							<p:message for="contractNumber" />
+
+						</p:panelGrid>
+
+						<sec:ifAnyGranted roles="ROLE_ADMIN">
+							<div class="EmptyBox20"></div>
+
+							<h:panelGroup id="buttonsPanel" layout="block">
+								<p:commandButton id="createStudent"
+									actionListener="#{studentController.onCreateStudent}"
+									update="studentCreatePanel, studentListPanel"
+									value="#{bundle['create']}" style="width:auto"
+									icon="fa fa-plus Fs16 White"
+									rendered="#{studentController.studentBean.id == null}" />
+
+
+								<p:commandButton id="updateStudent"
+									actionListener="#{studentController.onUpdateStudent}"
+									update="studentCreatePanel, studentListPanel"
+									value="#{bundle['update']}" styleClass="GreenButton"
+									style="width:auto" icon="fa fa-pencil Fs16 White"
+									rendered="#{studentController.studentBean.id != null}" />
+
+
+								<p:commandButton actionListener="#{studentController.onCancel}"
+									update="studentCreatePanel" process="@this" value="Չեղարկել"
+									styleClass="RedButton" style="width:auto"
+									icon="fa fa-ban Fs16 White"
+									rendered="#{studentController.studentBean.id != null}" />
+
+							</h:panelGroup>
+						</sec:ifAnyGranted>
+
+					</div>
+				</div>
+			</h:panelGroup>
+
+		</h:form>
+
+
+	</ui:define>
 
 </ui:composition>
