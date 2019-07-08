@@ -1,5 +1,9 @@
 package am.chronograph.service.student;
 
+import java.util.List;
+
+import am.chronograph.web.bean.student.StudentBean;
+
 public interface StudentService {
 	
 	void create();
@@ -8,6 +12,8 @@ public interface StudentService {
 	
 	void delete();
 	
-	// List<> getAllStudent();
+	List<StudentBean> getAllStudent();
+	
+	StudentBean getStudentById();
 
 }

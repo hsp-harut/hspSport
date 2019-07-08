@@ -16,16 +16,18 @@ import am.chronograph.domain.AuditAwareEntity;
 @Table(name = "student")
 public class Student extends AuditAwareEntity {
 
-	@Column(name = "first_name", nullable = true, insertable = true, updatable = true)
+	private static final long serialVersionUID = -103965845051084220L;
+
+	@Column(name = "firstName", insertable = true, updatable = true)
 	private String firstName;
 
-	@Column(name = "last_name", nullable = true, insertable = true, updatable = true)
+	@Column(name = "lastName",  insertable = true, updatable = true)
 	private String lastName;
 
-	@Column(name = "first_name", nullable = true, insertable = true, updatable = true)
+	@Column(name = "phoneNumber", insertable = true, updatable = true)
 	private String phoneNumber;
 
-	@Column(name = "last_name", nullable = true, insertable = true, updatable = true)
+	@Column(name = "eMail", insertable = true, updatable = true)
 	private String eMail;
 
 	/**

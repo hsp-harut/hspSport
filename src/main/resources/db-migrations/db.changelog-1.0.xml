@@ -373,5 +373,29 @@
     	</sql>
  	</changeSet>
  	
+ 	<changeSet id="2019-07-08/002" author="Lusine">  
+ 		 <createTable tableName="student">
+ 		 	<column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            
+            <column name="firstName" type="VARCHAR(100)">
+            	<constraints nullable="false"/>
+            </column>
+            
+            <column name="lastName" type="VARCHAR(100)">
+            	<constraints nullable="false"/>
+            </column>
+            
+             <column name="phoneNumber" type="VARCHAR(100)">
+            	<constraints nullable="false"/>
+            </column>
+            
+             <column name="eMail" type="VARCHAR(100)">
+            	<constraints nullable="false"/>
+            </column>
+            
+ 		 </createTable>
+ 	</changeSet>  
     
 </databaseChangeLog>

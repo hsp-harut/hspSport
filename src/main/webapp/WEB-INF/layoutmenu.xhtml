@@ -6,8 +6,6 @@
     xmlns:p="http://primefaces.org/ui"
     xmlns:sec="http://www.springframework.org/security"
     xmlns:pm="http://primefaces.org/modena">
-    
-    <f:loadBundle id="bundle" var="bundle" basename="#{sessionBean.currentBundle}"/>
 
     <div class="Animated05" id="layout-menu-cover">
         <h:form id="menuform">
@@ -15,8 +13,7 @@
            		<p:menuitem id="contracts" value="Պայմանագրեր" icon="fa fa-file-text-o" url="/dashboard" />             		
            		<p:menuitem id="importedExcels" value="Բեռնել քաղվածք" icon="fa fa-upload" url="/importData" />             	                               
                 <p:menuitem id="admin_users" value="Օգտվողներ" icon="fa fa-user" outcome="/users" />
-                
-                <p:menuitem id="student" value="#{bundle['students']}" icon="fa fa-user" outcome="/student" />
+                <p:menuitem id="test" value="Ուսանողներ" icon="fa fa-user" outcome="/student" />
             </pm:menu>
         </h:form>
     </div>
