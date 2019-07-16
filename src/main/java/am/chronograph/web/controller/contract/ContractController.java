@@ -12,9 +12,6 @@ import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -195,9 +192,9 @@ public class ContractController extends BaseController implements Serializable {
      * ActionListener method called when 'Create' or 'Update' clicked - to create new/update process...
      */
     public void onCreateUpdateContract() {
-        if(!isValidContract()) {
+      /*  if(!isValidContract()) {
             return;
-        }
+        }*/
         
         /* anyway, lets once more calculate total before saving...*/
         contractBean.calulateTotalAmount();

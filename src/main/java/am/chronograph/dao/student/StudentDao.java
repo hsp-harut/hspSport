@@ -23,6 +23,15 @@ public interface StudentDao extends GenericDao<Student>, SearchSupport<Student> 
 	void create(Student student);
 	
 	/**
+	 * update student by given id
+	 * 
+	 * @param id
+	 * @param student
+	 * @return
+	 */
+	Student update(Long id, Student student);
+	
+	/**
 	 * Return List of all student...
 	 * @return
 	 */

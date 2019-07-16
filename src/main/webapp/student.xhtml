@@ -13,20 +13,315 @@
 		<h:outputText value=" #{bundle['student']}"/>
 	</h:outputLink>        
 </ui:define>
+    
+<ui:define name="content">
   
- <h:panelGroup id="studentCreatePanel" layout="block" styleClass="Container100 ui-fluid">
- 	
- 		<div class="ContainerIndent">
-			<div class="Card ShadowEffect">	
+<f:loadBundle id="bundle" var="bundle" basename="#{studentController.currentBundle}"/>
+
+<h:form id="contractForm">
+
+<sec:ifAnyGranted roles="ROLE_ADMIN">
+	<p:defaultCommand target="createStudent" />
+</sec:ifAnyGranted>
+
+<h:panelGroup id="contractListPanel" layout="block" styleClass="Container100 ui-fluid">
+	<div class="ContainerIndent">
+		<div class="Card ShadowEffect">
+		
+			<h2 class="BigTopic">					
+				<h:outputText value="Ուսանողներ"/>
+			</h2>
+							    
+			
+			<p:dataTable id="contractList" widgetVar="contractTable" value="#{contractController.contractsModel}" var="contract"
+				reflow="true" lazy="true" paginator="true" rows="10" rowKey="#{contract.id}" 
+				selectionMode="single" paginatorAlwaysVisible="true"
+				paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+				currentPageReportTemplate="(Էջ: {currentPage}/{totalPages}, ընդ. {totalRecords} տող)"
+				rowsPerPageTemplate="10,25,50"
+				emptyMessage="#{bundle['contractsNotFound']}"
+				tableStyle="width: auto;">													
 				
+				
+				<p:column visible="#{Controller.columnsVisibility[2]}" 
+						  sortBy="#{contract.contractNumber}" 
+						  filterable="#{contractController.filterable}"
+						  filterBy="#{contract.contractNumber}">
+					<f:facet name="header">
+		                <h:outputText value="#{student.contractNumber}"/>
+		            </f:facet>
+		            
+					<h:outputText value="#{contract.contractNumber}" />
+				</p:column>	
+				
+				
+				
+				
+				<p:column visible="#{contractController.columnsVisibility[1]}" 
+						  sortBy="#{contract.contractNumber}" 
+						  filterable="#{contractController.filterable}"
+						  filterBy="#{contract.contractNumber}">
+					<f:facet name="header">
+		                <h:outputText value="#{student.studentFirstName}"/>
+		            </f:facet>
+		            
+					<h:outputText value="#{student.studentFirstName}" />
+				</p:column>
+				
+				<p:column visible="#{contractController.columnsVisibility[2]}" 
+						  sortBy="#{contract.contractNumber}" 
+						  filterable="#{contractController.filterable}"
+						  filterBy="#{contract.contractNumber}">
+					<f:facet name="header">
+		                <h:outputText value="#{student.studentLastName}"/>
+		            </f:facet>
+		            
+					<h:outputText value="#{contract.contractNumber}" />
+				</p:column>
+				
+				<p:column visible="#{contractController.columnsVisibility[2]}" 
+						  sortBy="#{contract.contractNumber}" 
+						  filterable="#{contractController.filterable}"
+						  filterBy="#{contract.contractNumber}">
+					<f:facet name="header">
+		                <h:outputText value="Պայմանագրի համար"/>
+		            </f:facet>
+		            
+					<h:outputText value="#{contract.contractNumber}" />
+				</p:column>
+				
+				
+				
+				
+				
+				
+							
+				
+				<p:column visible="#{contractController.columnsVisibility[3]}"
+						  sortBy="#{contract.enterDate}"
+						  filterable="#{contractController.filterable}" 
+						  filterBy="#{contract.enterDate}">					 
+					<f:facet name="header">
+		                <h:outputText value="#{bundle['contractCreatedAt']}"/>		                		                
+		            </f:facet>
+		            
+					<h:outputText value="#{contract.enterDate}" converter="chronoDateConverter"/>
+				</p:column>				
+				
+				<p:column visible="#{contractController.columnsVisibility[4]}"
+						  sortBy="#{contract.startDate}"
+						  filterable="#{contractController.filterable}" 
+						  filterBy="#{contract.startDate}">
+					
+					<f:facet name="header">
+		                <h:outputText value="#{bundle['contractStartDate']}"/>		            
+		            </f:facet>
+		            
+					<h:outputText value="#{contract.startDate}" converter="chronoDateConverter"/>
+				</p:column>
+				
+				<p:column visible="#{contractController.columnsVisibility[5]}"
+						  sortBy="#{contract.endDate}"
+						  filterable="#{contractController.filterable}" 
+						  filterBy="#{contract.endDate}">
+					<f:facet name="header">
+		                <h:outputText value="#{bundle['contractEndDate']}"/>
+		            </f:facet>
+		            
+					<h:outputText value="#{contract.endDate}" converter="chronoDateConverter"/>
+				</p:column>
+				
+				
+				
+				<p:column visible="#{contractController.columnsVisibility[6]}"
+						  sortBy="#{contract.periodicLastUpdatedAt}" 
+						  exportable="true">
+					<f:facet name="header">
+		                <h:outputText value="Պարբ. վճար. վերջին թարմ."/>
+		            </f:facet>
+		            
+					<h:outputText value="#{contract.periodicLastUpdatedAt}" converter="chronoDateConverter"/>
+				</p:column>
+				
+				
+	
+		
+			
+			
+				<sec:ifAnyGranted roles="ROLE_ADMIN">
+					<p:column style="text-align: center; white-space: nowrap;" visible="#{contractController.columnsVisibility[21]}" exportable="false">
+						<f:facet name="header">
+			                <h:outputText value="#{bundle['contractActions']}"/>
+			            </f:facet>
+			            			            			            
+			            <p:commandButton actionListener="#{contractController.onEditContract(contract)}"
+			           					 update="contractForm:contractCreatePanel"
+			       						 process="@this"		                   			 		                       		 
+				                   		 title="Փոփոխել պայմանագրի տվյալները"		        
+				                   		 icon="fa fa-pencil Fs16 White"
+				                   		 style="width:auto"			                       		 
+				                   		 styleClass="GreenButton"/>
+				                   		 
+				        <p:commandButton actionListener="#{contractController.onHistory(contract)}"
+			           					 update="contractForm:history"
+			       						 process="@this"		                   			 		                       		 
+				                   		 title="Դիտել պատմությունը"		        
+				                   		 icon="fa fa-history"
+				                   		 style="width:auto"			                       		 
+				                   		 styleClass="BlueButton"
+				                   		 oncomplete="PF('dlg').show();"/>           		 
+					              				        			        			        
+			        	<p:commandButton actionListener="#{contractController.onRemoveContract(contract)}"
+			        					 process="@this"
+	              						 update="contractForm:contractListPanel, contractForm:contractCreatePanel"
+			                   			 icon="fa fa-trash-o"
+			                       		 title="Ջնջել պայմանագիրը"
+			                       		 styleClass="RedButton"
+			                       		 onclick="if (!confirm('Դուք վստա՞հ եք, որ ուզում եք ջնջել ընտրված պաըմանագիրը։')) return false;"/>		        	
+	       			</p:column>
+       			</sec:ifAnyGranted>
+       			
+			</p:dataTable>						
+						
+		</div>
+	</div>
+</h:panelGroup>
 
-				<p:outputLabel for="firstName" value="#{bundle['contractFirstName']} *"/>
-               	<p:inputText id="firstName" value="#{studentController.contractBean.firstName}" maxlength="50" tabindex="6"/>
-               	<p:message for="firstName" />    
-			</div>
-		</div>				
- 
- </h:panelGroup>
 
+
+
+
+
+<h:panelGroup id="contractCreatePanel" layout="block" styleClass="Container100 ui-fluid">
+	<div class="ContainerIndent">
+		<div class="Card ShadowEffect">						
+		
+			<p:messages id="infoErrorMessages" showDetail="true" autoUpdate="false" closable="true" globalOnly="true"/>
+			
+			<h2 class="BigTopic">					
+				<h:outputText value="#{bundle['studentData']}"/>&#160;					                 
+			</h2>
+			
+			<div class="EmptyBox20"></div>
+			<p:panelGrid id="contractPanel" columns="3" columnClasses="ui-grid-col-2,ui-grid-col-5,i-grid-col-5" layout="grid" styleClass="ui-panelgrid-blank" style="border:0px none; background-color:transparent;" >
+             		
+				<p:outputLabel value="#{bundle['contractStatus']}" rendered="#{contractController.contractBean.status != null or contractController.contractBean.copy}"/>
+	            <h:panelGroup layout="block" styleClass="ShadowEffect #{contractController.contractBean.status != null ? contractController.contractBean.status : 'Copy'} TexAlCenter HoverEffect" 
+	            			  style="padding: 10px; text-align: left; cursor: pointer;"
+	            			  rendered="#{contractController.contractBean.status != null or contractController.contractBean.copy}">
+	            			  		            			  
+	            	<a href="#" class="#{contractController.contractBean.status != null ? contractController.contractBean.status : 'Copy'} MarRight20 HoverEffect">
+	            		<i class="fa fa-info-circle Fs16 #{contractController.contractBean.status != null ? contractController.contractBean.status : 'Copy'}"></i>
+	            		<h:outputText value=" #{contractController.contractBean.statusInfo}" styleClass="#{contractController.contractBean.status != null ? contractController.contractBean.status : 'Copy'}" rendered="#{contractController.contractBean.status != null}"/>	            		
+	            		<h:outputText value=" (Կրկնօրինակ)" styleClass="#{contractController.contractBean.status != null ? contractController.contractBean.status : 'Copy'}" rendered="#{contractController.contractBean.copy}"/>	            		
+	           		</a>
+	            </h:panelGroup>
+	            <h:panelGroup layout="block" rendered="#{contractController.contractBean.status != null or contractController.contractBean.copy}"/>
+             		
+       	               	
+               	
+            	<p:outputLabel for="firstName" value="#{bundle['studentFirstName']} *"/>
+               	<p:inputText id="firstName" value="#{studentController.studentBean.firstName}" maxlength="50" tabindex="6"/>
+               	<p:message for="firstName" />  
+               	
+               	<p:outputLabel for="lastName" value="#{bundle['contractLastName']} *"/>
+               	<p:inputText id="lastName" value="#{studentController.studentBean.lastName}" maxlength="50" tabindex="5"/>
+               	<p:message for="lastName" />           	               	
+               	
+               	<p:outputLabel for="phoneNumber" value="#{bundle['studentPhoneNumber']}"/>
+               	<p:inputText id="phoneNumber" value="#{studentController.studentBean.phoneNumber}" maxlength="50" tabindex="7"/>
+               	<p:message for="phoneNumber" />
+               	         	
+               	<p:outputLabel for="mail" value="#{bundle['studentMail']}"/>
+               	<p:inputText id="mail" value="#{studentController.studentBean.mail}" maxlength="50" tabindex="7"/>
+               	<p:message for="mail" />
+
+               	
+               	
+
+               
+     		</p:panelGrid>
+         	
+         	<sec:ifAnyGranted roles="ROLE_ADMIN">
+      		<div class="EmptyBox20"></div>
+         		
+      		<h:panelGroup id="buttonsPanel" layout="block">      			      			
+          		<p:commandButton id="createStudent" actionListener="#{studentController.onCreate}" 
+          						 update="contractCreatePanel"
+          						 process="@this"
+                    			 value="Ավելացնել" 
+                    			 styleClass="GreenButton"                     				 
+                    			 style="width:auto" icon="fa fa-plus Fs16 White"/>
+                    				 
+              	<p:commandButton actionListener="#{contractController.onCancel}" update="contractCreatePanel"
+              					 process="@this"
+                				 value="Հերքել" 
+                				 styleClass="RedButton"                     				 
+                				 style="width:auto" icon="fa fa-ban Fs16 White"
+                				 rendered="#{contractController.contractBean.id != null}"/>
+                				 
+            	<p:remoteCommand name="onCreateUpdateConfirmed" 
+            			         actionListener="#{contractController.onCreateUpdateConfirmed}" 
+            			         update="contractCreatePanel, contractListPanel" 
+						     	 process="@this"/>
+			</h:panelGroup>
+			</sec:ifAnyGranted>						
+						
+		</div>
+	</div>
+</h:panelGroup>
+
+<p:dialog id="history" header="#{contractController.contractNumberForHistory} պայմանագրի պատմությունը" widgetVar="dlg" modal="true" resizable="false">
+    
+    <p:dataTable id="historyList" value="#{contractController.excelContractImports}" var="excelContract"
+				reflow="true" lazy="false" paginator="true" rows="10" rowKey="#{excelContract.id}" 
+				paginatorAlwaysVisible="true"
+				paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+				paginatorPosition="bottom"
+				currentPageReportTemplate="(Էջ: {currentPage}/{totalPages}, ընդ. {totalRecords} տող)"
+				rowsPerPageTemplate="10,25,50"
+				emptyMessage="#{bundle['contractsNotFound']}"
+				tableStyle="width: auto;">																					
+				
+		<p:column sortBy="#{excelContract.excelName}">
+			<f:facet name="header">
+                <h:outputText value="Ֆայլի անուն"/>
+            </f:facet>
+            
+			<h:outputText value="#{excelContract.excelName}" />
+		</p:column>
+		
+		<p:column sortBy="#{excelContract.income}">
+			<f:facet name="header">
+                <h:outputText value="Պարբերական վճար"/>
+            </f:facet>
+            			
+			<h:outputText value="#{excelContract.income}">
+				<f:convertNumber pattern="#,###,###,###.##"/>
+			</h:outputText>
+		</p:column>
+		
+		<p:column sortBy="#{excelContract.dateInExcel}">
+			<f:facet name="header">
+                <h:outputText value="Ֆայլում ամսաթիվ"/>
+            </f:facet>
+            
+			<h:outputText value="#{excelContract.dateInExcel}" converter="chronoDateConverter"/>
+		</p:column>
+		
+		<p:column sortBy="#{excelContract.createdDate}">
+			<f:facet name="header">
+                <h:outputText value="Մուտք համակարգ"/>
+            </f:facet>
+            
+			<h:outputText value="#{excelContract.createdDate}" converter="chronoDateConverter"/>
+		</p:column>
+	</p:dataTable>
+</p:dialog>
+
+</h:form>
+
+        
+</ui:define>
 
 </ui:composition>

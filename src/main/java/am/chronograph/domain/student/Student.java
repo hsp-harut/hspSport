@@ -31,13 +31,6 @@ public class Student extends AuditAwareEntity {
 	private String eMail;
 
 	/**
-	 * Default constructor...
-	 */
-	public Student() {
-
-	}
-
-	/**
 	 * @return the firstName
 	 */
 	public String getFirstName() {

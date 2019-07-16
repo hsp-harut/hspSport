@@ -3,32 +3,15 @@ package am.chronograph.web.bean.student;
 import java.util.Date;
 
 import am.chronograph.web.bean.BaseBean;
-import am.chronograph.web.bean.contract.ContractBean;
 
 public class StudentBean extends BaseBean {
 
-	private static long serialVersionUID = 5964979443776005956L;
+	private static final long serialVersionUID = 1241875206414585150L;
 
 	private String firstName;
 	private String lastName;
 	private String phoneNumber;
 	private String eMail;
-
-	/**
-	 * @return the eMail
-	 */
-	public String geteMail() {
-		return eMail;
-	}
-
-	/**
-	 * @param eMail the eMail to set
-	 */
-	public void seteMail(String eMail) {
-		this.eMail = eMail;
-	}
-
-	private String middleName;
 
 	private Date enterDate;
 	private Date startDate;
@@ -39,19 +22,20 @@ public class StudentBean extends BaseBean {
 	 * Default constructor...
 	 */
 	public StudentBean() {
+
 	}
 
 	/**
-	 * Copy constructor...
+	 * Copy Constructor....
 	 * 
-	 * @param contractBean
+	 * @param studentBean
 	 */
 	public StudentBean(StudentBean studentBean) {
 
 		firstName = studentBean.getFirstName();
 		lastName = studentBean.getLastName();
-		phoneNumber = studentBean.phoneNumber;
-		eMail = studentBean.eMail;
+		phoneNumber = studentBean.getPhoneNumber();
+		eMail = studentBean.geteMail();
 
 	}
 
@@ -98,17 +82,17 @@ public class StudentBean extends BaseBean {
 	}
 
 	/**
-	 * @return the middleName
+	 * @return the eMail
 	 */
-	public String getMiddleName() {
-		return middleName;
+	public String geteMail() {
+		return eMail;
 	}
 
 	/**
-	 * @param middleName the middleName to set
+	 * @param eMail the eMail to set
 	 */
-	public void setMiddleName(String middleName) {
-		this.middleName = middleName;
+	public void seteMail(String eMail) {
+		this.eMail = eMail;
 	}
 
 	/**
