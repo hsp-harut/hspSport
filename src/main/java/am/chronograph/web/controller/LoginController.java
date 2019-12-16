@@ -24,6 +24,7 @@ public class LoginController {
 
 	/**
 	 * Checks if user is already logged in and redirect to dashboard if needed.
+	 * 
 	 * @return
 	 */
 	public String checkForStatus() {

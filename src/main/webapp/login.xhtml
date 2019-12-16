@@ -5,83 +5,105 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui">
 
-	<f:metadata>
-		<f:viewAction action="#{loginController.checkForStatus}" onPostback="false"/>
-	</f:metadata>
+<f:metadata>
+	<f:viewAction action="#{loginController.checkForStatus}"
+		onPostback="false" />
+</f:metadata>
 
-    <h:head>
-        <f:facet name="first">
-            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
-            <meta name="apple-mobile-web-app-capable" content="yes" />
-        </f:facet>
-        <title><h:outputText value="#{cst['application.title']}" /></title>
-        <ui:insert name="head" />
-    </h:head>
+<h:head>
+	<f:facet name="first">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="viewport"
+			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+	</f:facet>
+	<title><h:outputText value="#{cst['application.title']}" /></title>
+	<ui:insert name="head" />
+</h:head>
 
-    <h:body styleClass="GrayModena Geometry" style="height:auto;">
-        
-        <form id="loginForm" method="post" action="#{request.contextPath}/login">
-        <div class="Wid90 DispBlock MarAuto MarTopPerc5 TexAlCenter">
-            <div class="Wid33 MarAuto WidAutoOnMobile">
-                <div class="EmptyBox30"></div>
-                <div class="Card ShadowEffect">
-                    <div class="EmptyBox20"></div>
-                    <div class="Wid100 OvHidden BigTopic Fs30">
-                    <p:graphicImage name="chrono/images/bonako.png" style="width:40%; max-width:105px;"/>
-                    <i class="Fs60 DispBlock"></i><h:outputText value="#{msg['login.title']}" /></div>
-                    <ui:fragment rendered="#{param.activation}">
-                    	<div class="EmptyBox30" style="color: #5bc0de;">Your user is activated, please fill in data to continue.</div>
-                    </ui:fragment>
-                    <ui:fragment rendered="#{param.error != null}">
-                    	<div class="EmptyBox30" style="color: #d9534f;">Username or password is incorrect.</div>
-                    </ui:fragment>
-                    <ui:fragment rendered="#{param.success != null}">
-                    	<div class="EmptyBox30" style="color: #5bc0de;">Youv'e been successfully logged out.</div>
-                    </ui:fragment>
-                    <ui:fragment rendered="#{param.forgot != null}">
-                    	<div class="EmptyBox30" style="color: #5bc0de;">Verification email has been sent to your address.</div>
-                    </ui:fragment>
-                    <div class="Wid100">
-                    	<input type="text" class="ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all Wid80 TexAlCenter Fs18"
-                    		 placeholder="Email" name="username" role="textbox" 
-                    		 aria-disabled="false" aria-readonly="false"
-                    		 autocomplete="off" />
-                    </div>
-                    <div class="EmptyBox10"></div>
-                    <div class="Wid100">
-                    	<input type="password" class="ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all Wid80 TexAlCenter Fs18"
-                    		 placeholder="Password" name="password" role="textbox" 
-                    		 aria-disabled="false" aria-readonly="false"
-                    		 autocomplete="off" />
-                    </div>
-                    <div class="EmptyBox30"></div>
-                    <div class="Wid50 Fleft Responsive50">
-                    	<button type="submit" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-left  Fs18 White RaisedButton Fright FloatNoneOnMobile"
-                    		 role="button" aria-disabled="false" >
-                    		 <span class="ui-button-icon-left ui-icon ui-c fa fa-sign-in">
-                    		 </span><span class="ui-button-text ui-c"><h:outputText value="#{msg['login.login']}" /></span>
-                    	</button>
-                    </div>
-                    <div class="EmptyBox5 ShowOnMobile"></div>
-                    <div class="Wid50 Fleft Responsive50"><p:button value="#{msg['login.forgot']}" icon="fa fa-lock" outcome="/forgot" styleClass="RedButton Fs18 White RaisedButton Fleft FloatNoneOnMobile"/></div>
-                    <div class="EmptyBox20"></div>
-                </div>
-                <div class="Wid100 TexAlCenter MarTop20 Fs14 FontRobotoRegular Gray">
-                        <i class="fa fa-copyright"></i><h:outputText value="#{cst['application.copyright']}" /><br/> 
-						<h:outputText value="#{cst['application.address']}" />                        
-                    </div>
-            </div>
-        </div>
-        </form>
-        
-        <h:outputStylesheet name="css/core-layout.css" library="modena-layout" />
-        <h:outputStylesheet name="css/animate.css" library="modena-layout" />
-        <h:outputStylesheet name="css/modena-font.css" library="modena-layout" />
-        <h:outputStylesheet name="css/ripple-effect.css" library="modena-layout" />
-        <h:outputStylesheet name="css/font-awesome.css" library="modena-layout" />
-        <h:outputStylesheet name="css/modena-layout.css" library="modena-layout" />
-    </h:body>
+<h:body styleClass="GrayModena Geometry" style="height:auto;">
+
+	<form id="loginForm" method="post"
+		action="#{request.contextPath}/login">
+		<div class="Wid90 DispBlock MarAuto MarTopPerc5 TexAlCenter">
+			<div class="Wid33 MarAuto WidAutoOnMobile">
+				<div class="EmptyBox30"></div>
+				<div class="Card ShadowEffect">
+					<div class="EmptyBox20"></div>
+					<div class="Wid100 OvHidden BigTopic Fs30">
+						<p:graphicImage name="chrono/images/bonako.png"
+							style="width:40%; max-width:105px;" />
+						<i class="Fs60 DispBlock"></i>
+						<h:outputText value="#{msg['login.title']}" />
+					</div>
+					<ui:fragment rendered="#{param.activation}">
+						<div class="EmptyBox30" style="color: #5bc0de;">Your user is
+							activated, please fill in data to continue.</div>
+					</ui:fragment>
+					<ui:fragment rendered="#{param.error != null}">
+						<div class="EmptyBox30" style="color: #d9534f;">Username or
+							password is incorrect.</div>
+					</ui:fragment>
+					<ui:fragment rendered="#{param.success != null}">
+						<div class="EmptyBox30" style="color: #5bc0de;">Youv'e been
+							successfully logged out.</div>
+					</ui:fragment>
+					<ui:fragment rendered="#{param.forgot != null}">
+						<div class="EmptyBox30" style="color: #5bc0de;">Verification
+							email has been sent to your address.</div>
+					</ui:fragment>
+					<div class="Wid100">
+						<input type="text"
+							class="ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all Wid80 TexAlCenter Fs18"
+							placeholder="Email" name="username" role="textbox"
+							aria-disabled="false" aria-readonly="false" autocomplete="off" />
+					</div>
+					<div class="EmptyBox10"></div>
+					<div class="Wid100">
+						<input type="password"
+							class="ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all Wid80 TexAlCenter Fs18"
+							placeholder="Password" name="password" role="textbox"
+							aria-disabled="false" aria-readonly="false" autocomplete="off" />
+					</div>
+					<div class="EmptyBox30"></div>
+					<div class="Wid50 Fleft Responsive50">
+
+						<button type="submit"
+							class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-left  Fs18 White RaisedButton Fright FloatNoneOnMobile"
+							role="button" aria-disabled="false">
+							<span class="ui-button-icon-left ui-icon ui-c fa fa-sign-in">
+							</span><span class="ui-button-text ui-c"><h:outputText
+									value="#{msg['login.login']}" /></span>
+						</button>
+
+					</div>
+					<div class="EmptyBox5 ShowOnMobile"></div>
+					<div class="Wid50 Fleft Responsive50">
+						<p:button value="#{msg['login.forgot']}" icon="fa fa-lock"
+							outcome="/forgot"
+							styleClass="RedButton Fs18 White RaisedButton Fleft FloatNoneOnMobile" />
+					</div>
+					<div class="EmptyBox20"></div>
+				</div>
+				<div class="Wid100 TexAlCenter MarTop20 Fs14 FontRobotoRegular Gray">
+					<i class="fa fa-copyright"></i>
+					<h:outputText value="#{cst['application.copyright']}" />
+					<br />
+					<h:outputText value="#{cst['application.address']}" />
+				</div>
+			</div>
+		</div>
+	</form>
+
+	<h:outputStylesheet name="css/core-layout.css" library="modena-layout" />
+	<h:outputStylesheet name="css/animate.css" library="modena-layout" />
+	<h:outputStylesheet name="css/modena-font.css" library="modena-layout" />
+	<h:outputStylesheet name="css/ripple-effect.css"
+		library="modena-layout" />
+	<h:outputStylesheet name="css/font-awesome.css" library="modena-layout" />
+	<h:outputStylesheet name="css/modena-layout.css"
+		library="modena-layout" />
+</h:body>
 
 </html>
