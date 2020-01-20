@@ -22,7 +22,7 @@ import am.chronograph.service.user.UserService;
  * @author tigranbabloyan
  *
  */
-@Aspect
+@Aspect 
 @Component
 class AuditAwareAspect {
 
