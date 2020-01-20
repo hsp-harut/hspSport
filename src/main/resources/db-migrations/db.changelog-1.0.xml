@@ -1,377 +1,433 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
-         
-    <changeSet id="2015-03-05/001" author="tigran">    	
-    	
-    	<createTable tableName="permissions">
-        	<column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="name" type="VARCHAR(255)">
-            	<constraints nullable="false"/>
-            </column>
-            <column name="key" type="VARCHAR(255)">
-            	<constraints nullable="false"/>
-            </column>
-            <column name="ikey" type="VARCHAR(255)">
-            	<constraints nullable="false"/>
-            </column>
-        </createTable>
-                
-    	<insert tableName="permissions">
-    		<column name="id" value="1" />
-    		<column name="name" value="Administrator" />
-    		<column name="key" value="ROLE_ADMIN" />
-    		<column name="ikey" value="permission.super.admin"/>
-    	</insert>    
-        
-        
-    	<createTable tableName="roles">
-    		<column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="name" type="VARCHAR(255)">
-                <constraints nullable="false" unique="true" uniqueConstraintName="uq_Role_Name"/>
-            </column>
-           
-            <column name="hidden" type="BIT" defaultValueBoolean="false" >
-            	<constraints nullable="false"/>
-            </column>
-            
-            <column name="created_at" type="DATETIME" >
-            	<constraints nullable="false"/>
-            </column>
-            <column name="modified_at" type="DATETIME" />
-            <column name="created_by" type="BIGINT" >
-            	<constraints nullable="false"/>
-            </column>
-            <column name="modified_by" type="BIGINT" />
-    	</createTable>
-    	
-    	<insert tableName="roles">
-        	<column name="id" valueNumeric="1" />
-    		<column name="name" value="System Admin" />
-    		<column name="hidden" valueBoolean="true" />
-    		<column name="created_at" valueDate="2016-03-05"/>
-    		<column name="created_by" valueNumeric="1"/>    		
-    	</insert>
-    	
-    	<insert tableName="roles">
-        	<column name="id" valueNumeric="2" />
-    		<column name="name" value="Administrator" />
-    		<column name="hidden" valueBoolean="false" />
-    		<column name="created_at" valueDate="2017-03-18"/>
-    		<column name="created_by" valueNumeric="1"/>    		
-    	</insert>
-    	
-    	<createTable tableName="role_permission">
-        	<column name="role" type="BIGINT">
-        		<constraints nullable="false" foreignKeyName="fx_RP_role" referencedTableName="roles" referencedColumnNames="id"/>
-        	</column>
-        	<column name="permission" type="BIGINT">
-        		<constraints nullable="false" foreignKeyName="fx_RP_permission" referencedTableName="permissions" referencedColumnNames="id"/>
-        	</column>
-        </createTable>
-        <addUniqueConstraint constraintName="ux_RP_unque" columnNames="role,permission" tableName="role_permission"/>
-        
-        
-        <insert tableName="role_permission">
-    		<column name="role" value="2" />
-    		<column name="permission" value="1" />    		
-    	</insert>
-        
-    	
-        <createTable tableName="users">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            
-            <column name="email" type="VARCHAR(255)">
-                <constraints nullable="false" unique="true" uniqueConstraintName="uq_User_Email"/>
-            </column>
-            
-            <column name="first_name" type="VARCHAR(255)" >
-            	<constraints nullable="false"/>
-            </column>
-            
-            <column name="last_name" type="VARCHAR(255)" >
-            	<constraints nullable="false"/>
-            </column>
-            
-            <column name="password" type="VARCHAR(255)" />
-            
-            <column name="activation_code" type="VARCHAR(50)" />
-            
-            <column name="language_code" type="VARCHAR(3)" />
-            
-            <column name="deleted" type="BIT NOT NULL" defaultValueBoolean="false" >
-            	<constraints nullable="false"/>
-            </column>
-            
-            <column name="disabled" type="BIT NOT NULL" defaultValueBoolean="false" >
-            	<constraints nullable="false"/>
-            </column>
-            
-            <column name="created_at" type="DATETIME">
-            	<constraints nullable="false"/>
-            </column>
-            
-            <column name="modified_at" type="DATETIME" />
-            
-            <column name="created_by" type="BIGINT">
-            	<constraints nullable="false"/>
-            </column>
-            
-            <column name="modified_by" type="BIGINT" />
-        </createTable>
-        
-        <createTable tableName="user_role">
-        	<column name="user" type="BIGINT">
-        		<constraints nullable="false" foreignKeyName="fx_UR_user" referencedTableName="users" referencedColumnNames="id"/>
-        	</column>
-        	<column name="role" type="BIGINT">
-        		<constraints nullable="false" foreignKeyName="fx_UR_role" referencedTableName="roles" referencedColumnNames="id"/>
-        	</column>
-        </createTable>
-        <addUniqueConstraint constraintName="ux_UR_unique" columnNames="user,role" tableName="user_role"/>
-        
-        <insert tableName="users">
-        	<column name="id" valueNumeric="1" />
-    		<column name="email" value="admin@hsp.am" />
-    		<column name="first_name" value="Admin" />
-    		<column name="last_name" value="Adminyan" />
-    		<column name="password" value="$2a$10$LzLcrL4TCskVtUDSMkPk..AK95Gp2aYok2kMghHKf0tQ4J4HQy5XS"/>
-    		<column name="deleted" valueBoolean="false"/>
-    		<column name="disabled" valueBoolean="false"/>
-    		<column name="created_at" valueDate="2016-03-05"/>
-    		<column name="created_by" valueNumeric="1"/>
-    	</insert>
-    	
-    	<insert tableName="users">
-    		<column name="id" valueNumeric="2" />
-    		<column name="email" value="it@bablsoft.com" />
-    		<column name="first_name" value="It" />
-    		<column name="last_name" value="Support" />
-    		<column name="password" value="$2a$10$BZyweDWAsM.sXn7WDJPsVONuSPC3Yx/loDa.EOCvrmZRD1l5iNgwC"/>
-    		<column name="deleted" valueBoolean="false"/>
-    		<column name="disabled" valueBoolean="false"/>
-    		<column name="created_at" valueDate="2016-03-11"/>
-    		<column name="created_by" valueNumeric="1"/>
-    	</insert>
-    	
-    	<insert tableName="user_role">
-    		<column name="user" valueNumeric="1"/>
-    		<column name="role" valueNumeric="1"/>
-    	</insert>
-    	
-    	<insert tableName="user_role">
-    		<column name="user" valueNumeric="2"/>
-    		<column name="role" valueNumeric="1"/>
-    	</insert>
-    	
-    </changeSet>
-    
-    <changeSet id="2016-05-17/001" author="tigran">
-    	<createTable tableName="email_template">
-    		<column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="subject" type="VARCHAR(255)" >
-                <constraints nullable="false"/>
-            </column>
-            <column name="body" type="TEXT" >
-                <constraints nullable="false"/>
-            </column>
-            <column name="title" type="VARCHAR(255)" >
-                <constraints nullable="false"/>
-            </column>
-            <column name="type" type="VARCHAR(64)" >
-                <constraints nullable="false" unique="true" uniqueConstraintName="ux_EmailTemplate_Type"/>
-            </column>
-    	</createTable>
-    </changeSet>   
-    
-    <changeSet id="2017-02-19/001" author="harut">    
-    	<createTable tableName="contract">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            
-            <column name="contractNumber" type="VARCHAR(30)">
-            	<constraints nullable="false" unique="true" uniqueConstraintName="uq_contract_number"/>
-            </column>
-            
-            <column name="bankAccountNumber" type="VARCHAR(16)">
-            	<constraints nullable="false"/>
-            </column>
-                        
-            <column name="first_name" type="VARCHAR(255)" >
-            	<constraints nullable="false"/>
-            </column>
-            
-            <column name="last_name" type="VARCHAR(255)" >
-            	<constraints nullable="false"/>
-            </column>
-            
-            <column name="middle_name" type="VARCHAR(255)" >
-            	<constraints nullable="false"/>
-            </column>
-            
-            <column name="address" type="VARCHAR(255)"/>
-            
-            <column name="working_place" type="VARCHAR(255)"/>
-            
-            <column name="hotel" type="VARCHAR(255)"/>
-            
-            <column name="nights_number" type="INT"/>
-            
-            <column name="agent" type="VARCHAR(255)"/>
-            
-            <column name="amount_old" type="DOUBLE" defaultValueNumeric="0"/>
 
-            <column name="amount_new" type="DOUBLE" defaultValueNumeric="0"/>
-            	
-            <column name="amount_relax" type="DOUBLE" defaultValueNumeric="0"/>
-            	
-            <column name="amount_personal" type="DOUBLE" defaultValueNumeric="0"/>
-            	
-            <column name="amount_total" type="DOUBLE" defaultValueNumeric="0"/>
-            
-            <column name="periodic_payment" type="DOUBLE" defaultValueNumeric="0"/>
-            
-            <column name="amount_remains" type="DOUBLE" defaultValueNumeric="0"/>            	            
-            
-            <column name="isCopy" type="BIT" defaultValueBoolean="false" >
-            	<constraints nullable="false"/>
-            </column>
-            
-            <column name="status" type="ENUM('Overdue', 'Paid', 'Overpaid')"/>            	
-            
-            <column name="contract_start_date" type="DATETIME">
-            	<constraints nullable="false"/>
-            </column>
-            
-            <column name="contract_end_date" type="DATETIME"/>
-                        
-            <column name="created_at" type="DATETIME">
-            	<constraints nullable="false"/>
-            </column>
-            
-            <column name="modified_at" type="DATETIME"/>
-            
-            <column name="created_by" type="BIGINT">
-            	<constraints nullable="false"/>
-            </column>
-            
-            <column name="modified_by" type="BIGINT" />
-        </createTable>
- 	</changeSet>
- 	
- 	<changeSet id="2017-02-19/002" author="harut">    
-    	<createTable tableName="excels_imported">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            
-            <column name="file_name" type="VARCHAR(100)" >
-            	<constraints nullable="false"/>
-            </column>
-            
-            <column name="rows" type="INT"/>
-            
-			<column name="rows_updated" type="INT"/>
-			
-			<column name="rows_skipped_zero_amount" type="INT"/>
-			
-			<column name="rows_no_contract_found" type="INT"/>
-			
-			<column name="content_type" type="VARCHAR(100)">
-	        	<constraints nullable="false"/>
-	        </column>
-			
-			<column name="size" type="DOUBLE" />
-                        
-            <column name="created_at" type="DATETIME">
-            	<constraints nullable="false"/>
-            </column>
-            
-            <column name="modified_at" type="DATETIME"/>
-            
-            <column name="created_by" type="BIGINT">
-            	<constraints nullable="false"/>
-            </column>
-            
-            <column name="modified_by" type="BIGINT" />
-        </createTable>
-        
-        <createTable tableName="excel_contract_income">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            
-            <column name="excel_id" type="BIGINT">
-        		<constraints nullable="false" foreignKeyName="ec_excel" referencedTableName="excels_imported" referencedColumnNames="id" deleteCascade="true"/>
-        	</column>
-        	
-        	<column name="contract_id" type="BIGINT">
-        		<constraints nullable="false" foreignKeyName="ec_contract" referencedTableName="contract" referencedColumnNames="id" deleteCascade="true"/>
-        	</column>
-			
-			<column name="income" type="DOUBLE" defaultValueNumeric="0">
-				<constraints nullable="false"/>
+	<changeSet id="2015-03-05/001" author="tigran">
+
+		<createTable tableName="permissions">
+			<column name="id" type="BIGINT" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
 			</column>
-			
-			<column name="date_in_excel" type="DATETIME"/>
-                        
-            <column name="created_at" type="DATETIME">
-            	<constraints nullable="false"/>
-            </column>
-            
-            <column name="modified_at" type="DATETIME"/>
-            
-            <column name="created_by" type="BIGINT">
-            	<constraints nullable="false"/>
-            </column>
-            
-            <column name="modified_by" type="BIGINT" />
-        </createTable>
- 	</changeSet>
- 	
- 	
- 	<changeSet id="2017-03-28/001" author="harut">
- 		<modifyDataType tableName="contract" columnName="bankAccountNumber" newDataType="VARCHAR(50)"/>
- 	</changeSet> 
- 	
- 	<changeSet id="2017-03-31/001" author="harut">
- 		<sql>
-    		UPDATE users SET first_name = 'Artur', last_name = 'Apyan' WHERE id = 2;
-    		UPDATE user_role SET role = 2 WHERE user = 2;
-    	</sql>
- 	</changeSet>
- 	
- 	<changeSet id="2017-04-11/001" author="harut">
- 		<addColumn tableName="contract">   
-	    	<column name="contract_enter_date" type="DATETIME" afterColumn="contract_end_date"/>	        
-        </addColumn>
- 	
- 		<sql>
-    		UPDATE contract SET contract_enter_date = created_at;    
-    	</sql>
- 	</changeSet>
- 	
- 	<changeSet id="2017-05-25/001" author="harut">
- 		<addColumn tableName="contract">   
-	    	<column name="peiodic_last_updated_at" type="DATETIME" afterColumn="contract_enter_date"/>	        
-        </addColumn>
- 	
- 		<sql>
-    		UPDATE contract SET peiodic_last_updated_at = contract_start_date;    
-    	</sql>
- 	</changeSet>
- 	
-    
+			<column name="name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="key" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="ikey" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+
+		<insert tableName="permissions">
+			<column name="id" value="1" />
+			<column name="name" value="Administrator" />
+			<column name="key" value="ROLE_ADMIN" />
+			<column name="ikey" value="permission.super.admin" />
+		</insert>
+
+
+		<createTable tableName="roles">
+			<column name="id" type="BIGINT" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="name" type="VARCHAR(255)">
+				<constraints nullable="false" unique="true"
+					uniqueConstraintName="uq_Role_Name" />
+			</column>
+
+			<column name="hidden" type="BIT" defaultValueBoolean="false">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="created_at" type="DATETIME">
+				<constraints nullable="false" />
+			</column>
+			<column name="modified_at" type="DATETIME" />
+			<column name="created_by" type="BIGINT">
+				<constraints nullable="false" />
+			</column>
+			<column name="modified_by" type="BIGINT" />
+		</createTable>
+
+		<insert tableName="roles">
+			<column name="id" valueNumeric="1" />
+			<column name="name" value="System Admin" />
+			<column name="hidden" valueBoolean="true" />
+			<column name="created_at" valueDate="2016-03-05" />
+			<column name="created_by" valueNumeric="1" />
+		</insert>
+
+		<insert tableName="roles">
+			<column name="id" valueNumeric="2" />
+			<column name="name" value="Administrator" />
+			<column name="hidden" valueBoolean="false" />
+			<column name="created_at" valueDate="2017-03-18" />
+			<column name="created_by" valueNumeric="1" />
+		</insert>
+
+		<createTable tableName="role_permission">
+			<column name="role" type="BIGINT">
+				<constraints nullable="false"
+					foreignKeyName="fx_RP_role" referencedTableName="roles"
+					referencedColumnNames="id" />
+			</column>
+			<column name="permission" type="BIGINT">
+				<constraints nullable="false"
+					foreignKeyName="fx_RP_permission" referencedTableName="permissions"
+					referencedColumnNames="id" />
+			</column>
+		</createTable>
+		<addUniqueConstraint constraintName="ux_RP_unque"
+			columnNames="role,permission" tableName="role_permission" />
+
+
+		<insert tableName="role_permission">
+			<column name="role" value="2" />
+			<column name="permission" value="1" />
+		</insert>
+
+
+		<createTable tableName="users">
+			<column name="id" type="BIGINT" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+
+			<column name="email" type="VARCHAR(255)">
+				<constraints nullable="false" unique="true"
+					uniqueConstraintName="uq_User_Email" />
+			</column>
+
+			<column name="first_name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="last_name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="password" type="VARCHAR(255)" />
+
+			<column name="activation_code" type="VARCHAR(50)" />
+
+			<column name="language_code" type="VARCHAR(3)" />
+
+			<column name="deleted" type="BIT NOT NULL"
+				defaultValueBoolean="false">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="disabled" type="BIT NOT NULL"
+				defaultValueBoolean="false">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="created_at" type="DATETIME">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="modified_at" type="DATETIME" />
+
+			<column name="created_by" type="BIGINT">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="modified_by" type="BIGINT" />
+		</createTable>
+
+		<createTable tableName="user_role">
+			<column name="user" type="BIGINT">
+				<constraints nullable="false"
+					foreignKeyName="fx_UR_user" referencedTableName="users"
+					referencedColumnNames="id" />
+			</column>
+			<column name="role" type="BIGINT">
+				<constraints nullable="false"
+					foreignKeyName="fx_UR_role" referencedTableName="roles"
+					referencedColumnNames="id" />
+			</column>
+		</createTable>
+		<addUniqueConstraint constraintName="ux_UR_unique"
+			columnNames="user,role" tableName="user_role" />
+
+		<insert tableName="users">
+			<column name="id" valueNumeric="1" />
+			<column name="email" value="admin@hsp.am" />
+			<column name="first_name" value="Admin" />
+			<column name="last_name" value="Adminyan" />
+			<column name="password"
+				value="$2a$10$LzLcrL4TCskVtUDSMkPk..AK95Gp2aYok2kMghHKf0tQ4J4HQy5XS" />
+			<column name="deleted" valueBoolean="false" />
+			<column name="disabled" valueBoolean="false" />
+			<column name="created_at" valueDate="2016-03-05" />
+			<column name="created_by" valueNumeric="1" />
+		</insert>
+
+		<insert tableName="users">
+			<column name="id" valueNumeric="2" />
+			<column name="email" value="it@bablsoft.com" />
+			<column name="first_name" value="It" />
+			<column name="last_name" value="Support" />
+			<column name="password"
+				value="$2a$10$BZyweDWAsM.sXn7WDJPsVONuSPC3Yx/loDa.EOCvrmZRD1l5iNgwC" />
+			<column name="deleted" valueBoolean="false" />
+			<column name="disabled" valueBoolean="false" />
+			<column name="created_at" valueDate="2016-03-11" />
+			<column name="created_by" valueNumeric="1" />
+		</insert>
+
+		<insert tableName="user_role">
+			<column name="user" valueNumeric="1" />
+			<column name="role" valueNumeric="1" />
+		</insert>
+
+		<insert tableName="user_role">
+			<column name="user" valueNumeric="2" />
+			<column name="role" valueNumeric="1" />
+		</insert>
+
+	</changeSet>
+
+	<changeSet id="2016-05-17/001" author="tigran">
+		<createTable tableName="email_template">
+			<column name="id" type="BIGINT" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="subject" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="body" type="TEXT">
+				<constraints nullable="false" />
+			</column>
+			<column name="title" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="type" type="VARCHAR(64)">
+				<constraints nullable="false" unique="true"
+					uniqueConstraintName="ux_EmailTemplate_Type" />
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet id="2017-02-19/001" author="harut">
+		<createTable tableName="contract">
+			<column name="id" type="BIGINT" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+
+			<column name="contractNumber" type="VARCHAR(30)">
+				<constraints nullable="false" unique="true"
+					uniqueConstraintName="uq_contract_number" />
+			</column>
+
+			<column name="bankAccountNumber" type="VARCHAR(16)">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="first_name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="last_name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="middle_name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="address" type="VARCHAR(255)" />
+
+			<column name="working_place" type="VARCHAR(255)" />
+
+			<column name="hotel" type="VARCHAR(255)" />
+
+			<column name="nights_number" type="INT" />
+
+			<column name="agent" type="VARCHAR(255)" />
+
+			<column name="amount_old" type="DOUBLE"
+				defaultValueNumeric="0" />
+
+			<column name="amount_new" type="DOUBLE"
+				defaultValueNumeric="0" />
+
+			<column name="amount_relax" type="DOUBLE"
+				defaultValueNumeric="0" />
+
+			<column name="amount_personal" type="DOUBLE"
+				defaultValueNumeric="0" />
+
+			<column name="amount_total" type="DOUBLE"
+				defaultValueNumeric="0" />
+
+			<column name="periodic_payment" type="DOUBLE"
+				defaultValueNumeric="0" />
+
+			<column name="amount_remains" type="DOUBLE"
+				defaultValueNumeric="0" />
+
+			<column name="isCopy" type="BIT" defaultValueBoolean="false">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="status"
+				type="ENUM('Overdue', 'Paid', 'Overpaid')" />
+
+			<column name="contract_start_date" type="DATETIME">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="contract_end_date" type="DATETIME" />
+
+			<column name="created_at" type="DATETIME">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="modified_at" type="DATETIME" />
+
+			<column name="created_by" type="BIGINT">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="modified_by" type="BIGINT" />
+		</createTable>
+	</changeSet>
+
+	<changeSet id="2017-02-19/002" author="harut">
+		<createTable tableName="excels_imported">
+			<column name="id" type="BIGINT" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+
+			<column name="file_name" type="VARCHAR(100)">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="rows" type="INT" />
+
+			<column name="rows_updated" type="INT" />
+
+			<column name="rows_skipped_zero_amount" type="INT" />
+
+			<column name="rows_no_contract_found" type="INT" />
+
+			<column name="content_type" type="VARCHAR(100)">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="size" type="DOUBLE" />
+
+			<column name="created_at" type="DATETIME">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="modified_at" type="DATETIME" />
+
+			<column name="created_by" type="BIGINT">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="modified_by" type="BIGINT" />
+		</createTable>
+
+		<createTable tableName="excel_contract_income">
+			<column name="id" type="BIGINT" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+
+			<column name="excel_id" type="BIGINT">
+				<constraints nullable="false" foreignKeyName="ec_excel"
+					referencedTableName="excels_imported" referencedColumnNames="id"
+					deleteCascade="true" />
+			</column>
+
+			<column name="contract_id" type="BIGINT">
+				<constraints nullable="false"
+					foreignKeyName="ec_contract" referencedTableName="contract"
+					referencedColumnNames="id" deleteCascade="true" />
+			</column>
+
+			<column name="income" type="DOUBLE" defaultValueNumeric="0">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="date_in_excel" type="DATETIME" />
+
+			<column name="created_at" type="DATETIME">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="modified_at" type="DATETIME" />
+
+			<column name="created_by" type="BIGINT">
+				<constraints nullable="false" />
+			</column>
+
+			<column name="modified_by" type="BIGINT" />
+		</createTable>
+	</changeSet>
+
+
+	<changeSet id="2017-03-28/001" author="harut">
+		<modifyDataType tableName="contract"
+			columnName="bankAccountNumber" newDataType="VARCHAR(50)" />
+	</changeSet>
+
+	<changeSet id="2017-03-31/001" author="harut">
+		<sql>
+			UPDATE users SET first_name = 'Artur', last_name = 'Apyan' WHERE id = 2;
+			UPDATE user_role SET role = 2 WHERE user = 2;
+		</sql>
+	</changeSet>
+
+	<changeSet id="2017-04-11/001" author="harut">
+		<addColumn tableName="contract">
+			<column name="contract_enter_date" type="DATETIME"
+				afterColumn="contract_end_date" />
+		</addColumn>
+
+		<sql>
+			UPDATE contract SET contract_enter_date = created_at;
+		</sql>
+	</changeSet>
+
+	<changeSet id="2017-05-25/001" author="harut">
+		<addColumn tableName="contract">
+			<column name="peiodic_last_updated_at" type="DATETIME"
+				afterColumn="contract_enter_date" />
+		</addColumn>
+
+		<sql>
+			UPDATE contract SET peiodic_last_updated_at = contract_start_date;
+		</sql>
+	</changeSet>
+<changeSet id="2020-01-15/002" author="Grigor">
+		<createTable tableName="students">
+			<column name="id" type="BIGINT" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="first_name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="last_name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="middle_name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="address" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="phon_number" type="INT">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+	
+
+
 </databaseChangeLog>
