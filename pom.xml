@@ -36,7 +36,7 @@
 		<HikariCP.version>2.4.7</HikariCP.version>
 		<hibernate.validator.version>5.2.2.Final</hibernate.validator.version>
 		<mysql.connector.version>5.1.39</mysql.connector.version>
-		<liquibase.version>3.5.1</liquibase.version>
+		<liquibase.version>4.8.0</liquibase.version>
 		<tomcat.version>8.0.33</tomcat.version>
 		<poi.version>3.14</poi.version>
 		<itext.version>5.5.9</itext.version>
